@@ -1,0 +1,52 @@
+#version 400
+
+layout(triangles, equal_spacing) in;
+
+in vec3 tc_colour[];
+in vec3 tc_position[];
+in vec3 tc_worldpos[];
+in vec3 tc_normal[];
+in vec2 tc_tex_coord[];
+flat in uint tc_id[];
+
+out vec3 te_colour;
+out vec4 te_position;
+out vec3 te_normal;
+out vec2 te_tex_coord;
+flat out uint te_id;
+
+uniform mat4 projection_matrix;
+uniform mat4 view_matrix;
+
+uniform sampler2D height_texture;
+uniform float elevation;
+
+void main() {
+    te_id = tc_id[0];
+    te_colour = tc_colour[0];
+
+    vec3 pos = gl_TessCoord.x * tc_position[0] +
+        gl_TessCoord.y * tc_position[1] +
+        gl_TessCoord.z * tc_position[2];
+
+    vec3 worldpos = gl_TessCoord.x * tc_worldpos[0] +
+        gl_TessCoord.y * tc_worldpos[1] +
+        gl_TessCoord.z * tc_worldpos[2];
+
+    vec3 normal = normalize(
+        gl_TessCoord.x * tc_normal[0] +
+        gl_TessCoord.y * tc_normal[1] +
+        gl_TessCoord.z * tc_normal[2]
+    );
+
+    vec2 tex_coord = gl_TessCoord.x * tc_tex_coord[0] +
+        gl_TessCoord.y * tc_tex_coord[1] +
+        gl_TessCoord.z * tc_tex_coord[2];
+
+    float height = length(texture(height_texture, tex_coord));
+    pos -= normal * (2.0 - height) * elevation;
+
+    te_position = projection_matrix * view_matrix * vec4(pos + worldpos, 1.0);
+    te_normal = vec3(view_matrix * vec4(normal, 1.0)).xyz;
+    te_tex_coord = tex_coord;
+}
