@@ -149,21 +149,30 @@ pub mod shapes {
                         texture: [1.0, 1.0],
                     },
                 ],
-            ).unwrap();
+            )
+            .unwrap();
 
             let indices = glium::IndexBuffer::new(
                 display,
                 glium::index::PrimitiveType::TrianglesList,
                 &CUBE_INDICES,
-            ).unwrap();
+            )
+            .unwrap();
 
             let tessellices = glium::IndexBuffer::new(
                 display,
-                glium::index::PrimitiveType::Patches { vertices_per_patch: 3 },
+                glium::index::PrimitiveType::Patches {
+                    vertices_per_patch: 3,
+                },
                 &CUBE_INDICES,
-            ).unwrap();
+            )
+            .unwrap();
 
-            Cube { vertices, indices, tessellices }
+            Cube {
+                vertices,
+                indices,
+                tessellices,
+            }
         }
 
         pub fn vertices(&self) -> &glium::vertex::VertexBuffer<CubeVertex> {
@@ -238,10 +247,7 @@ pub mod shapes {
 
     impl CubeInstances {
         pub fn new(display: &glium::Display) -> Self {
-            let instances = glium::vertex::VertexBuffer::new(
-                display,
-                &CUBE_INSTANCES,
-            ).unwrap();
+            let instances = glium::vertex::VertexBuffer::new(display, &CUBE_INSTANCES).unwrap();
 
             let picked = glium::texture::pixel_buffer::PixelBuffer::new_empty(display, 1);
             picked.write(&[8]);
@@ -279,23 +285,27 @@ pub mod shapes {
     impl SpritesBatch {
         pub fn new(display: &glium::Display) -> Self {
             let sprites = {
-                let images = (0 .. 64).map(|_| {
-                    let color1: (f32, f32, f32) = (rand::random(), rand::random(), rand::random());
-                    let color2: (f32, f32, f32) = (rand::random(), rand::random(), rand::random());
-                    vec![vec![color1], vec![color2]]
-                }).collect::<Vec<_>>();
+                let images = (0..64)
+                    .map(|_| {
+                        let color1: (f32, f32, f32) =
+                            (rand::random(), rand::random(), rand::random());
+                        let color2: (f32, f32, f32) =
+                            (rand::random(), rand::random(), rand::random());
+                        vec![vec![color1], vec![color2]]
+                    })
+                    .collect::<Vec<_>>();
 
                 glium::texture::Texture2dArray::new(display, images).unwrap()
             };
 
             let mut sprite_vectors = Vec::with_capacity(SPRITES_COUNT);
-            for _ in 0 .. SPRITES_COUNT {
+            for _ in 0..SPRITES_COUNT {
                 sprite_vectors.push(Self::random_sprite());
             }
 
             let (vertex_buffer, index_buffer) = {
-
-                let mut vb: glium::VertexBuffer<SpritesBatchVertex> = glium::VertexBuffer::empty_dynamic(display, SPRITES_COUNT * 4).unwrap();
+                let mut vb: glium::VertexBuffer<SpritesBatchVertex> =
+                    glium::VertexBuffer::empty_dynamic(display, SPRITES_COUNT * 4).unwrap();
                 let mut ib_data = Vec::with_capacity(SPRITES_COUNT * 6);
 
                 for (num, sprite) in vb.map().chunks_mut(4).enumerate() {
@@ -324,14 +334,32 @@ pub mod shapes {
                     ib_data.push(num * 4 + 3);
                 }
 
-                (vb, glium::index::IndexBuffer::new(display, glium::index::PrimitiveType::TrianglesList, &ib_data).unwrap())
+                (
+                    vb,
+                    glium::index::IndexBuffer::new(
+                        display,
+                        glium::index::PrimitiveType::TrianglesList,
+                        &ib_data,
+                    )
+                    .unwrap(),
+                )
             };
 
-            SpritesBatch { sprites, sprite_vectors, vertex_buffer, index_buffer }
+            SpritesBatch {
+                sprites,
+                sprite_vectors,
+                vertex_buffer,
+                index_buffer,
+            }
         }
 
         pub fn process_sprites(&mut self) {
-            for (sprite, direction) in self.vertex_buffer.map().chunks_mut(4).zip(&mut self.sprite_vectors) {
+            for (sprite, direction) in self
+                .vertex_buffer
+                .map()
+                .chunks_mut(4)
+                .zip(&mut self.sprite_vectors)
+            {
                 let x = direction[0] / 60.0;
                 let y = direction[1] / 60.0;
                 direction[1] -= 9.832 / 60.0;

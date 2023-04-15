@@ -10,16 +10,17 @@ pub mod engine {
     use glium::glutin::event_loop::{ControlFlow, EventLoop};
 
     pub fn start_loop<F>(event_loop: EventLoop<()>, mut callback: F) -> !
-    where F: 'static + FnMut(&Vec<Event<'_, ()>>) -> Action {
+    where
+        F: 'static + FnMut(&Vec<Event<'_, ()>>) -> Action,
+    {
         let mut events_buffer = Vec::new();
-        let next_frame_time = std::time::Instant::now() + std::time::Duration::from_nanos(16_666_667);
+        let next_frame_time =
+            std::time::Instant::now() + std::time::Duration::from_nanos(16_666_667);
         event_loop.run(move |event, _, control_flow| {
             let run_callback = match event.to_static() {
-                Some(Event::NewEvents(cause)) => {
-                    match cause {
-                        StartCause::ResumeTimeReached { .. } | StartCause::Init => true,
-                        _ => false,
-                    }
+                Some(Event::NewEvents(cause)) => match cause {
+                    StartCause::ResumeTimeReached { .. } | StartCause::Init => true,
+                    _ => false,
                 },
                 Some(event) => {
                     events_buffer.push(event);
@@ -40,16 +41,16 @@ pub mod engine {
             match action {
                 Action::Continue => {
                     *control_flow = ControlFlow::WaitUntil(next_frame_time);
-                },
-                Action::Stop => *control_flow = ControlFlow::Exit
+                }
+                Action::Stop => *control_flow = ControlFlow::Exit,
             }
         })
     }
 }
 
 pub mod input {
-    use crate::CameraState;
     use crate::engine::Action;
+    use crate::CameraState;
 
     use glium::glutin::event::{ElementState, Event, VirtualKeyCode, WindowEvent};
 
@@ -77,7 +78,13 @@ pub mod input {
         }
     }
 
-    pub fn process_input(display: &glium::Display, camera: &mut CameraState, keyboard: &mut KeyboardState, cursor: &mut Option<(i32, i32)>, events: &Vec<Event<'_, ()>>) -> Action {
+    pub fn process_input(
+        display: &glium::Display,
+        camera: &mut CameraState,
+        keyboard: &mut KeyboardState,
+        cursor: &mut Option<(i32, i32)>,
+        events: &Vec<Event<'_, ()>>,
+    ) -> Action {
         let mut action = Action::Continue;
 
         for event in events {
@@ -86,50 +93,78 @@ pub mod input {
                     let main_display = *window_id == display.gl_window().window().id();
 
                     match event {
-                        WindowEvent::CloseRequested => if main_display {
-                            action = Action::Stop
-                        },
+                        WindowEvent::CloseRequested => {
+                            if main_display {
+                                action = Action::Stop
+                            }
+                        }
                         WindowEvent::CursorMoved { position, .. } => {
                             *cursor = Some(position.cast::<i32>().into());
                         }
-                        ev@WindowEvent::KeyboardInput { input, .. } => {
+                        ev @ WindowEvent::KeyboardInput { input, .. } => {
                             match (input.state, input.virtual_keycode) {
-                                (ElementState::Pressed, Some(VirtualKeyCode::Return)) => keyboard.enter_pressed[if main_display { 0 } else { 1 }] = true,
-                                (ElementState::Pressed, Some(VirtualKeyCode::LAlt)) => keyboard.alt_pressed = true,
-                                (ElementState::Pressed, Some(VirtualKeyCode::RAlt)) => keyboard.alt_pressed = true,
-                                (ElementState::Released, Some(VirtualKeyCode::LAlt)) => keyboard.alt_pressed = false,
-                                (ElementState::Released, Some(VirtualKeyCode::RAlt)) => keyboard.alt_pressed = false,
-                                (ElementState::Pressed, Some(VirtualKeyCode::LShift)) => keyboard.shift_pressed = true,
-                                (ElementState::Pressed, Some(VirtualKeyCode::RShift)) => keyboard.shift_pressed = true,
-                                (ElementState::Released, Some(VirtualKeyCode::LShift)) => keyboard.shift_pressed = false,
-                                (ElementState::Released, Some(VirtualKeyCode::RShift)) => keyboard.shift_pressed = false,
-                                (ElementState::Pressed, Some(VirtualKeyCode::Space)) => keyboard.space_pressed = true,
-                                (ElementState::Pressed, Some(VirtualKeyCode::D)) => keyboard.d_pressed = true,
-                                (ElementState::Pressed, Some(VirtualKeyCode::S)) => keyboard.s_pressed = true,
-                                (ElementState::Pressed, Some(VirtualKeyCode::T)) => keyboard.t_pressed = true,
+                                (ElementState::Pressed, Some(VirtualKeyCode::Return)) => {
+                                    keyboard.enter_pressed[if main_display { 0 } else { 1 }] = true
+                                }
+                                (ElementState::Pressed, Some(VirtualKeyCode::LAlt)) => {
+                                    keyboard.alt_pressed = true
+                                }
+                                (ElementState::Pressed, Some(VirtualKeyCode::RAlt)) => {
+                                    keyboard.alt_pressed = true
+                                }
+                                (ElementState::Released, Some(VirtualKeyCode::LAlt)) => {
+                                    keyboard.alt_pressed = false
+                                }
+                                (ElementState::Released, Some(VirtualKeyCode::RAlt)) => {
+                                    keyboard.alt_pressed = false
+                                }
+                                (ElementState::Pressed, Some(VirtualKeyCode::LShift)) => {
+                                    keyboard.shift_pressed = true
+                                }
+                                (ElementState::Pressed, Some(VirtualKeyCode::RShift)) => {
+                                    keyboard.shift_pressed = true
+                                }
+                                (ElementState::Released, Some(VirtualKeyCode::LShift)) => {
+                                    keyboard.shift_pressed = false
+                                }
+                                (ElementState::Released, Some(VirtualKeyCode::RShift)) => {
+                                    keyboard.shift_pressed = false
+                                }
+                                (ElementState::Pressed, Some(VirtualKeyCode::Space)) => {
+                                    keyboard.space_pressed = true
+                                }
+                                (ElementState::Pressed, Some(VirtualKeyCode::D)) => {
+                                    keyboard.d_pressed = true
+                                }
+                                (ElementState::Pressed, Some(VirtualKeyCode::S)) => {
+                                    keyboard.s_pressed = true
+                                }
+                                (ElementState::Pressed, Some(VirtualKeyCode::T)) => {
+                                    keyboard.t_pressed = true
+                                }
                                 _ => (),
                             }
 
                             if main_display {
                                 camera.process_input(&ev);
                             }
-                        },
+                        }
                         _ => (),
                     }
-                },
+                }
                 _ => (),
             }
-        };
+        }
 
         action
     }
 }
 
 pub mod screenshot {
-    use crate::{TargaImage, write_targa};
+    use crate::{write_targa, TargaImage};
 
-    use glium::Surface;
     use glium::texture::{Texture2d, Texture2dDataSink};
+    use glium::Surface;
     use std::borrow::Cow;
     use std::collections::VecDeque;
     use std::vec::Vec;
@@ -173,7 +208,11 @@ pub mod screenshot {
 
             let texture = Texture2d::empty(facade, dimensions.0, dimensions.1).unwrap();
             let framebuffer = glium::framebuffer::SimpleFrameBuffer::new(facade, &texture).unwrap();
-            framebuffer.blit_from_frame(&rect, &blit_target, glium::uniforms::MagnifySamplerFilter::Nearest);
+            framebuffer.blit_from_frame(
+                &rect,
+                &blit_target,
+                glium::uniforms::MagnifySamplerFilter::Nearest,
+            );
 
             let image = texture.read_to_pixel_buffer().read_as_texture_2d().unwrap();
 
@@ -190,7 +229,13 @@ pub mod screenshot {
         type Item = RGBAImageData;
 
         fn next(&mut self) -> Option<RGBAImageData> {
-            if self.0.screenshot_tasks.front().map(|task| task.target_frame) == Some(self.0.frame) {
+            if self
+                .0
+                .screenshot_tasks
+                .front()
+                .map(|task| task.target_frame)
+                == Some(self.0.frame)
+            {
                 let task = self.0.screenshot_tasks.pop_front().unwrap();
                 Some(task.image)
             } else {
@@ -223,9 +268,10 @@ pub mod screenshot {
         }
 
         pub fn take_screenshot(&mut self, facade: &dyn glium::backend::Facade) {
-            self.screenshot_tasks.push_back(
-                AsyncScreenshotTask::new(facade, self.frame + self.screenshot_delay)
-            );
+            self.screenshot_tasks.push_back(AsyncScreenshotTask::new(
+                facade,
+                self.frame + self.screenshot_delay,
+            ));
         }
 
         pub fn process_screenshots(&mut self) {
@@ -243,11 +289,11 @@ pub mod screenshot {
                         v
                     };
 
-                    write_targa("screenshot.tga", TargaImage::new(
-                        pixels,
-                        image_data.width as u16,
-                        image_data.height as u16)
-                    ).unwrap();
+                    write_targa(
+                        "screenshot.tga",
+                        TargaImage::new(pixels, image_data.width as u16, image_data.height as u16),
+                    )
+                    .unwrap();
                 });
             }
         }
@@ -269,7 +315,11 @@ pub mod simple_targa {
             let width = width as u32;
             let height = height as u32;
 
-            TargaImage { bytes, width, height }
+            TargaImage {
+                bytes,
+                width,
+                height,
+            }
         }
     }
 
@@ -290,8 +340,8 @@ pub mod simple_targa {
         if components != 32 {
             panic!("unexpected TGA format");
         }
-        let width = data[TGA_WIDTH+1] as u32 * 256 + data[TGA_WIDTH] as u32;
-        let height = data[TGA_HEIGHT+1] as u32 * 256 + data[TGA_HEIGHT] as u32;
+        let width = data[TGA_WIDTH + 1] as u32 * 256 + data[TGA_WIDTH] as u32;
+        let height = data[TGA_HEIGHT + 1] as u32 * 256 + data[TGA_HEIGHT] as u32;
         let mut bytes = Vec::new();
         for i in 0..(width * height) as usize {
             let index = TGA_HDR + 4 * i;
@@ -302,15 +352,19 @@ pub mod simple_targa {
             bytes.push(data[index + 3]);
         }
 
-        Ok(TargaImage { bytes, width, height })
+        Ok(TargaImage {
+            bytes,
+            width,
+            height,
+        })
     }
 
     pub fn write_targa(path: &str, mut image: TargaImage) -> Result<()> {
         let mut header = [0u8, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0];
         header[TGA_WIDTH] = (image.width % 256) as u8;
-        header[TGA_WIDTH+1] = (image.width / 256) as u8;
+        header[TGA_WIDTH + 1] = (image.width / 256) as u8;
         header[TGA_HEIGHT] = (image.height % 256) as u8;
-        header[TGA_HEIGHT+1] = (image.height / 256) as u8;
+        header[TGA_HEIGHT + 1] = (image.height / 256) as u8;
 
         let mut file = File::create(path)?;
 

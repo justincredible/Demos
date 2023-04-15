@@ -52,15 +52,31 @@ impl CameraState {
 
     pub fn get_view(&self) -> Mat4 {
         let f = self.direction.normalize();
-        let up = if f.cross(Vec3::Y).length() < 0.001 { -Vec3::Z } else  { Vec3::Y };
+        let up = if f.cross(Vec3::Y).length() < 0.001 {
+            -Vec3::Z
+        } else {
+            Vec3::Y
+        };
         let s = f.cross(up).normalize();
         let u = s.cross(f).normalize();
 
         Mat4::from_cols_array(&[
-            s.x, u.x, f.x, 0.0, // c0
-            s.y, u.y, f.y, 0.0, // c1
-            s.z, u.z, f.z, 0.0, // c2
-            -s.dot(self.position), -u.dot(self.position), -f.dot(self.position), 1.0
+            s.x,
+            u.x,
+            f.x,
+            0.0, // c0
+            s.y,
+            u.y,
+            f.y,
+            0.0, // c1
+            s.z,
+            u.z,
+            f.z,
+            0.0, // c2
+            -s.dot(self.position),
+            -u.dot(self.position),
+            -f.dot(self.position),
+            1.0,
         ])
     }
 
@@ -74,9 +90,11 @@ impl CameraState {
 
         let up = (0.0, 1.0, 0.0);
 
-        let s = (f.1 * up.2 - f.2 * up.1,
-                 f.2 * up.0 - f.0 * up.2,
-                 f.0 * up.1 - f.1 * up.0);
+        let s = (
+            f.1 * up.2 - f.2 * up.1,
+            f.2 * up.0 - f.0 * up.2,
+            f.0 * up.1 - f.1 * up.0,
+        );
 
         let s = {
             let len = s.0 * s.0 + s.1 * s.1 + s.2 * s.2;
@@ -84,9 +102,11 @@ impl CameraState {
             (s.0 / len, s.1 / len, s.2 / len)
         };
 
-        let u = (s.1 * f.2 - s.2 * f.1,
-                 s.2 * f.0 - s.0 * f.2,
-                 s.0 * f.1 - s.1 * f.0);
+        let u = (
+            s.1 * f.2 - s.2 * f.1,
+            s.2 * f.0 - s.0 * f.2,
+            s.0 * f.1 - s.1 * f.0,
+        );
 
         const DELTA: f32 = 0.03f32;
 

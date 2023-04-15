@@ -7,18 +7,18 @@ pub mod debug;
 use debug::{DebugWindow, HALF_DEBUG};
 pub mod engine;
 use engine::engine::start_loop;
-use engine::input::{KeyboardState, process_input};
+use engine::input::{process_input, KeyboardState};
 use engine::screenshot::AsyncScreenshotTaker;
-use engine::simple_targa::{read_targa, TargaImage, write_targa};
+use engine::simple_targa::{read_targa, write_targa, TargaImage};
 pub mod fxaa;
 pub mod shapes;
-use shapes::shapes::{Cube, CUBE_INSTANCES, CubeInstances, SPRITES_COUNT, SpritesBatch};
+use shapes::shapes::{Cube, CubeInstances, SpritesBatch, CUBE_INSTANCES, SPRITES_COUNT};
 
 use glam::{Mat4, Quat, Vec3};
-use glium::{Api, Profile, Surface, Version};
 use glium::glutin;
 use glium::glutin::window::Fullscreen;
 use glium::program::ProgramCreationInput;
+use glium::{Api, Profile, Surface, Version};
 use std::f32::consts::TAU;
 use std::fs::File;
 use std::io::Read;
@@ -46,25 +46,55 @@ fn main() {
     let cube = Cube::new(&display);
     let cubes = CubeInstances::new(&display);
 
-    let subroutine_shader = glium::Program::from_source(&display, &read_shader("src/subroutine.vs").unwrap(), &read_shader("src/subroutine.fs").unwrap(), None).unwrap();
-    let tessellancing_shader = glium::Program::new(&display, glium::program::SourceCode {
-        vertex_shader: &read_shader("src/tessellancing.vs").unwrap(),
-        tessellation_control_shader: Some(&read_shader("src/tessellancing.tcs").unwrap()),
-        tessellation_evaluation_shader: Some(&read_shader("src/tessellancing.tes").unwrap()),
-        geometry_shader: Some(&read_shader("src/tessellancing.gs").unwrap()),
-        fragment_shader: &read_shader("src/tessellancing.fs").unwrap(),
-    }).unwrap();
-    let sprites_shader = glium::Program::from_source(&display, &read_shader("src/sprites.vs").unwrap(), &read_shader("src/sprites.fs").unwrap(), None).unwrap();
-    let shadow_map_shader = glium::Program::from_source(&display, &read_shader("src/shadow_map.vs").unwrap(), &read_shader("src/shadow_map.fs").unwrap(), None).unwrap();
-    let shadows_shader = glium::Program::from_source(&display, &read_shader("src/shadows.vs").unwrap(), &read_shader("src/shadows.fs").unwrap(), None).unwrap();
+    let subroutine_shader = glium::Program::from_source(
+        &display,
+        &read_shader("src/subroutine.vs").unwrap(),
+        &read_shader("src/subroutine.fs").unwrap(),
+        None,
+    )
+    .unwrap();
+    let tessellancing_shader = glium::Program::new(
+        &display,
+        glium::program::SourceCode {
+            vertex_shader: &read_shader("src/tessellancing.vs").unwrap(),
+            tessellation_control_shader: Some(&read_shader("src/tessellancing.tcs").unwrap()),
+            tessellation_evaluation_shader: Some(&read_shader("src/tessellancing.tes").unwrap()),
+            geometry_shader: Some(&read_shader("src/tessellancing.gs").unwrap()),
+            fragment_shader: &read_shader("src/tessellancing.fs").unwrap(),
+        },
+    )
+    .unwrap();
+    let sprites_shader = glium::Program::from_source(
+        &display,
+        &read_shader("src/sprites.vs").unwrap(),
+        &read_shader("src/sprites.fs").unwrap(),
+        None,
+    )
+    .unwrap();
+    let shadow_map_shader = glium::Program::from_source(
+        &display,
+        &read_shader("src/shadow_map.vs").unwrap(),
+        &read_shader("src/shadow_map.fs").unwrap(),
+        None,
+    )
+    .unwrap();
+    let shadows_shader = glium::Program::from_source(
+        &display,
+        &read_shader("src/shadows.vs").unwrap(),
+        &read_shader("src/shadows.fs").unwrap(),
+        None,
+    )
+    .unwrap();
 
     let targa = read_targa("resource/opengl.tga").unwrap();
-    let tessell_img = glium::texture::RawImage2d::from_raw_rgba(targa.bytes, (targa.width, targa.height));
+    let tessell_img =
+        glium::texture::RawImage2d::from_raw_rgba(targa.bytes, (targa.width, targa.height));
     let dbg_img = glium::texture::RawImage2d::from_raw_rgba(
         (&tessell_img.data).to_vec(),
         (tessell_img.width, tessell_img.height),
     );
-    let opengl_texture = glium::texture::CompressedSrgbTexture2d::new(&display, tessell_img).unwrap();
+    let opengl_texture =
+        glium::texture::CompressedSrgbTexture2d::new(&display, tessell_img).unwrap();
     let debug_texture = glium::Texture2d::new(&display, dbg_img).unwrap();
     debug_texture.as_surface().blit_whole_color_to(
         &debug.image().as_surface(),
@@ -79,14 +109,16 @@ fn main() {
 
     const SHADOW_MAP_SIZE: u32 = 1024;
 
-    let shadow_texture = glium::Texture2d::empty(&display, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE).unwrap();
+    let shadow_texture =
+        glium::Texture2d::empty(&display, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE).unwrap();
     let shadow_rect = glium::BlitTarget {
         left: 0,
         bottom: 0,
         width: SHADOW_MAP_SIZE as i32 / 2,
         height: SHADOW_MAP_SIZE as i32 / 2,
     };
-    let depth_texture = glium::texture::DepthTexture2d::empty(&display, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE).unwrap();
+    let depth_texture =
+        glium::texture::DepthTexture2d::empty(&display, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE).unwrap();
 
     let config_texture_0 = glium::texture::UnsignedTexture2d::empty_with_format(
         &display,
@@ -94,24 +126,39 @@ fn main() {
         glium::texture::MipmapsOption::NoMipmap,
         HALF_DEBUG,
         HALF_DEBUG,
-    ).unwrap();
+    )
+    .unwrap();
     let config_texture_1 = glium::texture::UnsignedTexture2d::empty_with_format(
         &display,
         glium::texture::UncompressedUintFormat::U8,
         glium::texture::MipmapsOption::NoMipmap,
         HALF_DEBUG,
         HALF_DEBUG,
-    ).unwrap();
+    )
+    .unwrap();
     let final_texture = glium::texture::Texture2d::empty_with_format(
         &display,
         glium::texture::UncompressedFloatFormat::U8U8U8U8,
         glium::texture::MipmapsOption::NoMipmap,
         HALF_DEBUG,
         HALF_DEBUG,
-    ).unwrap();
-    let gol_init_program = glium::program::ComputeShader::from_source(&display, &read_shader("src/gol_init.cs").unwrap()).unwrap();
-    let gol_exec_program = glium::program::ComputeShader::from_source(&display, &read_shader("src/gol_exec.cs").unwrap()).unwrap();
-    let gol_copy_program = glium::program::ComputeShader::from_source(&display, &read_shader("src/gol_copy.cs").unwrap()).unwrap();
+    )
+    .unwrap();
+    let gol_init_program = glium::program::ComputeShader::from_source(
+        &display,
+        &read_shader("src/gol_init.cs").unwrap(),
+    )
+    .unwrap();
+    let gol_exec_program = glium::program::ComputeShader::from_source(
+        &display,
+        &read_shader("src/gol_exec.cs").unwrap(),
+    )
+    .unwrap();
+    let gol_copy_program = glium::program::ComputeShader::from_source(
+        &display,
+        &read_shader("src/gol_copy.cs").unwrap(),
+    )
+    .unwrap();
     let image_unit = config_texture_0
         .image_unit(glium::uniforms::ImageUnitFormat::R8UI)
         .unwrap()
@@ -153,7 +200,6 @@ fn main() {
 
     let start = std::time::Instant::now();
     start_loop(event_loop, move |events| {
-
         let mut take_screenshot = false;
 
         if counter < 10 {
@@ -247,7 +293,7 @@ fn main() {
             _ => {
                 j = 0;
                 "ColourNone"
-            },
+            }
         };
 
         let window_size = display.gl_window().window().inner_size();
@@ -259,7 +305,11 @@ fn main() {
         let view = camera.get_view();
         let project_view = projection * view;
         let model = Mat4::from_axis_angle(Vec3::ONE.normalize(), angle);
-        let floor = Mat4::from_scale_rotation_translation(Vec3::new(10.0, 10.0, 0.01), Quat::IDENTITY, -3.0 * Vec3::Z);
+        let floor = Mat4::from_scale_rotation_translation(
+            Vec3::new(10.0, 10.0, 0.01),
+            Quat::IDENTITY,
+            -3.0 * Vec3::Z,
+        );
         let ring = Mat4::from_rotation_z(i as f32 / 8.0 / SUBR_DUR as f32 * TAU);
         const LIGHT_LOC: [f32; 3] = [-2.24593993, 5.0, 7.98890769];
         let depth_projection = Mat4::orthographic_rh(-4.0, 4.0, -4.0, 4.0, -10.0, 20.0);
@@ -267,9 +317,13 @@ fn main() {
         let project_depth = depth_projection * depth_view;
 
         sprites_batch.process_sprites();
-        let ib_slice = sprites_batch.index_buffer().slice(0 .. SPRITES_COUNT * 6).unwrap();
+        let ib_slice = sprites_batch
+            .index_buffer()
+            .slice(0..SPRITES_COUNT * 6)
+            .unwrap();
 
-        let per_instance_buffer = glium::vertex::VertexBuffer::new(&display, &per_instance).unwrap();
+        let per_instance_buffer =
+            glium::vertex::VertexBuffer::new(&display, &per_instance).unwrap();
 
         let mut params = glium::DrawParameters {
             depth: glium::Depth {
@@ -281,28 +335,37 @@ fn main() {
             ..Default::default()
         };
 
-        let mut depth_target = glium::framebuffer::SimpleFrameBuffer::with_depth_buffer(&display, &shadow_texture, &depth_texture).unwrap();
+        let mut depth_target = glium::framebuffer::SimpleFrameBuffer::with_depth_buffer(
+            &display,
+            &shadow_texture,
+            &depth_texture,
+        )
+        .unwrap();
         depth_target.clear_color(1.0, 1.0, 1.0, 1.0);
         depth_target.clear_depth(1.0);
 
-        depth_target.draw(
-            cube.vertices(),
-            cube.indices(),
-            &shadow_map_shader,
-            &uniform! {
-                depth_mvp: (project_depth * floor).to_cols_array_2d(),
-            },
-            &params,
-        ).unwrap();
-        depth_target.draw(
-            cube.vertices(),
-            cube.indices(),
-            &shadow_map_shader,
-            &uniform! {
-                depth_mvp : (project_depth * model).to_cols_array_2d(),
-            },
-            &params,
-        ).unwrap();
+        depth_target
+            .draw(
+                cube.vertices(),
+                cube.indices(),
+                &shadow_map_shader,
+                &uniform! {
+                    depth_mvp: (project_depth * floor).to_cols_array_2d(),
+                },
+                &params,
+            )
+            .unwrap();
+        depth_target
+            .draw(
+                cube.vertices(),
+                cube.indices(),
+                &shadow_map_shader,
+                &uniform! {
+                    depth_mvp : (project_depth * model).to_cols_array_2d(),
+                },
+                &params,
+            )
+            .unwrap();
 
         for instance in &CUBE_INSTANCES {
             depth_target.draw(
@@ -320,7 +383,6 @@ fn main() {
 
         let mut target = display.draw();
         fxaa::draw(&fxaa, &mut target, fxaa_enabled, |target| {
-
             target.clear_color_and_depth((1.0, 0.0, 1.0, 1.0), 1.0);
 
             target.draw(
@@ -334,20 +396,24 @@ fn main() {
                 &params,
             ).unwrap();
 
-            let subroutine_shader = glium::Program::new(&display,
+            let subroutine_shader = glium::Program::new(
+                &display,
                 ProgramCreationInput::from(subroutine_shader.get_binary().unwrap()),
-            ).unwrap();
-            target.draw(
-                cube.vertices(),
-                cube.indices(),
-                &subroutine_shader,
-                &uniform! {
-                    matrix: (project_view * model).to_cols_array_2d(),
-                    colour: (subroutine, glium::program::ShaderStage::Fragment),
-                    percentage: j as f32 / SUBR_DUR as f32,
-                },
-                &params,
-            ).unwrap();
+            )
+            .unwrap();
+            target
+                .draw(
+                    cube.vertices(),
+                    cube.indices(),
+                    &subroutine_shader,
+                    &uniform! {
+                        matrix: (project_view * model).to_cols_array_2d(),
+                        colour: (subroutine, glium::program::ShaderStage::Fragment),
+                        percentage: j as f32 / SUBR_DUR as f32,
+                    },
+                    &params,
+                )
+                .unwrap();
 
             const BIAS_MATRIX: [[f32; 4]; 4] = [
                 [0.5, 0.0, 0.0, 0.0],
@@ -377,36 +443,46 @@ fn main() {
                 &params,
             ).unwrap();
 
-            target.draw(
-                (cube.vertices(), per_instance_buffer.per_instance().unwrap()),
-                cube.tessellices(),
-                &tessellancing_shader,
-                &uniform! {
-                    inner_level: tess_level as f32,
-                    outer_level: tess_level as f32,
-                    projection_matrix: projection.to_cols_array_2d(),
-                    view_matrix: (view * ring).to_cols_array_2d(),
-                    height_texture: &opengl_texture,
-                    elevation: 0.1f32,
-                    colour_texture: &opengl_texture,
-                },
-                &params,
-            ).unwrap();
+            target
+                .draw(
+                    (cube.vertices(), per_instance_buffer.per_instance().unwrap()),
+                    cube.tessellices(),
+                    &tessellancing_shader,
+                    &uniform! {
+                        inner_level: tess_level as f32,
+                        outer_level: tess_level as f32,
+                        projection_matrix: projection.to_cols_array_2d(),
+                        view_matrix: (view * ring).to_cols_array_2d(),
+                        height_texture: &opengl_texture,
+                        elevation: 0.1f32,
+                        colour_texture: &opengl_texture,
+                    },
+                    &params,
+                )
+                .unwrap();
         });
 
-        if let (Some(cursor), Some(ref picking_texture)) = (cursor_position, &*fxaa.picking_texture()) {
+        if let (Some(cursor), Some(ref picking_texture)) =
+            (cursor_position, &*fxaa.picking_texture())
+        {
             let read_target = glium::Rect {
                 left: (cursor.0 - 1) as u32,
-                bottom: picking_texture.get_height().unwrap().saturating_sub(std::cmp::max(cursor.1 - 1, 0) as u32),
+                bottom: picking_texture
+                    .get_height()
+                    .unwrap()
+                    .saturating_sub(std::cmp::max(cursor.1 - 1, 0) as u32),
                 width: 1,
                 height: 1,
             };
 
             if read_target.left < picking_texture.get_width()
-            && read_target.bottom < picking_texture.get_height().unwrap() {
-                picking_texture.main_level()
+                && read_target.bottom < picking_texture.get_height().unwrap()
+            {
+                picking_texture
+                    .main_level()
                     .first_layer()
-                    .into_image(None).unwrap()
+                    .into_image(None)
+                    .unwrap()
                     .raw_read_to_pixel_buffer(&read_target, cubes.picked());
             } else {
                 cubes.picked().write(&[8]);
@@ -417,9 +493,16 @@ fn main() {
 
         target.finish().unwrap();
 
-        shadow_texture.as_surface().blit_whole_color_to(&debug.image().as_surface(), &shadow_rect, glium::uniforms::MagnifySamplerFilter::Linear);
+        shadow_texture.as_surface().blit_whole_color_to(
+            &debug.image().as_surface(),
+            &shadow_rect,
+            glium::uniforms::MagnifySamplerFilter::Linear,
+        );
         let target = debug.display().draw();
-        debug.image().as_surface().fill(&target, glium::uniforms::MagnifySamplerFilter::Linear);
+        debug
+            .image()
+            .as_surface()
+            .fill(&target, glium::uniforms::MagnifySamplerFilter::Linear);
         target.finish().unwrap();
 
         keyboard.enter_pressed = [false, false];
@@ -427,14 +510,25 @@ fn main() {
         keyboard.d_pressed = false;
         keyboard.s_pressed = false;
         keyboard.t_pressed = false;
-        let action = process_input(&display, &mut camera, &mut keyboard, &mut cursor_position, events);
+        let action = process_input(
+            &display,
+            &mut camera,
+            &mut keyboard,
+            &mut cursor_position,
+            events,
+        );
 
         if keyboard.alt_pressed && keyboard.enter_pressed[0] {
             if fullscreen[0] {
                 display.gl_window().window().set_fullscreen(None);
                 fullscreen[0] = false;
             } else {
-                let monitor_handle = display.gl_window().window().available_monitors().next().unwrap();
+                let monitor_handle = display
+                    .gl_window()
+                    .window()
+                    .available_monitors()
+                    .next()
+                    .unwrap();
                 let fs = Fullscreen::Borderless(Some(monitor_handle));
                 display.gl_window().window().set_fullscreen(Some(fs));
                 fullscreen[0] = true;
@@ -444,9 +538,19 @@ fn main() {
                 debug.display().gl_window().window().set_fullscreen(None);
                 fullscreen[1] = false;
             } else {
-                let monitor_handle = debug.display().gl_window().window().available_monitors().next().unwrap();
+                let monitor_handle = debug
+                    .display()
+                    .gl_window()
+                    .window()
+                    .available_monitors()
+                    .next()
+                    .unwrap();
                 let fs = Fullscreen::Borderless(Some(monitor_handle));
-                debug.display().gl_window().window().set_fullscreen(Some(fs));
+                debug
+                    .display()
+                    .gl_window()
+                    .window()
+                    .set_fullscreen(Some(fs));
                 fullscreen[1] = true;
             }
         }
@@ -471,7 +575,10 @@ fn main() {
             debug.enabled = !debug.enabled;
             let copy = debug.enabled;
             debug.display().gl_window().window().set_visible(copy);
-            display.gl_window().window().request_user_attention(Some(glutin::window::UserAttentionType::Informational));
+            display
+                .gl_window()
+                .window()
+                .request_user_attention(Some(glutin::window::UserAttentionType::Informational));
         }
 
         if keyboard.alt_pressed && keyboard.s_pressed {
@@ -505,7 +612,7 @@ fn read_icon(path: &str) -> std::io::Result<glutin::window::Icon> {
 
 fn read_shader(path: &str) -> std::io::Result<String> {
     let mut file = File::open(path)?;
-    
+
     let mut string = "".to_string();
     let _read = file.read_to_string(&mut string)?;
 
@@ -516,9 +623,13 @@ fn display_info(display: &glium::Display) {
     let version = *display.get_opengl_version();
     let api = match version {
         Version(Api::Gl, _, _) => "OpenGL",
-        Version(Api::GlEs, _, _) => "OpenGL ES"
+        Version(Api::GlEs, _, _) => "OpenGL ES",
     };
-    println!("{} context version: {}", api, display.get_opengl_version_string());
+    println!(
+        "{} context version: {}",
+        api,
+        display.get_opengl_version_string()
+    );
     print!("{} context flags:", api);
     if display.is_forward_compatible() {
         print!(" forward-compatible");
@@ -531,19 +642,33 @@ fn display_info(display: &glium::Display) {
     }
     print!("\n");
     if version >= Version(Api::Gl, 3, 2) {
-        println!("{} profile mask: {}", api, match display.get_opengl_profile() {
-            Some(Profile::Core) => "core",
-            Some(Profile::Compatibility) => "compatibility",
-            None => "unknown"
-        });
+        println!(
+            "{} profile mask: {}",
+            api,
+            match display.get_opengl_profile() {
+                Some(Profile::Core) => "core",
+                Some(Profile::Compatibility) => "compatibility",
+                None => "unknown",
+            }
+        );
     }
-    println!("{} robustness strategy: {}", api,
+    println!(
+        "{} robustness strategy: {}",
+        api,
         if display.is_context_loss_possible() {
             "lose"
         } else {
             "none"
         }
     );
-    println!("{} context renderer: {}", api, display.get_opengl_renderer_string());
-    println!("{} context vendor: {}", api, display.get_opengl_vendor_string());
+    println!(
+        "{} context renderer: {}",
+        api,
+        display.get_opengl_renderer_string()
+    );
+    println!(
+        "{} context vendor: {}",
+        api,
+        display.get_opengl_vendor_string()
+    );
 }

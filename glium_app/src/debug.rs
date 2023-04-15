@@ -1,6 +1,6 @@
 use crate::read_shader;
-use glium::*;
 use glium::glutin::*;
+use glium::*;
 
 pub const HALF_DEBUG: u32 = 512;
 
@@ -35,24 +35,56 @@ impl DebugWindow {
         let vertices = vertex::VertexBuffer::new(
             &display,
             &[
-                QuadVertex { position: [-1.0, -1.0], texture: [0.0, 0.0] },
-                QuadVertex { position: [1.0, -1.0], texture: [1.0, 0.0] },
-                QuadVertex { position: [-1.0, 1.0], texture: [0.0, 1.0] },
-                QuadVertex { position: [1.0, 1.0], texture: [1.0, 1.0] },
+                QuadVertex {
+                    position: [-1.0, -1.0],
+                    texture: [0.0, 0.0],
+                },
+                QuadVertex {
+                    position: [1.0, -1.0],
+                    texture: [1.0, 0.0],
+                },
+                QuadVertex {
+                    position: [-1.0, 1.0],
+                    texture: [0.0, 1.0],
+                },
+                QuadVertex {
+                    position: [1.0, 1.0],
+                    texture: [1.0, 1.0],
+                },
             ],
-        ).unwrap();
+        )
+        .unwrap();
 
         let indices = index::NoIndices(index::PrimitiveType::TriangleStrip);
-        
-        let shader = Program::from_source(&display, &read_shader("src/debug.vs").unwrap(), &read_shader("src/debug.fs").unwrap(), None).unwrap();
 
-        let image = Texture2d::empty_with_format(&display,
+        let shader = Program::from_source(
+            &display,
+            &read_shader("src/debug.vs").unwrap(),
+            &read_shader("src/debug.fs").unwrap(),
+            None,
+        )
+        .unwrap();
+
+        let image = Texture2d::empty_with_format(
+            &display,
             texture::UncompressedFloatFormat::U8U8U8U8,
             texture::MipmapsOption::NoMipmap,
-            2 * HALF_DEBUG, 2 * HALF_DEBUG).unwrap();
-        image.as_surface().clear(None, Some((0.0, 0.0, 0.0, 1.0)), false, None, None);
+            2 * HALF_DEBUG,
+            2 * HALF_DEBUG,
+        )
+        .unwrap();
+        image
+            .as_surface()
+            .clear(None, Some((0.0, 0.0, 0.0, 1.0)), false, None, None);
 
-        DebugWindow { vertices, indices, shader, enabled: false, display, image }
+        DebugWindow {
+            vertices,
+            indices,
+            shader,
+            enabled: false,
+            display,
+            image,
+        }
     }
 
     pub fn vertices(&self) -> &vertex::VertexBuffer<QuadVertex> {
