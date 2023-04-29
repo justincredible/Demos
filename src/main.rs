@@ -51,15 +51,13 @@ fn main() {
 
     event_loop.run(move |event, _, control_flow| {
         match event {
-            Event::RedrawEventsCleared => {
+            Event::RedrawEventsCleared => display.gl_window().window().request_redraw(),
+            Event::RedrawRequested(_) => {
                 rotation *= rotation_delta;
 
-                display.gl_window().window().request_redraw();
-            }
-            Event::RedrawRequested(_) => {
                 let mut frame = display.draw();
 
-                frame.clear_color(0.0, 0.0, 0.0, 1.0); // as Surface
+                frame.clear_color(0.0, 0.0, 0.0, 1.0);
 
                 frame.draw(
                     &triangle.vertices,
