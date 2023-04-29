@@ -31,4 +31,26 @@ pub mod shapes {
             }
         }
     }
+
+    pub struct Quadrilateral {
+        pub vertices: VertexBuffer<PosVertex>,
+        pub indices: NoIndices,
+    }
+
+    impl Quadrilateral {
+        pub fn new(facade: &dyn Facade) -> Self {
+            Quadrilateral {
+                vertices: VertexBuffer::new(
+                    facade,
+                    &[
+                        PosVertex { position: [-0.5, -0.5, 0.0] },
+                        PosVertex { position: [0.5, -0.5, 0.0] },
+                        PosVertex { position: [-0.5, 0.5, 0.0] },
+                        PosVertex { position: [0.5, 0.5, 0.0] },
+                    ],
+                ).unwrap(),
+                indices: NoIndices(PrimitiveType::TriangleStrip),
+            }
+        }
+    }
 }

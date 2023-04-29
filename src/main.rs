@@ -2,7 +2,7 @@
 extern crate glium;
 
 pub mod shapes;
-use shapes::shapes::Triangle;
+use shapes::shapes::*;
 
 use glam::{Mat4, Quat, Vec3};
 use glium::{glutin, Surface};
@@ -44,7 +44,7 @@ fn main() {
         None,
     ).unwrap();
 
-    let triangle = Triangle::new(&display);
+    let quad = Quadrilateral::new(&display);
 
     let mut rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
     let rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01);
@@ -60,8 +60,8 @@ fn main() {
                 frame.clear_color(0.0, 0.0, 0.0, 1.0);
 
                 frame.draw(
-                    &triangle.vertices,
-                    &triangle.indices,
+                    &quad.vertices,
+                    &quad.indices,
                     &program,
                     &uniform! { transform: Mat4::from_quat(rotation.normalize()).to_cols_array_2d() },
                     &Default::default(),
