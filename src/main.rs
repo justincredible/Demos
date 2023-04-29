@@ -4,7 +4,7 @@ extern crate glium;
 pub mod shapes;
 use shapes::shapes::Triangle;
 
-use glam::Mat4;
+use glam::{Mat4, Quat, Vec3};
 use glium::{glutin, Surface};
 use glutin::dpi::PhysicalPosition;
 use glutin::{event::{Event, WindowEvent}, event_loop::ControlFlow};
@@ -46,9 +46,16 @@ fn main() {
 
     let triangle = Triangle::new(&display);
 
+    let mut rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
+    let rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01);
+
     event_loop.run(move |event, _, control_flow| {
         match event {
-            Event::RedrawEventsCleared => display.gl_window().window().request_redraw(),
+            Event::RedrawEventsCleared => {
+                rotation *= rotation_delta;
+
+                display.gl_window().window().request_redraw();
+            }
             Event::RedrawRequested(_) => {
                 let mut frame = display.draw();
 
@@ -58,7 +65,7 @@ fn main() {
                     &triangle.vertices,
                     &triangle.indices,
                     &program,
-                    &uniform! { transform: Mat4::IDENTITY.to_cols_array_2d() },
+                    &uniform! { transform: Mat4::from_quat(rotation.normalize()).to_cols_array_2d() },
                     &Default::default(),
                 ).unwrap();
 
