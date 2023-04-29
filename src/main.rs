@@ -38,7 +38,7 @@ fn main() {
         out vec4 colour;
 
         void main() {
-            colour = vec4(1.0, 1, 1, 1);
+            colour = vec4(1.0, gl_FrontFacing, 1, 1);
         }
         "#,
         None,
