@@ -18,13 +18,15 @@ pub mod shapes {
 
     impl Triangle {
         pub fn new(facade: &dyn Facade) -> Self {
+            let half_sin_60: f32 = f32::sin(std::f32::consts::PI / 3.0) / 2.0;
+
             Triangle {
                 vertices: VertexBuffer::new(
                     facade,
                     &[
-                        PosVertex { position: [-0.5, -0.4330127, 0.0] },
-                        PosVertex { position: [0.5, -0.4330127, 0.0] },
-                        PosVertex { position: [0.0, 0.4330127, 0.0] },
+                        PosVertex { position: [-0.5, -half_sin_60, 0.0] },
+                        PosVertex { position: [0.5, -half_sin_60, 0.0] },
+                        PosVertex { position: [0.0, half_sin_60, 0.0] },
                     ],
                 ).unwrap(),
                 indices: NoIndices(PrimitiveType::TriangleStrip),
