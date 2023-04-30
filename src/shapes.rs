@@ -22,9 +22,9 @@ pub mod shapes {
                 vertices: VertexBuffer::new(
                     facade,
                     &[
-                        PosVertex { position: [-0.5, -0.5, 0.0] },
-                        PosVertex { position: [0.5, -0.5, 0.0] },
-                        PosVertex { position: [0.0, 0.5, 0.0] },
+                        PosVertex { position: [-0.5, -0.4330127, 0.0] },
+                        PosVertex { position: [0.5, -0.4330127, 0.0] },
+                        PosVertex { position: [0.0, 0.4330127, 0.0] },
                     ],
                 ).unwrap(),
                 indices: NoIndices(PrimitiveType::TriangleStrip),
