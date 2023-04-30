@@ -44,7 +44,12 @@ fn main() {
         None,
     ).unwrap();
 
-    let shape = Quadrilateral::new(&display);
+    let shape = Tetrahedron::new(&display);
+
+    let params = glium::DrawParameters {
+        backface_culling: glium::BackfaceCullingMode::CullClockwise,
+        ..Default::default()
+    };
 
     let mut rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
     let rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01);
@@ -64,7 +69,7 @@ fn main() {
                     &shape.indices,
                     &program,
                     &uniform! { transform: Mat4::from_quat(rotation.normalize()).to_cols_array_2d() },
-                    &Default::default(),
+                    &params,
                 ).unwrap();
 
                 frame.finish().unwrap();
