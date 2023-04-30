@@ -44,7 +44,7 @@ fn main() {
         None,
     ).unwrap();
 
-    let quad = Quadrilateral::new(&display);
+    let shape = Quadrilateral::new(&display);
 
     let mut rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
     let rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01);
@@ -60,8 +60,8 @@ fn main() {
                 frame.clear_color(0.0, 0.0, 0.0, 1.0);
 
                 frame.draw(
-                    &quad.vertices,
-                    &quad.indices,
+                    &shape.vertices,
+                    &shape.indices,
                     &program,
                     &uniform! { transform: Mat4::from_quat(rotation.normalize()).to_cols_array_2d() },
                     &Default::default(),
