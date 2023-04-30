@@ -84,4 +84,34 @@ pub mod shapes {
             }
         }
     }
+
+    pub struct Hexahedron {
+        pub vertices: VertexBuffer<PosVertex>,
+        pub indices: IndexBuffer<u8>,
+    }
+
+    impl Hexahedron {
+        pub fn new(facade: &dyn Facade) -> Self {
+            Hexahedron {
+                vertices: VertexBuffer::new(
+                    facade,
+                    &[
+                        PosVertex { position: [-0.5, -0.5, 0.5] },
+                        PosVertex { position: [0.5, -0.5, 0.5] },
+                        PosVertex { position: [-0.5, 0.5, 0.5] },
+                        PosVertex { position: [0.5, 0.5, 0.5] },
+                        PosVertex { position: [0.5, 0.5, -0.5] },
+                        PosVertex { position: [0.5, -0.5, -0.5] },
+                        PosVertex { position: [-0.5, -0.5, -0.5] },
+                        PosVertex { position: [-0.5, 0.5, -0.5] },
+                    ],
+                ).unwrap(),
+                indices: IndexBuffer::new(
+                    facade,
+                    PrimitiveType::TriangleStrip,
+                    &[0u8, 1, 2, 3, 4, 1, 5, 0, 6, 2, 7, 4, 6, 5]
+                ).unwrap(),
+            }
+        }
+    }
 }

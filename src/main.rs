@@ -44,7 +44,7 @@ fn main() {
         None,
     ).unwrap();
 
-    let shape = Tetrahedron::new(&display);
+    let shape = Hexahedron::new(&display);
 
     let params = glium::DrawParameters {
         backface_culling: glium::BackfaceCullingMode::CullClockwise,
