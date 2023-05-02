@@ -6,7 +6,7 @@ fn main() {
     let event_loop = glutin::event_loop::EventLoop::new();
     let wb = glutin::window::WindowBuilder::new()
         .with_resizable(false)
-        .with_title("TessellWorld")
+        .with_title("text")
         .with_position(PhysicalPosition::<i32>::from((50, 50)));
     let cb = glutin::ContextBuilder::new()
         .with_multisampling(4)
@@ -18,7 +18,7 @@ fn main() {
             Event::RedrawEventsCleared => display.gl_window().window().request_redraw(),
             Event::RedrawRequested(_) => {
                 let mut frame = display.draw();
-                frame.clear_color(0.0, 0.0, 0.0, 1.0); // as Surface
+                frame.clear_color(0.0, 0.0, 0.0, 1.0);
                 frame.finish().unwrap();
             }
             Event::WindowEvent { event, .. } => {
@@ -26,7 +26,7 @@ fn main() {
                     WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
                     _ => (),
                 }
-            },
+            }
             _ => (),
         }
     });
