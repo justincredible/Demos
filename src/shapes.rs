@@ -56,6 +56,36 @@ pub mod shapes {
         }
     }
 
+    pub struct Pentagon {
+        pub vertices: VertexBuffer<PosVertex>,
+        pub indices: NoIndices,
+    }
+
+    impl Pentagon {
+        pub fn new(facade: &dyn Facade) -> Self {
+            let pi = std::f32::consts::PI;
+
+            let half_width = f32::sin (3.0/10.0*pi);
+            let width_offset = f32::cos (2.0/5.0*pi);
+            let height_offset = f32::cos (3.0/10.0*pi);
+            let half_height = (height_offset + f32::sin (2.0/5.0*pi)) / 2.0;
+
+            Pentagon {
+                vertices: VertexBuffer::new(
+                    facade,
+                    &[
+                        PosVertex { position: [0.0, half_height, 0.0] },
+                        PosVertex { position: [-half_width, half_height - height_offset, 0.0] },
+                        PosVertex { position: [half_width, half_height - height_offset, 0.0] },
+                        PosVertex { position: [-half_width + width_offset, -half_height, 0.0] },
+                        PosVertex { position: [half_width - width_offset, -half_height, 0.0] },
+                    ],
+                ).unwrap(),
+                indices: NoIndices(PrimitiveType::TriangleStrip),
+            }
+        }
+    }
+
     pub struct Tetrahedron {
         pub vertices: VertexBuffer<PosVertex>,
         pub indices: IndexBuffer<u8>,

@@ -44,10 +44,10 @@ fn main() {
         None,
     ).unwrap();
 
-    let shape = Hexahedron::new(&display);
+    let shape = Pentagon::new(&display);
 
     let params = glium::DrawParameters {
-        backface_culling: glium::BackfaceCullingMode::CullClockwise,
+        //backface_culling: glium::BackfaceCullingMode::CullClockwise,
         ..Default::default()
     };
 
