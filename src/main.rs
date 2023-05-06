@@ -48,6 +48,7 @@ fn main() {
 
     let params = glium::DrawParameters {
         //backface_culling: glium::BackfaceCullingMode::CullClockwise,
+        //polygon_mode: glium::draw_parameters::PolygonMode::Line,
         ..Default::default()
     };
 
