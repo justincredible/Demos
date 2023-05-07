@@ -144,4 +144,34 @@ pub mod shapes {
             }
         }
     }
+
+    pub struct Octahedron {
+        pub vertices: VertexBuffer<PosVertex>,
+        pub indices: IndexBuffer<u8>,
+    }
+
+    impl Octahedron {
+        pub fn new(facade: &dyn Facade) -> Self {
+            let half_height: f32 = 1.0 / f32::sqrt(2.0);
+
+            Octahedron {
+                vertices: VertexBuffer::new(
+                    facade,
+                    &[
+                        PosVertex { position: [0.0, half_height, 0.0] },
+                        PosVertex { position: [-0.5, 0.0, -0.5] },
+                        PosVertex { position: [-0.5, 0.0, 0.5] },
+                        PosVertex { position: [0.5, 0.0, 0.5] },
+                        PosVertex { position: [0.5, 0.0, -0.5] },
+                        PosVertex { position: [0.0, -half_height, 0.0] },
+                    ],
+                ).unwrap(),
+                indices: IndexBuffer::new(
+                    facade,
+                    PrimitiveType::TriangleStrip,
+                    &[0u8, 1, 2, 5, 3, 4, 1, 5, 2, 3, 0, 4, 1]
+                ).unwrap(),
+            }
+        }
+    }
 }

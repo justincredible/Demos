@@ -44,11 +44,11 @@ fn main() {
         None,
     ).unwrap();
 
-    let shape = Pentagon::new(&display);
+    let shape = Octahedron::new(&display);
 
     let params = glium::DrawParameters {
-        //backface_culling: glium::BackfaceCullingMode::CullClockwise,
-        //polygon_mode: glium::draw_parameters::PolygonMode::Line,
+        backface_culling: glium::BackfaceCullingMode::CullClockwise,
+        polygon_mode: glium::draw_parameters::PolygonMode::Line,
         ..Default::default()
     };
 
