@@ -169,7 +169,9 @@ pub mod shapes {
                 indices: IndexBuffer::new(
                     facade,
                     PrimitiveType::TriangleStrip,
-                    &[0u8, 1, 2, 5, 3, 4, 1, 5, 2, 3, 0, 4, 1]
+                    //&[0u8, 1, 2, 5, 3, 4, 1, 5, 2, 3, 0, 4, 1]
+                    //&[1u8, 2, 0, 3, 4, 5, 1, 2, 3, 5, 4, 1, 0]
+                    &[2u8, 0, 1, 4, 5, 3, 2, 0, 4, 3, 5, 2, 1]
                 ).unwrap(),
             }
         }
