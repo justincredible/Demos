@@ -44,7 +44,7 @@ fn main() {
         None,
     ).unwrap();
 
-    let shape = Octahedron::new(&display);
+    let shape = Dodecahedron::new(&display);
 
     let params = glium::DrawParameters {
         backface_culling: glium::BackfaceCullingMode::CullClockwise,
@@ -69,7 +69,7 @@ fn main() {
                     &shape.vertices,
                     &shape.indices,
                     &program,
-                    &uniform! { transform: Mat4::from_quat(rotation.normalize()).to_cols_array_2d() },
+                    &uniform! { transform: Mat4::from_scale_rotation_translation(0.5*Vec3::ONE, rotation.normalize(), Vec3::ZERO).to_cols_array_2d() },
                     &params,
                 ).unwrap();
 
