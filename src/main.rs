@@ -26,29 +26,70 @@ fn main() {
         #version 150
 
         in vec3 position;
-        uniform mat4 transform;
+
+        out vec3 v_position;
 
         void main() {
-            gl_Position = transform * vec4(position, 1.0);
+            v_position = position;
         }
         "#,
         /* Fragment shader */r#"
         #version 140
 
-        out vec4 colour;
+        const vec3 LIGHT_DIR = vec3(1.0, 1, 1);
+        const vec4 AMBIENT = vec4(0.1, 0.1, 0.1, 1);
+
+        in vec3 g_normal;
+
+        out vec4 f_colour;
 
         void main() {
-            colour = vec4(1.0, gl_FrontFacing, 1, 1);
+            float saturation = clamp(dot(normalize(LIGHT_DIR), g_normal), 0, 1);
+            vec4 colour = vec4(1.0, gl_FrontFacing, 1, 1);
+
+            f_colour = saturation * colour + AMBIENT;
         }
         "#,
-        None,
+        /* Geometry shader */Some(r#"
+            #version 150
+
+            layout(triangles) in;
+            layout(triangle_strip, max_vertices = 3) out;
+
+            in vec3 v_position[];
+
+            out vec3 g_normal;
+
+            uniform mat4 transform;
+
+            void main() {
+                vec3 a = normalize(v_position[1] - v_position[0]);
+                vec3 b = normalize(v_position[2] - v_position[0]);
+                vec3 normal = normalize(mat3x3(transform) * cross(a, b));
+
+                gl_Position = transform * vec4(v_position[0], 1);
+                g_normal = normal;
+                EmitVertex();
+
+                gl_Position = transform * vec4(v_position[1], 1);
+                g_normal = normal;
+                EmitVertex();
+
+                gl_Position = transform * vec4(v_position[2], 1);
+                g_normal = normal;
+                EmitVertex();
+
+                EndPrimitive();
+            }
+            "#
+        ),
     ).unwrap();
 
     let shape = Dodecahedron::new(&display);
 
     let params = glium::DrawParameters {
         backface_culling: glium::BackfaceCullingMode::CullClockwise,
-        polygon_mode: glium::draw_parameters::PolygonMode::Line,
+        //polygon_mode: glium::draw_parameters::PolygonMode::Line,
         ..Default::default()
     };
 
