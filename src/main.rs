@@ -101,6 +101,7 @@ fn main() {
             Event::RedrawEventsCleared => display.gl_window().window().request_redraw(),
             Event::RedrawRequested(_) => {
                 rotation *= rotation_delta;
+                let matrix = Mat4::from_scale_rotation_translation(0.5*Vec3::ONE, rotation.normalize(), Vec3::ZERO);
 
                 let mut frame = display.draw();
 
@@ -110,7 +111,7 @@ fn main() {
                     &shape.vertices,
                     &shape.indices,
                     &program,
-                    &uniform! { transform: Mat4::from_scale_rotation_translation(0.5*Vec3::ONE, rotation.normalize(), Vec3::ZERO).to_cols_array_2d() },
+                    &uniform! { transform: matrix.to_cols_array_2d() },
                     &params,
                 ).unwrap();
 
