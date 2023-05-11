@@ -36,7 +36,7 @@ fn main() {
         /* Fragment shader */r#"
         #version 140
 
-        const vec3 LIGHT_DIR = vec3(1.0, 1, 1);
+        const vec3 LIGHT_DIR = vec3(-1.0, 1, 1);
         const vec4 AMBIENT = vec4(0.01, 0.01, 0.01, 1);
 
         in vec3 g_normal;
