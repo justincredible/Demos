@@ -85,7 +85,7 @@ fn main() {
         ),
     ).unwrap();
 
-    let shape = platonic_solids::Dodecahedron::new(&display);
+    let shape = platonic_solids::Icosahedron::new(&display);
 
     let params = glium::DrawParameters {
         backface_culling: glium::BackfaceCullingMode::CullClockwise,
@@ -106,7 +106,7 @@ fn main() {
             Event::RedrawEventsCleared => display.gl_window().window().request_redraw(),
             Event::RedrawRequested(_) => {
                 rotation *= rotation_delta;
-                let matrix = Mat4::from_scale_rotation_translation(0.5*Vec3::ONE, rotation.normalize(), Vec3::ZERO);
+                let matrix = Mat4::from_scale_rotation_translation(Vec3::ONE, rotation.normalize(), Vec3::ZERO);
 
                 let mut frame = display.draw();
 
