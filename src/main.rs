@@ -23,32 +23,32 @@ fn main() {
     let program = glium::Program::from_source(
         &display,
         /* Vertex shader */r#"
-        #version 150
+            #version 150
 
-        in vec3 position;
+            in vec3 position;
 
-        out vec3 v_position;
+            out vec3 v_position;
 
-        void main() {
-            v_position = position;
-        }
+            void main() {
+                v_position = position;
+            }
         "#,
         /* Fragment shader */r#"
-        #version 140
+            #version 140
 
-        const vec3 LIGHT_DIR = vec3(-1.0, 1, 1);
-        const vec4 AMBIENT = vec4(0.01, 0.01, 0.01, 1);
+            const vec3 LIGHT_DIR = vec3(-1.0, 1, 1);
+            const vec4 AMBIENT = vec4(0.01, 0.01, 0.01, 1);
 
-        in vec3 g_normal;
+            in vec3 g_normal;
 
-        out vec4 f_colour;
+            out vec4 f_colour;
 
-        void main() {
-            float saturation = clamp(dot(normalize(LIGHT_DIR), g_normal), 0, 1);
-            vec4 colour = vec4(1.0, gl_FrontFacing, 1, 1);
+            void main() {
+                float saturation = clamp(dot(normalize(LIGHT_DIR), g_normal), 0, 1);
+                vec4 colour = vec4(1.0, gl_FrontFacing, 1, 1);
 
-            f_colour = saturation * colour + AMBIENT;
-        }
+                f_colour = saturation * colour + AMBIENT;
+            }
         "#,
         /* Geometry shader */Some(r#"
             #version 150
@@ -81,7 +81,7 @@ fn main() {
 
                 EndPrimitive();
             }
-            "#
+        "#
         ),
     ).unwrap();
 
