@@ -1,13 +1,13 @@
 #[macro_use]
 extern crate glium;
 
-pub mod shapes;
-use shapes::shapes::*;
-
 use glam::{Mat4, Quat, Vec3};
 use glium::{glutin, Surface};
 use glutin::dpi::PhysicalPosition;
 use glutin::{event::{Event, WindowEvent}, event_loop::ControlFlow};
+
+pub mod shapes;
+use shapes::platonic_solids::platonic_solids;
 
 fn main() {
     let event_loop = glutin::event_loop::EventLoop::new();
@@ -85,7 +85,7 @@ fn main() {
         ),
     ).unwrap();
 
-    let shape = Dodecahedron::new(&display);
+    let shape = platonic_solids::Dodecahedron::new(&display);
 
     let params = glium::DrawParameters {
         backface_culling: glium::BackfaceCullingMode::CullClockwise,
