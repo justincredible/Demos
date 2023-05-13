@@ -90,6 +90,11 @@ fn main() {
     let params = glium::DrawParameters {
         backface_culling: glium::BackfaceCullingMode::CullClockwise,
         //polygon_mode: glium::draw_parameters::PolygonMode::Line,
+        depth: glium::draw_parameters::Depth {
+            write: true,
+            test: glium::draw_parameters::DepthTest::IfMore,
+            ..Default::default()
+        },
         ..Default::default()
     };
 
@@ -105,7 +110,7 @@ fn main() {
 
                 let mut frame = display.draw();
 
-                frame.clear_color(0.0, 0.0, 0.0, 1.0);
+                frame.clear_color_and_depth((0.0, 0.0, 0.0, 1.0), -1.0);
 
                 frame.draw(
                     &shape.vertices,
