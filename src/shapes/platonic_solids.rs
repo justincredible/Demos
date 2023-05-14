@@ -11,17 +11,21 @@ pub mod platonic_solids {
 
     impl Tetrahedron {
         pub fn new(facade: &dyn Facade) -> Self {
-            let half_sin_60 = f32::sqrt(3.0) / 4.0;
-            let half_square_sin_60 = 3.0 / 8.0;
+            let depth = f32::sqrt(3.0) / 2.0;
+            let z = depth / 2.0 - 0.125 / depth;
+            let z_diff = z - depth;
+            let y = f32::sqrt(1.0 - z_diff * z_diff);
+            let above = 0.75 * y;
+            let below = above - y;
 
             Tetrahedron {
                 vertices: VertexBuffer::new(
                     facade,
                     &[
-                        PosVertex::new([-0.5, -half_square_sin_60, half_sin_60]),
-                        PosVertex::new([0.5, -half_square_sin_60, half_sin_60]),
-                        PosVertex::new([0.0, half_square_sin_60, 0.0]),
-                        PosVertex::new([0.0, -half_square_sin_60, -half_sin_60]),
+                        PosVertex::new([-0.5, below, z]),
+                        PosVertex::new([0.5, below, z]),
+                        PosVertex::new([0.0, above, 0.0]),
+                        PosVertex::new([0.0, below, -depth + z]),
                     ],
                 ).unwrap(),
                 indices: IndexBuffer::new(
