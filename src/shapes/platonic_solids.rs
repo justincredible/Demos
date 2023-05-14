@@ -11,7 +11,7 @@ pub mod platonic_solids {
 
     impl Tetrahedron {
         pub fn new(facade: &dyn Facade) -> Self {
-            let half_sin_60: f32 = f32::sqrt(3.0) / 4.0;
+            let half_sin_60 = f32::sqrt(3.0) / 4.0;
             let half_square_sin_60 = 3.0 / 8.0;
 
             Tetrahedron {
@@ -70,7 +70,7 @@ pub mod platonic_solids {
 
     impl Octahedron {
         pub fn new(facade: &dyn Facade) -> Self {
-            let half_height: f32 = 1.0 / f32::sqrt(2.0);
+            let half_height = 1.0 / f32::sqrt(2.0);
 
             Octahedron {
                 vertices: VertexBuffer::new(
