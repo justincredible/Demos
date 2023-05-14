@@ -176,23 +176,26 @@ pub mod platonic_solids {
 
     impl Icosahedron {
         pub fn new(facade: &dyn Facade) -> Self {
-            let degrees_18 = std::f32::consts::PI/10.0;
-            let degrees_54 = 3.0*std::f32::consts::PI/10.0;
+            let degrees_18 = std::f32::consts::PI / 10.0;
+            let degrees_54 = 3.0 * std::f32::consts::PI / 10.0;
             let mid = f32::cos(degrees_18);
-            let height = f32::cos(degrees_54) + mid;
+            let depth = f32::cos(degrees_54) + mid;
             let width = f32::sin(degrees_54);
-            let cz = (height * height - 1.0 / 4.0) / 2.0 / height;
+            let cz = depth / 2.0 - 0.125 / depth;
+            let r = depth / 2.0 + 0.125 / depth;
 
-            let depth = height - cz;
-            let y_diff = f32::sqrt(1.0 - depth*depth);
-            let half_middle = f32::sqrt(3.0) / 4.0;
+            let z_diff = depth - cz;
+            let y_diff = f32::sqrt(1.0 - z_diff * z_diff);
+            let x_diff = r * f32::cos(degrees_54);
+            let z_diff = z_diff - r * f32::sin(degrees_54);
+            let half_middle = f32::sqrt(1.0 - x_diff * x_diff - z_diff * z_diff) / 2.0;
 
             Icosahedron {
                 vertices: VertexBuffer::new(
                     facade,
                     &[
                         PosVertex::new([0.0, half_middle + y_diff, 0.0]),
-                        PosVertex::new([0.0, half_middle, -height + cz]),
+                        PosVertex::new([0.0, half_middle, -depth + cz]),
                         PosVertex::new([-width, half_middle, -mid + cz]),
                         PosVertex::new([width, half_middle, -mid + cz]),
                         PosVertex::new([-0.5, half_middle, cz]),
@@ -201,7 +204,7 @@ pub mod platonic_solids {
                         PosVertex::new([0.5, -half_middle, -cz]),
                         PosVertex::new([-width, -half_middle, mid - cz]),
                         PosVertex::new([width, -half_middle, mid - cz]),
-                        PosVertex::new([0.0, -half_middle, height - cz]),
+                        PosVertex::new([0.0, -half_middle, depth - cz]),
                         PosVertex::new([0.0, -half_middle - y_diff, 0.0]),
                     ],
                 ).unwrap(),
