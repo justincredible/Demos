@@ -15,7 +15,7 @@ pub mod platonic_solids {
             let z = depth / 2.0 - 0.125 / depth;
             let z_diff = z - depth;
             let y = f32::sqrt(1.0 - z_diff * z_diff);
-            let above = 0.75 * y;
+            let above = 0.75 * y; // depth^2 * y
             let below = above - y;
 
             Tetrahedron {
