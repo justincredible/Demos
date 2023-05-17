@@ -108,50 +108,43 @@ pub mod platonic_solids {
         pub fn new(facade: &dyn Facade) -> Self {
             let phi = (1.0 + f32::sqrt(5.0)) / 2.0;
 
-            let degrees_18 = std::f32::consts::PI/10.0;
-            let degrees_54 = 3.0*std::f32::consts::PI/10.0;
-            let inner_mid = f32::cos(degrees_18);
-            let inner_height = f32::cos(degrees_54) + inner_mid;
-            let inner_width = f32::sin(degrees_54);
-            let outer_mid = phi * inner_mid;
-            let outer_height = phi * inner_height;
-            let outer_width = phi * inner_width;
-            // .*cx = 0
-            let icy = (inner_height * inner_height - 1.0 / 4.0) / 2.0 / inner_height;
-            let ir = (inner_height * inner_height + 1.0 / 4.0) / 2.0 / inner_height;
-            let ocy = (outer_height * outer_height - phi * phi / 4.0) / 2.0 / outer_height;
-            let or = (outer_height * outer_height + phi * phi / 4.0) / 2.0 / outer_height;
+            let degrees_18 = std::f32::consts::PI / 10.0;
+            let degrees_54 = 3.0 * std::f32::consts::PI / 10.0;
+            let mid = f32::cos(degrees_18);
+            let height = f32::cos(degrees_54) + mid;
+            let width = f32::sin(degrees_54);
+            let cy = height / 2.0 - 0.125 / height;
 
-            let y_diff = (outer_height - ocy) - (inner_height - icy);
-            let oz = f32::sqrt(1.0 - y_diff*y_diff);
-            let x_diff = or * f32::cos(degrees_54);
-            let y_diff = or * f32::sin(degrees_54) - outer_height + ocy;
-            let iz = f32::sqrt(1.0 - x_diff*x_diff - y_diff*y_diff);
+            let y_diff = (phi - 1.0) * (height - cy);
+            let oz = f32::sqrt(1.0 - y_diff * y_diff);
+            let x_diff = 0.5 * phi;
+            let y_diff = phi * (height - 2.0 * cy);
+            let iz = f32::sqrt(1.0 - x_diff * x_diff - y_diff * y_diff);
 
             Dodecahedron {
                 vertices: VertexBuffer::new(
                     facade,
                     &[
-                        PosVertex::new([0.0, inner_height - icy, oz + 0.5*iz]),
-                        PosVertex::new([-inner_width, inner_mid - icy, oz + 0.5*iz]),
-                        PosVertex::new([inner_width, inner_mid - icy, oz + 0.5*iz]),
-                        PosVertex::new([-0.5, -icy, oz + 0.5*iz]),
-                        PosVertex::new([0.5, -icy, oz + 0.5*iz]),
-                        PosVertex::new([0.0, outer_height - ocy, 0.5*iz]),
-                        PosVertex::new([-outer_width, outer_mid - ocy, 0.5*iz]),
-                        PosVertex::new([outer_width, outer_mid - ocy, 0.5*iz]),
-                        PosVertex::new([-0.5*phi, -ocy, 0.5*iz]),
-                        PosVertex::new([0.5*phi, -ocy, 0.5*iz]),
-                        PosVertex::new([-or * f32::cos(degrees_54), or * f32::sin(degrees_54), -0.5*iz]),
-                        PosVertex::new([or * f32::cos(degrees_54), or * f32::sin(degrees_54), -0.5*iz]),
-                        PosVertex::new([-or * f32::cos(-degrees_18), or * f32::sin(-degrees_18), -0.5*iz]),
-                        PosVertex::new([or * f32::cos(-degrees_18), or * f32::sin(-degrees_18), -0.5*iz]),
-                        PosVertex::new([0.0, -or, -0.5*iz]),
-                        PosVertex::new([-ir * f32::cos(degrees_54), ir * f32::sin(degrees_54), -oz - 0.5*iz]),
-                        PosVertex::new([ir * f32::cos(degrees_54), ir * f32::sin(degrees_54), -oz - 0.5*iz]),
-                        PosVertex::new([-ir * f32::cos(-degrees_18), ir * f32::sin(-degrees_18), -oz - 0.5*iz]),
-                        PosVertex::new([ir * f32::cos(-degrees_18), ir * f32::sin(-degrees_18), -oz - 0.5*iz]),
-                        PosVertex::new([0.0, -ir, -oz - 0.5*iz]),
+                        PosVertex::new([0.0, height - cy, oz + 0.5*iz]),
+                        PosVertex::new([-width, mid - cy, oz + 0.5*iz]),
+                        PosVertex::new([width, mid - cy, oz + 0.5*iz]),
+                        PosVertex::new([-0.5, -cy, oz + 0.5*iz]),
+                        PosVertex::new([0.5, -cy, oz + 0.5*iz]),
+                        PosVertex::new([0.0, phi * (height - cy), 0.5*iz]),
+                        PosVertex::new([-phi * width, phi * (mid - cy), 0.5*iz]),
+                        PosVertex::new([phi * width, phi * (mid - cy), 0.5*iz]),
+                        PosVertex::new([-0.5 * phi, -phi * cy, 0.5*iz]),
+                        PosVertex::new([0.5 * phi, -phi * cy, 0.5*iz]),
+                        PosVertex::new([-0.5 * phi, phi * cy, -0.5*iz]),
+                        PosVertex::new([0.5 * phi, phi * cy, -0.5*iz]),
+                        PosVertex::new([-phi * width, -phi * (mid - cy), -0.5*iz]),
+                        PosVertex::new([phi * width, -phi * (mid - cy), -0.5*iz]),
+                        PosVertex::new([0.0, -phi * (height - cy), -0.5*iz]),
+                        PosVertex::new([-0.5, cy, -oz - 0.5*iz]),
+                        PosVertex::new([0.5, cy, -oz - 0.5*iz]),
+                        PosVertex::new([-width, -mid + cy, -oz - 0.5*iz]),
+                        PosVertex::new([width, -mid + cy, -oz - 0.5*iz]),
+                        PosVertex::new([0.0, -height + cy, -oz - 0.5*iz]),
                     ],
                 ).unwrap(),
                 indices: IndexBuffer::new(
