@@ -3,6 +3,9 @@ use glium::backend::Facade;
 use glium::index::{IndexBuffer, PrimitiveType};
 use glium::vertex::VertexBuffer;
 
+const DEGREES_18: f32 = std::f32::consts::PI / 10.0;
+const DEGREES_54: f32 = 3.0 * std::f32::consts::PI / 10.0;
+
 pub enum PlatonicSolids {
     Tetrahedron,
     Hexahedron,
@@ -92,11 +95,9 @@ impl PlatonicSolid {
     fn dodecahedron() -> (Vec<PosVertex>, Vec<u8>) {
         let phi = (1.0 + f32::sqrt(5.0)) / 2.0;
 
-        let degrees_18 = std::f32::consts::PI / 10.0;
-        let degrees_54 = 3.0 * std::f32::consts::PI / 10.0;
-        let mid = f32::cos(degrees_18);
-        let height = f32::cos(degrees_54) + mid;
-        let width = f32::sin(degrees_54);
+        let mid = f32::cos(DEGREES_18);
+        let height = f32::cos(DEGREES_54) + mid;
+        let width = f32::sin(DEGREES_54);
         let cy = height / 2.0 - 0.125 / height;
 
         let y_diff = (phi - 1.0) * (height - cy);
@@ -140,18 +141,16 @@ impl PlatonicSolid {
     }
 
     fn icosahedron() -> (Vec<PosVertex>, Vec<u8>) {
-        let degrees_18 = std::f32::consts::PI / 10.0;
-        let degrees_54 = 3.0 * std::f32::consts::PI / 10.0;
-        let mid = f32::cos(degrees_18);
-        let depth = f32::cos(degrees_54) + mid;
-        let width = f32::sin(degrees_54);
+        let mid = f32::cos(DEGREES_18);
+        let depth = f32::cos(DEGREES_54) + mid;
+        let width = f32::sin(DEGREES_54);
         let cz = depth / 2.0 - 0.125 / depth;
         let r = depth / 2.0 + 0.125 / depth;
 
         let z_diff = depth - cz;
         let y_diff = f32::sqrt(1.0 - z_diff * z_diff);
-        let x_diff = r * f32::cos(degrees_54);
-        let z_diff = z_diff - r * f32::sin(degrees_54);
+        let x_diff = r * f32::cos(DEGREES_54);
+        let z_diff = z_diff - r * f32::sin(DEGREES_54);
         let half_middle = f32::sqrt(1.0 - x_diff * x_diff - z_diff * z_diff) / 2.0;
 
         let vertices = vec![
