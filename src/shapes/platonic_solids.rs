@@ -41,7 +41,7 @@ impl PlatonicSolid {
         let z = depth / 2.0 - 0.125 / depth;
         let z_diff = z - depth;
         let y = f32::sqrt(1.0 - z_diff * z_diff);
-        let above = 0.75 * y; // depth^2 * y
+        let above = depth * depth * y;
         let below = above - y;
 
         let vertices = vec![
@@ -62,13 +62,13 @@ impl PlatonicSolid {
             PosVertex::new([0.5, -0.5, 0.5]),
             PosVertex::new([-0.5, 0.5, 0.5]),
             PosVertex::new([0.5, 0.5, 0.5]),
-            PosVertex::new([0.5, 0.5, -0.5]),
-            PosVertex::new([0.5, -0.5, -0.5]),
             PosVertex::new([-0.5, -0.5, -0.5]),
+            PosVertex::new([0.5, -0.5, -0.5]),
             PosVertex::new([-0.5, 0.5, -0.5]),
+            PosVertex::new([0.5, 0.5, -0.5]),
         ];
 
-        let indices = vec![0u8, 1, 2, 3, 4, 1, 5, 0, 6, 2, 7, 4, 6, 5];
+        let indices = vec![0u8, 1, 2, 3, 7, 1, 5, 0, 4, 2, 6, 7, 4, 5];
 
         (vertices, indices)
     }
