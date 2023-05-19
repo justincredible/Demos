@@ -2,10 +2,9 @@ pub mod platonic_solids;
 pub mod polygons;
 
 pub mod shapes {
-
     #[derive(Debug, Clone, Copy)]
     pub struct PosVertex {
-        position: [f32; 3],
+        pub position: [f32; 3],
     }
 
     impl PosVertex {
