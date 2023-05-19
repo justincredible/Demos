@@ -197,178 +197,168 @@ mod tests {
         x*x + y*y + z*z
     }
 
+    macro_rules! equal_distance {
+        ($polyhedron:ident) => {
+            let (vertices, _) = PlatonicSolid::$polyhedron();
+
+            let r_squared = magnitude_squared(&vertices[0].position);
+
+            for vertex in vertices {
+                assert!(f32::abs(r_squared - magnitude_squared(&vertex.position)) <= TOLERANCE);
+            }
+        }
+    }
+
+    macro_rules! unit_neighbour {
+        ($vertices:expr, $a:expr, $b:expr) => {
+            let difference_length = magnitude_squared_diff(&$vertices[$a].position, &$vertices[$b].position);
+
+            assert!(f32::abs(1.0 - difference_length) <= TOLERANCE);
+        }
+    }
+
     #[test]
     fn tetrahedron_centered() {
-        let (vertices, _) = PlatonicSolid::tetrahedron();
-
-        let r_squared = magnitude_squared(&vertices[0].position);
-
-        for vertex in vertices {
-            assert!(f32::abs(r_squared - magnitude_squared(&vertex.position)) <= TOLERANCE);
-        }
+        equal_distance!(tetrahedron);
     }
 
     #[test]
     fn tetrahedron_edges() {
         let (vertices, _) = PlatonicSolid::tetrahedron();
 
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[1].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[2].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[3].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[2].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[3].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[2].position, &vertices[3].position)) <= TOLERANCE);
+        unit_neighbour!(vertices, 0, 1);
+        unit_neighbour!(vertices, 0, 2);
+        unit_neighbour!(vertices, 0, 3);
+        unit_neighbour!(vertices, 1, 2);
+        unit_neighbour!(vertices, 1, 3);
+        unit_neighbour!(vertices, 2, 3);
     }
 
     #[test]
     fn hexahedron_centered() {
-        let (vertices, _) = PlatonicSolid::hexahedron();
-
-        let r_squared = magnitude_squared(&vertices[0].position);
-
-        for vertex in vertices {
-            assert!(f32::abs(r_squared - magnitude_squared(&vertex.position)) <= TOLERANCE);
-        }
+        equal_distance!(hexahedron);
     }
 
     #[test]
     fn hexahedron_edges() {
         let (vertices, _) = PlatonicSolid::hexahedron();
 
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[1].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[2].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[4].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[3].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[5].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[2].position, &vertices[3].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[2].position, &vertices[6].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[3].position, &vertices[7].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[4].position, &vertices[5].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[4].position, &vertices[6].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[5].position, &vertices[7].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[6].position, &vertices[7].position)) <= TOLERANCE);
+        unit_neighbour!(vertices, 0, 1);
+        unit_neighbour!(vertices, 0, 2);
+        unit_neighbour!(vertices, 0, 4);
+        unit_neighbour!(vertices, 1, 3);
+        unit_neighbour!(vertices, 1, 5);
+        unit_neighbour!(vertices, 2, 3);
+        unit_neighbour!(vertices, 2, 6);
+        unit_neighbour!(vertices, 3, 7);
+        unit_neighbour!(vertices, 4, 5);
+        unit_neighbour!(vertices, 4, 6);
+        unit_neighbour!(vertices, 5, 7);
+        unit_neighbour!(vertices, 6, 7);
     }
 
     #[test]
     fn octahedron_centered() {
-        let (vertices, _) = PlatonicSolid::octahedron();
-
-        let r_squared = magnitude_squared(&vertices[0].position);
-
-        for vertex in vertices {
-            assert!(f32::abs(r_squared - magnitude_squared(&vertex.position)) <= TOLERANCE);
-        }
+        equal_distance!(octahedron);
     }
 
     #[test]
     fn octahedron_edges() {
         let (vertices, _) = PlatonicSolid::octahedron();
 
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[1].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[2].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[3].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[4].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[2].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[4].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[5].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[2].position, &vertices[3].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[2].position, &vertices[5].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[3].position, &vertices[4].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[3].position, &vertices[5].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[4].position, &vertices[5].position)) <= TOLERANCE);
+        unit_neighbour!(vertices, 0, 1);
+        unit_neighbour!(vertices, 0, 2);
+        unit_neighbour!(vertices, 0, 3);
+        unit_neighbour!(vertices, 0, 4);
+        unit_neighbour!(vertices, 1, 2);
+        unit_neighbour!(vertices, 1, 4);
+        unit_neighbour!(vertices, 1, 5);
+        unit_neighbour!(vertices, 2, 3);
+        unit_neighbour!(vertices, 2, 5);
+        unit_neighbour!(vertices, 3, 4);
+        unit_neighbour!(vertices, 3, 5);
+        unit_neighbour!(vertices, 4, 5);
     }
 
     #[test]
     fn dodecahedron_centered() {
-        let (vertices, _) = PlatonicSolid::dodecahedron();
-
-        let r_squared = magnitude_squared(&vertices[0].position);
-
-        for vertex in vertices {
-            assert!(f32::abs(r_squared - magnitude_squared(&vertex.position)) <= TOLERANCE);
-        }
+        equal_distance!(dodecahedron);
     }
 
     #[test]
     fn dodecahedron_edges() {
         let (vertices, _) = PlatonicSolid::dodecahedron();
 
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[1].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[2].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[5].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[3].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[6].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[2].position, &vertices[4].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[2].position, &vertices[7].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[3].position, &vertices[4].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[3].position, &vertices[8].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[4].position, &vertices[9].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[5].position, &vertices[10].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[5].position, &vertices[11].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[6].position, &vertices[10].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[6].position, &vertices[12].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[7].position, &vertices[11].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[7].position, &vertices[13].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[8].position, &vertices[12].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[8].position, &vertices[14].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[9].position, &vertices[13].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[9].position, &vertices[14].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[10].position, &vertices[15].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[11].position, &vertices[16].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[12].position, &vertices[17].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[13].position, &vertices[18].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[14].position, &vertices[19].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[15].position, &vertices[16].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[15].position, &vertices[17].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[16].position, &vertices[18].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[17].position, &vertices[19].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[18].position, &vertices[19].position)) <= TOLERANCE);
+        unit_neighbour!(vertices, 0, 1);
+        unit_neighbour!(vertices, 0, 2);
+        unit_neighbour!(vertices, 0, 5);
+        unit_neighbour!(vertices, 1, 3);
+        unit_neighbour!(vertices, 1, 6);
+        unit_neighbour!(vertices, 2, 4);
+        unit_neighbour!(vertices, 2, 7);
+        unit_neighbour!(vertices, 3, 4);
+        unit_neighbour!(vertices, 3, 8);
+        unit_neighbour!(vertices, 4, 9);
+        unit_neighbour!(vertices, 5, 10);
+        unit_neighbour!(vertices, 5, 11);
+        unit_neighbour!(vertices, 6, 10);
+        unit_neighbour!(vertices, 6, 12);
+        unit_neighbour!(vertices, 7, 11);
+        unit_neighbour!(vertices, 7, 13);
+        unit_neighbour!(vertices, 8, 12);
+        unit_neighbour!(vertices, 8, 14);
+        unit_neighbour!(vertices, 9, 13);
+        unit_neighbour!(vertices, 9, 14);
+        unit_neighbour!(vertices, 10, 15);
+        unit_neighbour!(vertices, 11, 16);
+        unit_neighbour!(vertices, 12, 17);
+        unit_neighbour!(vertices, 13, 18);
+        unit_neighbour!(vertices, 14, 19);
+        unit_neighbour!(vertices, 15, 16);
+        unit_neighbour!(vertices, 15, 17);
+        unit_neighbour!(vertices, 16, 18);
+        unit_neighbour!(vertices, 17, 19);
+        unit_neighbour!(vertices, 18, 19);
     }
 
     #[test]
     fn icosahedron_centered() {
-        let (vertices, _) = PlatonicSolid::icosahedron();
-
-        let r_squared = magnitude_squared(&vertices[0].position);
-
-        for vertex in vertices {
-            assert!(f32::abs(r_squared - magnitude_squared(&vertex.position)) <= TOLERANCE);
-        }
+        equal_distance!(icosahedron);
     }
 
     #[test]
     fn icosahedron_edges() {
         let (vertices, _) = PlatonicSolid::icosahedron();
 
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[1].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[2].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[3].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[4].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[0].position, &vertices[5].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[2].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[3].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[6].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[1].position, &vertices[7].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[2].position, &vertices[4].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[2].position, &vertices[6].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[2].position, &vertices[8].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[3].position, &vertices[5].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[3].position, &vertices[7].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[3].position, &vertices[9].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[4].position, &vertices[5].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[4].position, &vertices[8].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[4].position, &vertices[10].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[5].position, &vertices[9].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[5].position, &vertices[10].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[6].position, &vertices[7].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[6].position, &vertices[8].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[6].position, &vertices[11].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[7].position, &vertices[9].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[7].position, &vertices[11].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[8].position, &vertices[10].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[8].position, &vertices[11].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[9].position, &vertices[10].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[9].position, &vertices[11].position)) <= TOLERANCE);
-        assert!(f32::abs(1.0 - magnitude_squared_diff(&vertices[10].position, &vertices[11].position)) <= TOLERANCE);
+        unit_neighbour!(vertices, 0, 1);
+        unit_neighbour!(vertices, 0, 2);
+        unit_neighbour!(vertices, 0, 3);
+        unit_neighbour!(vertices, 0, 4);
+        unit_neighbour!(vertices, 0, 5);
+        unit_neighbour!(vertices, 1, 2);
+        unit_neighbour!(vertices, 1, 3);
+        unit_neighbour!(vertices, 1, 6);
+        unit_neighbour!(vertices, 1, 7);
+        unit_neighbour!(vertices, 2, 4);
+        unit_neighbour!(vertices, 2, 6);
+        unit_neighbour!(vertices, 2, 8);
+        unit_neighbour!(vertices, 3, 5);
+        unit_neighbour!(vertices, 3, 7);
+        unit_neighbour!(vertices, 3, 9);
+        unit_neighbour!(vertices, 4, 5);
+        unit_neighbour!(vertices, 4, 8);
+        unit_neighbour!(vertices, 4, 10);
+        unit_neighbour!(vertices, 5, 9);
+        unit_neighbour!(vertices, 5, 10);
+        unit_neighbour!(vertices, 6, 7);
+        unit_neighbour!(vertices, 6, 8);
+        unit_neighbour!(vertices, 6, 11);
+        unit_neighbour!(vertices, 7, 9);
+        unit_neighbour!(vertices, 7, 11);
+        unit_neighbour!(vertices, 8, 10);
+        unit_neighbour!(vertices, 8, 11);
+        unit_neighbour!(vertices, 9, 10);
+        unit_neighbour!(vertices, 9, 11);
+        unit_neighbour!(vertices, 10, 11);
     }
 }
