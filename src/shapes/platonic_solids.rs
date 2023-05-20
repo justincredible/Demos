@@ -197,7 +197,7 @@ mod tests {
         x*x + y*y + z*z
     }
 
-    macro_rules! equal_distance {
+    macro_rules! uniform_distance {
         ($polyhedron:ident) => {
             let (vertices, _) = PlatonicSolid::$polyhedron();
 
@@ -219,7 +219,7 @@ mod tests {
 
     #[test]
     fn tetrahedron_centered() {
-        equal_distance!(tetrahedron);
+        uniform_distance!(tetrahedron);
     }
 
     #[test]
@@ -236,7 +236,7 @@ mod tests {
 
     #[test]
     fn hexahedron_centered() {
-        equal_distance!(hexahedron);
+        uniform_distance!(hexahedron);
     }
 
     #[test]
@@ -259,7 +259,7 @@ mod tests {
 
     #[test]
     fn octahedron_centered() {
-        equal_distance!(octahedron);
+        uniform_distance!(octahedron);
     }
 
     #[test]
@@ -282,7 +282,7 @@ mod tests {
 
     #[test]
     fn dodecahedron_centered() {
-        equal_distance!(dodecahedron);
+        uniform_distance!(dodecahedron);
     }
 
     #[test]
@@ -323,7 +323,7 @@ mod tests {
 
     #[test]
     fn icosahedron_centered() {
-        equal_distance!(icosahedron);
+        uniform_distance!(icosahedron);
     }
 
     #[test]
