@@ -38,9 +38,9 @@ impl PlatonicSolid {
 
     fn tetrahedron() -> (Vec<PosVertex>, Vec<u8>) {
         let depth = f32::sqrt(3.0) / 2.0;
-        let z = depth / 2.0 - 0.125 / depth;
-        let z_diff = z - depth;
-        let y = f32::sqrt(1.0 - z_diff * z_diff);
+        let z = 0.5 * depth - 0.125 / depth;
+        let r = 0.5 * depth + 0.125 / depth;
+        let y = f32::sqrt(1.0 - r * r);
         let above = depth * depth * y;
         let below = above - y;
 
@@ -48,7 +48,7 @@ impl PlatonicSolid {
             PosVertex::new([-0.5, below, z]),
             PosVertex::new([0.5, below, z]),
             PosVertex::new([0.0, above, 0.0]),
-            PosVertex::new([0.0, below, -depth + z]),
+            PosVertex::new([0.0, below, -r]),
         ];
 
         let indices = vec![0u8, 1, 2, 3, 0, 1];
@@ -96,11 +96,12 @@ impl PlatonicSolid {
         let phi = 0.5 * (1.0 + f32::sqrt(5.0));
 
         let mid = f32::cos(DEGREES_18);
-        let height = f32::cos(DEGREES_54) + mid;
+        let top = f32::cos(DEGREES_54);
         let width = f32::sin(DEGREES_54);
+        let height = top + mid;
         let circle_offset = 0.5 * height - 0.125 / height;
         let circle_radius = 0.5 * height + 0.125 / height;
-        let centred_mid = circle_radius - f32::cos(DEGREES_54);
+        let centred_mid = circle_radius - top;
 
         let oz = f32::sqrt(1.0 - (2.0 - phi) * circle_radius * circle_radius);
         let half_iz = 0.5 * f32::sqrt(1.0 - 4.0 * (phi + 1.0) * centred_mid * centred_mid);
@@ -141,29 +142,28 @@ impl PlatonicSolid {
 
     fn icosahedron() -> (Vec<PosVertex>, Vec<u8>) {
         let mid = f32::cos(DEGREES_18);
-        let depth = f32::cos(DEGREES_54) + mid;
+        let top = f32::cos(DEGREES_54);
         let width = f32::sin(DEGREES_54);
-        let cz = depth / 2.0 - 0.125 / depth;
-        let r = depth / 2.0 + 0.125 / depth;
+        let depth = top + mid;
+        let center = 0.5 * depth - 0.125 / depth;
+        let radius = 0.5 * depth + 0.125 / depth;
 
-        let z_diff = depth - cz;
-        let y_diff = f32::sqrt(1.0 - z_diff * z_diff);
-        let x_diff = r * f32::cos(DEGREES_54);
-        let z_diff = z_diff - r * f32::sin(DEGREES_54);
-        let half_middle = f32::sqrt(1.0 - x_diff * x_diff - z_diff * z_diff) / 2.0;
+        let y_diff = f32::sqrt(1.0 - radius * radius);
+        let width_diff = 1.0 - width;
+        let half_middle = 0.5 * f32::sqrt(1.0 - radius * radius * (top * top + width_diff * width_diff));
 
         let vertices = vec![
             PosVertex::new([0.0, half_middle + y_diff, 0.0]),
-            PosVertex::new([0.0, half_middle, -depth + cz]),
-            PosVertex::new([-width, half_middle, -mid + cz]),
-            PosVertex::new([width, half_middle, -mid + cz]),
-            PosVertex::new([-0.5, half_middle, cz]),
-            PosVertex::new([0.5, half_middle, cz]),
-            PosVertex::new([-0.5, -half_middle, -cz]),
-            PosVertex::new([0.5, -half_middle, -cz]),
-            PosVertex::new([-width, -half_middle, mid - cz]),
-            PosVertex::new([width, -half_middle, mid - cz]),
-            PosVertex::new([0.0, -half_middle, depth - cz]),
+            PosVertex::new([0.0, half_middle, -radius]),
+            PosVertex::new([-width, half_middle, -radius + top]),
+            PosVertex::new([width, half_middle, -radius + top]),
+            PosVertex::new([-0.5, half_middle, center]),
+            PosVertex::new([0.5, half_middle, center]),
+            PosVertex::new([-0.5, -half_middle, -center]),
+            PosVertex::new([0.5, -half_middle, -center]),
+            PosVertex::new([-width, -half_middle, radius - top]),
+            PosVertex::new([width, -half_middle, radius - top]),
+            PosVertex::new([0.0, -half_middle, radius]),
             PosVertex::new([0.0, -half_middle - y_diff, 0.0]),
         ];
 
