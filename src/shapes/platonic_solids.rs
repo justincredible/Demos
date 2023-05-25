@@ -37,18 +37,15 @@ impl PlatonicSolid {
     }
 
     fn tetrahedron() -> (Vec<PosVertex>, Vec<u8>) {
-        let depth = f32::sqrt(3.0) / 2.0;
-        let z = 0.5 * depth - 0.125 / depth;
-        let r = 0.5 * depth + 0.125 / depth;
-        let y = f32::sqrt(1.0 - r * r);
-        let above = depth * depth * y;
-        let below = above - y;
+        let sr2 = f32::sqrt(2.0);
+        let sr3 = f32::sqrt(3.0);
+        let base = -0.5 / sr2 / sr3;
 
         let vertices = vec![
-            PosVertex::new([-0.5, below, z]),
-            PosVertex::new([0.5, below, z]),
-            PosVertex::new([0.0, above, 0.0]),
-            PosVertex::new([0.0, below, -r]),
+            PosVertex::new([-0.5, base, 0.5 / sr3]),
+            PosVertex::new([0.5, base, 0.5 / sr3]),
+            PosVertex::new([0.0, base + sr2 / sr3, 0.0]),
+            PosVertex::new([0.0, base, -1.0 / sr3]),
         ];
 
         let indices = vec![0u8, 1, 2, 3, 0, 1];
