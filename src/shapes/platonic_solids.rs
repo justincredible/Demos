@@ -90,40 +90,46 @@ impl PlatonicSolid {
     }
 
     fn dodecahedron() -> (Vec<PosVertex>, Vec<u8>) {
-        let phi = 0.5 * (1.0 + f32::sqrt(5.0));
+        let sr5 = f32::sqrt(5.0);
+        let phi = 0.5 * (1.0 + sr5);
 
-        let mid = f32::cos(DEGREES_18);
-        let top = f32::cos(DEGREES_54);
-        let width = f32::sin(DEGREES_54);
+        let mid = 0.25 * f32::sqrt(10.0 + 2.0 * sr5);
+        let top = 0.25 * f32::sqrt(10.0 - 2.0 * sr5);
+        let width = 0.25 * (1.0 + sr5); // phi/2
         let height = top + mid;
-        let circle_offset = 0.5 * height - 0.125 / height;
-        let circle_radius = 0.5 * height + 0.125 / height;
-        let centred_mid = circle_radius - top;
+        let circle_offset = 0.25 * (2.0 + sr5) / height;
+        let circle_radius = 0.25 * (3.0 + sr5) / height;
+        let centred_mid = mid - circle_offset; // 0.125 * (1.0 + sr5) / height;
+        let phi_width = 0.25 * (3.0 + sr5);
+        // we use the less accurate (phi * circle_offset)
+        // to offset some accumulated error in the tests
+        let _phi_offset = 0.125 * (7.0 + 3.0 * sr5) / height;
+        let phi_radius = 0.5 * (2.0 + sr5) / height; // 2 * circle_offset
+        let phi_mid = 0.125 * (3.0 + sr5) / height; // circle_radius / 2
 
-        let oz = f32::sqrt(1.0 - (2.0 - phi) * circle_radius * circle_radius);
-        let half_iz = 0.5 * f32::sqrt(1.0 - 4.0 * (phi + 1.0) * centred_mid * centred_mid);
+        let half_iz = 0.5 * f32::sqrt(0.5 - 0.1 * sr5);
 
         let vertices = vec![
-            PosVertex::new([0.0, circle_radius, oz + half_iz]),
-            PosVertex::new([-width, centred_mid, oz + half_iz]),
-            PosVertex::new([width, centred_mid, oz + half_iz]),
-            PosVertex::new([-0.5, -circle_offset, oz + half_iz]),
-            PosVertex::new([0.5, -circle_offset, oz + half_iz]),
-            PosVertex::new([0.0, phi * circle_radius, half_iz]),
-            PosVertex::new([-phi * width, phi * centred_mid, half_iz]),
-            PosVertex::new([phi * width, phi * centred_mid, half_iz]),
-            PosVertex::new([-0.5 * phi, -phi * circle_offset, half_iz]),
-            PosVertex::new([0.5 * phi, -phi * circle_offset, half_iz]),
-            PosVertex::new([-0.5 * phi, phi * circle_offset, -half_iz]),
-            PosVertex::new([0.5 * phi, phi * circle_offset, -half_iz]),
-            PosVertex::new([-phi * width, -phi * centred_mid, -half_iz]),
-            PosVertex::new([phi * width, -phi * centred_mid, -half_iz]),
-            PosVertex::new([0.0, -phi * circle_radius, -half_iz]),
-            PosVertex::new([-0.5, circle_offset, -oz - half_iz]),
-            PosVertex::new([0.5, circle_offset, -oz - half_iz]),
-            PosVertex::new([-width, -centred_mid, -oz - half_iz]),
-            PosVertex::new([width, -centred_mid, -oz - half_iz]),
-            PosVertex::new([0.0, -circle_radius, -oz - half_iz]),
+            PosVertex::new([0.0, circle_radius, circle_radius + half_iz]),
+            PosVertex::new([-width, centred_mid, circle_radius + half_iz]),
+            PosVertex::new([width, centred_mid, circle_radius + half_iz]),
+            PosVertex::new([-0.5, -circle_offset, circle_radius + half_iz]),
+            PosVertex::new([0.5, -circle_offset, circle_radius + half_iz]),
+            PosVertex::new([0.0, phi_radius, half_iz]),
+            PosVertex::new([-phi_width, phi_mid, half_iz]),
+            PosVertex::new([phi_width, phi_mid, half_iz]),
+            PosVertex::new([-width, -phi * circle_offset, half_iz]),
+            PosVertex::new([width, -phi * circle_offset, half_iz]),
+            PosVertex::new([-width, phi * circle_offset, -half_iz]),
+            PosVertex::new([width, phi * circle_offset, -half_iz]),
+            PosVertex::new([-phi_width, -phi_mid, -half_iz]),
+            PosVertex::new([phi_width, -phi_mid, -half_iz]),
+            PosVertex::new([0.0, -phi_radius, -half_iz]),
+            PosVertex::new([-0.5, circle_offset, -circle_radius - half_iz]),
+            PosVertex::new([0.5, circle_offset, -circle_radius - half_iz]),
+            PosVertex::new([-width, -centred_mid, -circle_radius - half_iz]),
+            PosVertex::new([width, -centred_mid, -circle_radius - half_iz]),
+            PosVertex::new([0.0, -circle_radius, -circle_radius - half_iz]),
         ];
 
         let indices = vec![
@@ -179,7 +185,7 @@ impl PlatonicSolid {
 mod tests {
     use crate::PlatonicSolid;
 
-    const TOLERANCE: f32 = 2.5e-7f32;
+    const TOLERANCE: f32 = 1.8e-7f32;
 
     fn magnitude_squared(vertex: &[f32; 3]) -> f32 {
         vertex[0]*vertex[0] + vertex[1]*vertex[1] + vertex[2]*vertex[2]
