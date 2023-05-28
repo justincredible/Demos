@@ -144,16 +144,17 @@ impl PlatonicSolid {
     }
 
     fn icosahedron() -> (Vec<PosVertex>, Vec<u8>) {
-        let mid = f32::cos(DEGREES_18);
-        let top = f32::cos(DEGREES_54);
-        let width = f32::sin(DEGREES_54);
-        let depth = top + mid;
-        let center = 0.5 * depth - 0.125 / depth;
-        let radius = 0.5 * depth + 0.125 / depth;
+        let sr5 = f32::sqrt(5.0);
 
-        let y_diff = f32::sqrt(1.0 - radius * radius);
-        let width_diff = 1.0 - width;
-        let half_middle = 0.5 * f32::sqrt(1.0 - radius * radius * (top * top + width_diff * width_diff));
+        let mid = 0.25 * f32::sqrt(10.0 + 2.0 * sr5);
+        let top = 0.25 * f32::sqrt(10.0 - 2.0 * sr5);
+        let width = 0.25 * (1.0 + sr5); // phi/2
+        let depth = top + mid;
+        let center = 0.25 * (2.0 + sr5) / depth;
+        let radius = 0.25 * (3.0 + sr5) / depth;
+
+        let y_diff = f32::sqrt(0.5 - 0.1 * sr5);
+        let half_middle = 0.5 * f32::sqrt(0.5 + 0.1 * sr5);
 
         let vertices = vec![
             PosVertex::new([0.0, half_middle + y_diff, 0.0]),
@@ -185,7 +186,7 @@ impl PlatonicSolid {
 mod tests {
     use crate::PlatonicSolid;
 
-    const TOLERANCE: f32 = 1.8e-7f32;
+    const TOLERANCE: f32 = 1.2e-7f32;
 
     fn magnitude_squared(vertex: &[f32; 3]) -> f32 {
         vertex[0]*vertex[0] + vertex[1]*vertex[1] + vertex[2]*vertex[2]
