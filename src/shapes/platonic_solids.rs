@@ -3,9 +3,6 @@ use glium::backend::Facade;
 use glium::index::{IndexBuffer, PrimitiveType};
 use glium::vertex::VertexBuffer;
 
-const DEGREES_18: f32 = std::f32::consts::PI / 10.0;
-const DEGREES_54: f32 = 3.0 * std::f32::consts::PI / 10.0;
-
 pub enum PlatonicSolids {
     Tetrahedron,
     Hexahedron,
