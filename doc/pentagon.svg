@@ -1,0 +1,30 @@
+<svg viewBox="-30 -30 225 225" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="0,59 31,154 131,154 162,59 81,0" fill="none" stroke="black" />
+
+    <line x1="0" y1="59" x2="131" y2="154" stroke="black" stroke-dasharray="2" />
+
+    <text x="10" y="107" font-size="5" >1</text>
+    <text x="81" y="160" font-size="5" >1</text>
+
+    <!-- phi -->
+    <path d="M 68 102 C 65.5 105 71.5 104 70 102.5 S 68.5 103 68.5 105.5" stroke="black" fill="none" stroke-width="0.4" />
+
+    <path d="M 41 154 A 10 10 0 0 0 28 144" stroke="black" fill="none" stroke-width="0.5" />
+
+    <!-- pi -->
+    <path d="M 37.5 135 C 39.5 134.5 39.5 135 39.5 135 S 40.5 135 40 134.5
+            M 39 134.8 C 38 134.5 38.8 136 37.5 137
+            M 39.3 134.8 C 39.5 135 38 138 40 136.5" stroke="black" fill="none" stroke-width="0.3" />
+    <text x="35" y="137" font-size="5" >3</text>
+    <text x="35" y="137" font-size="5" >__</text>
+    <text x="36" y="142" font-size="5" >5</text>
+
+    <polyline points="81,0 81,59 162,59" stroke="black" fill="none" stroke-width="0.5" stroke-dasharray="1" />
+    <polyline points="91,59 91,49 81,49" stroke="black" fill="none" stroke-width="0.5" />
+    <text x="73" y="29" font-size="5" >top</text>
+    <text x="115" y="63.5" font-size="5" >span</text>
+
+    <polyline points="162,59 162,154 131,154" stroke="black" fill="none" stroke-width="0.5" stroke-dasharray="1" />
+    <polyline points="152,154 152,144 162,144" stroke="black" fill="none" stroke-width="0.5" />
+    <text x="163.5" y="106" font-size="5" >base</text>
+</svg>

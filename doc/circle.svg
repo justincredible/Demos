@@ -1,0 +1,20 @@
+<svg viewBox="-30 -30 225 225" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="0,59 31,154 131,154 162,59 81,0" fill="none" stroke="black" />
+
+    <polygon points="0,111 31,16 131,16 162,111 81,170" fill="none" stroke="black" stroke-dasharray="5,3" />
+
+    <!-- cy = height - center -->
+    <circle cx="81" cy="85" r="85" fill="none" stroke="black" />
+
+    <circle cx="81" cy="85" r="0.5" stroke="black" />
+    <text x="84" y="88" font-size="5" >c</text>
+
+    <line x1="81" y1="85" x2="81" y2="0" stroke="black" stroke-width="0.5" stroke-dasharray="1" />
+    <text x="84" y="44" font-size="5" >r</text>
+
+    <polyline points="131,154 131,0 81,0" stroke="black" fill="none" stroke-width="0.5" stroke-dasharray="1" />
+    <polyline points="126,0 126,5 131,5" stroke="black" fill="none" stroke-width="0.5" />
+    <text x="126" y="85" font-size="5" >h</text>
+
+    <text x="81" y="151.5" font-size="5" >1</text>
+</svg>
