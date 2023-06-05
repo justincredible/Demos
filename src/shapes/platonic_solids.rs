@@ -96,7 +96,7 @@ impl PlatonicSolid {
         let height = top + mid;
         let circle_offset = 0.25 * (2.0 + sr5) / height;
         let circle_radius = 0.25 * (3.0 + sr5) / height;
-        let centred_mid = mid - circle_offset; // 0.125 * (1.0 + sr5) / height;
+        let centred_mid = 0.125 * (1.0 + sr5) / height;
         let phi_width = 0.25 * (3.0 + sr5);
         // we use the less accurate (phi * circle_offset)
         // to offset some accumulated error in the tests
