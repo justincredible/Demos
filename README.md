@@ -11,11 +11,13 @@ These are regular polygons with unit length.
 
 ### Triangle
 
-An equilateral triangle has $60^\circ$ vertex angles, so the height is $h = { \sqrt 3 \over 2 }$.
+An equilateral triangle has $60^\circ$ vertex angles, so the height is $h = { \sqrt 3 \over 2 }$
+![triangle](https://github.com/justincredible/Playground/assets/3183562/5db98b4c-a59b-4df8-9697-26c696f9981f)
 
 ### Square
 
 A square has $90^\circ$ vertex angles, and the distance between non-adjacent vertices is $\sqrt 2$
+![square](https://github.com/justincredible/Playground/assets/3183562/74e05847-f055-4c19-b973-c9db52833049)
 
 ### Pentagon
 
@@ -24,6 +26,7 @@ A regular pentagon has $108^\circ$ vertex angles, leading to several facts:
 - the angles adjacent to lengths top and span are $54^\circ$ and $36^\circ$ respectively
 - the angle adjacent to length base is $18^\circ$
 - the height of this polygon is $h = \cos { \pi \over 10 } + \cos { 3\pi \over 10 }$
+![pentagon](https://github.com/justincredible/Playground/assets/3183562/511624af-d685-475e-8ced-215e9ce19f3c)
 
 ### Circumscribing circle
 
@@ -38,6 +41,7 @@ center $c = (0, { h \over 2 } - { 1 \over 8h })$ and
 radius $r = { h \over 2 } + { 1 \over 8h }$
 
 The vertices are centred by subtracting $c$
+![circle](https://github.com/justincredible/Playground/assets/3183562/49fea3be-5f4f-45d9-9249-fb96fb09bda2)
 
 Also notice how a reflected face can be symmetrically positioned in the circle.
 
@@ -71,6 +75,7 @@ and the two remaining vertices have a distance of $1 \over \sqrt 2$ from the squ
 
 The first five relative positions are known from the pentagon,
 and from the diagram below we see a conceptual pentagon with side length $\phi$
+![dodecahedron](https://github.com/justincredible/Playground/assets/3183562/615e39ed-935c-4dae-8588-9bd620c2170a)
 
 Positioning this larger pentagon similarly shows the next five vertices have x- and y-coordinates $\phi$ times larger than the first five.
 The distance between the first two sets of vertices, $z_{outer}$,
