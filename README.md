@@ -3,7 +3,7 @@
 The Platonic Solids and necessary polygons.
 
 The derivation of vertex positions requires only elementary trigonometry and algebra.
-All angles used have [simple exact solutions](https://en.wikipedia.org/wiki/Exact_trigonometric_values).
+All angles have simple [exact trigonometric values](https://en.wikipedia.org/wiki/Exact_trigonometric_values).
 
 ## Polygons
 
