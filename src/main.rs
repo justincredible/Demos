@@ -4,7 +4,10 @@ extern crate glium;
 use glam::{Mat4, Quat, Vec3};
 use glium::{glutin, Surface};
 use glutin::dpi::PhysicalPosition;
-use glutin::{event::{Event, WindowEvent}, event_loop::ControlFlow};
+use glutin::{
+    event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
+    event_loop::ControlFlow,
+};
 
 pub mod shapes;
 use shapes::platonic_solids::{PlatonicSolid, PlatonicSolids};
@@ -25,7 +28,8 @@ fn main() {
 
     let program = glium::Program::from_source(
         &display,
-        /* Vertex shader */r#"
+        /* Vertex shader */
+        r#"
             #version 150
 
             in vec3 position;
@@ -36,7 +40,8 @@ fn main() {
                 v_position = position;
             }
         "#,
-        /* Fragment shader */r#"
+        /* Fragment shader */
+        r#"
             #version 140
 
             const vec3 LIGHT_DIR = vec3(-1.0, 1, 1);
@@ -53,7 +58,9 @@ fn main() {
                 f_colour = saturation * colour + AMBIENT;
             }
         "#,
-        /* Geometry shader */Some(r#"
+        /* Geometry shader */
+        Some(
+            r#"
             #version 150
 
             layout(triangles) in;
@@ -84,11 +91,18 @@ fn main() {
 
                 EndPrimitive();
             }
-        "#
+        "#,
         ),
-    ).unwrap();
+    )
+    .unwrap();
 
-    let shape = PlatonicSolid::new(&display, PlatonicSolids::Icosahedron);
+    let shapes = vec![
+        PlatonicSolid::new(&display, PlatonicSolids::Tetrahedron),
+        PlatonicSolid::new(&display, PlatonicSolids::Hexahedron),
+        PlatonicSolid::new(&display, PlatonicSolids::Octahedron),
+        PlatonicSolid::new(&display, PlatonicSolids::Dodecahedron),
+        PlatonicSolid::new(&display, PlatonicSolids::Icosahedron),
+    ];
 
     let params = glium::DrawParameters {
         backface_culling: glium::BackfaceCullingMode::CullClockwise,
@@ -104,33 +118,88 @@ fn main() {
     let mut rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
     let rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01);
 
+    let mut shape = 4;
+
+    println!(
+        "Up and Down arrows modify vertices per face.\n\
+        Left and Right arrows modify faces per vertex."
+    );
     event_loop.run(move |event, _, control_flow| {
         match event {
             Event::RedrawEventsCleared => display.gl_window().window().request_redraw(),
             Event::RedrawRequested(_) => {
                 rotation *= rotation_delta;
-                let matrix = Mat4::from_scale_rotation_translation(Vec3::ONE, rotation.normalize(), Vec3::ZERO);
+                let scale = Vec3::ONE
+                    * if shape != 3 {
+                        1.0
+                    // the dodecahedron is rather large
+                    } else {
+                        0.5
+                    };
+                let matrix =
+                    Mat4::from_scale_rotation_translation(scale, rotation.normalize(), Vec3::ZERO);
 
                 let mut frame = display.draw();
 
                 frame.clear_color_and_depth((0.0, 0.0, 0.0, 1.0), -1.0);
 
-                frame.draw(
-                    &shape.vertices,
-                    &shape.indices,
-                    &program,
-                    &uniform! { transform: matrix.to_cols_array_2d() },
-                    &params,
-                ).unwrap();
+                frame
+                    .draw(
+                        &shapes[shape].vertices,
+                        &shapes[shape].indices,
+                        &program,
+                        &uniform! { transform: matrix.to_cols_array_2d() },
+                        &params,
+                    )
+                    .unwrap();
 
                 frame.finish().unwrap();
             }
-            Event::WindowEvent { event, .. } => {
-                match event {
-                    WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+
+            Event::WindowEvent { event, .. } => match event {
+                WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+                WindowEvent::KeyboardInput { input, .. } => match input {
+                    KeyboardInput {
+                        state: ElementState::Pressed,
+                        virtual_keycode: Some(VirtualKeyCode::Up),
+                        ..
+                    } => match shape {
+                        0 | 2 | 4 => shape = 1,
+                        1 => shape = 3,
+                        _ => (),
+                    },
+                    KeyboardInput {
+                        state: ElementState::Pressed,
+                        virtual_keycode: Some(VirtualKeyCode::Down),
+                        ..
+                    } => match shape {
+                        3 => shape = 1,
+                        1 => shape = 0,
+                        _ => (),
+                    },
+                    KeyboardInput {
+                        state: ElementState::Pressed,
+                        virtual_keycode: Some(VirtualKeyCode::Left),
+                        ..
+                    } => match shape {
+                        4 => shape = 2,
+                        2 => shape = 0,
+                        _ => (),
+                    },
+                    KeyboardInput {
+                        state: ElementState::Pressed,
+                        virtual_keycode: Some(VirtualKeyCode::Right),
+                        ..
+                    } => match shape {
+                        0 => shape = 2,
+                        2 => shape = 4,
+                        _ => (),
+                    },
                     _ => (),
-                }
+                },
+                _ => (),
             },
+
             _ => (),
         }
     });
