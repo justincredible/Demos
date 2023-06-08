@@ -137,7 +137,7 @@ fn main() {
 }
 
 fn read_icon(path: &str) -> std::io::Result<glutin::window::Icon> {
-    let image = read_targa(path).unwrap();
+    let image = read_targa(path)?;
 
     let icon = glutin::window::Icon::from_rgba(image.bytes, image.width, image.height).unwrap();
     Ok(icon)
