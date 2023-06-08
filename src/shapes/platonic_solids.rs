@@ -18,7 +18,6 @@ pub struct PlatonicSolid {
 
 impl PlatonicSolid {
     pub fn new(facade: &dyn Facade, polyhedron: PlatonicSolids) -> Self {
-
         let (vertices, indices) = match polyhedron {
             PlatonicSolids::Tetrahedron => Self::tetrahedron(),
             PlatonicSolids::Hexahedron => Self::hexahedron(),
@@ -130,11 +129,8 @@ impl PlatonicSolid {
         ];
 
         let indices = vec![
-            10u8, 6, 5, 1, 0, 2, 5, 7, 11,
-            13, 16, 18, 19, 13, 14, 9, 8, 4,
-            3, 1, 8, 6, 12, 10, 17, 15, 16,
-            10, 11, 5, 1, 4, 2, 9, 7, 13,
-            16, 19, 17, 14, 12, 8,
+            10u8, 6, 5, 1, 0, 2, 5, 7, 11, 13, 16, 18, 19, 13, 14, 9, 8, 4, 3, 1, 8, 6, 12, 10, 17,
+            15, 16, 10, 11, 5, 1, 4, 2, 9, 7, 13, 16, 19, 17, 14, 12, 8,
         ];
 
         (vertices, indices)
@@ -169,9 +165,7 @@ impl PlatonicSolid {
         ];
 
         let indices = vec![
-            4u8, 10, 5, 9, 3, 7, 1, 6, 2,
-            8, 4, 10, 9, 11, 7, 6, 6, 11,
-            8, 10, 4, 5, 0, 3, 1, 1, 0,
+            4u8, 10, 5, 9, 3, 7, 1, 6, 2, 8, 4, 10, 9, 11, 7, 6, 6, 11, 8, 10, 4, 5, 0, 3, 1, 1, 0,
             2, 4,
         ];
 
@@ -186,7 +180,7 @@ mod tests {
     const TOLERANCE: f32 = 1.2e-7f32;
 
     fn magnitude_squared(vertex: &[f32; 3]) -> f32 {
-        vertex[0]*vertex[0] + vertex[1]*vertex[1] + vertex[2]*vertex[2]
+        vertex[0] * vertex[0] + vertex[1] * vertex[1] + vertex[2] * vertex[2]
     }
 
     fn magnitude_squared_diff(a: &[f32; 3], b: &[f32; 3]) -> f32 {
@@ -194,7 +188,7 @@ mod tests {
         let y = a[1] - b[1];
         let z = a[2] - b[2];
 
-        x*x + y*y + z*z
+        x * x + y * y + z * z
     }
 
     macro_rules! uniform_distance {
@@ -206,15 +200,16 @@ mod tests {
             for vertex in vertices {
                 assert!(f32::abs(r_squared - magnitude_squared(&vertex.position)) <= TOLERANCE);
             }
-        }
+        };
     }
 
     macro_rules! unit_neighbour {
         ($vertices:expr, $a:expr, $b:expr) => {
-            let difference_length = magnitude_squared_diff(&$vertices[$a].position, &$vertices[$b].position);
+            let difference_length =
+                magnitude_squared_diff(&$vertices[$a].position, &$vertices[$b].position);
 
             assert!(f32::abs(1.0 - difference_length) <= TOLERANCE);
-        }
+        };
     }
 
     #[test]

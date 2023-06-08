@@ -20,7 +20,8 @@ impl Triangle {
                     PosVertex::new([0.5, -half_sin_60, 0.0]),
                     PosVertex::new([0.0, half_sin_60, 0.0]),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             indices: NoIndices(PrimitiveType::TriangleStrip),
         }
     }
@@ -42,7 +43,8 @@ impl Quadrilateral {
                     PosVertex::new([-0.5, 0.5, 0.0]),
                     PosVertex::new([0.5, 0.5, 0.0]),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             indices: NoIndices(PrimitiveType::TriangleStrip),
         }
     }
@@ -57,10 +59,10 @@ impl Pentagon {
     pub fn new(facade: &dyn Facade) -> Self {
         let pi = std::f32::consts::PI;
 
-        let half_width = f32::sin (3.0/10.0*pi);
-        let width_offset = f32::cos (2.0/5.0*pi);
-        let height_offset = f32::cos (3.0/10.0*pi);
-        let half_height = (height_offset + f32::sin (2.0/5.0*pi)) / 2.0;
+        let half_width = f32::sin(3.0 / 10.0 * pi);
+        let width_offset = f32::cos(2.0 / 5.0 * pi);
+        let height_offset = f32::cos(3.0 / 10.0 * pi);
+        let half_height = (height_offset + f32::sin(2.0 / 5.0 * pi)) / 2.0;
 
         Pentagon {
             vertices: VertexBuffer::new(
@@ -72,7 +74,8 @@ impl Pentagon {
                     PosVertex::new([-half_width + width_offset, -half_height, 0.0]),
                     PosVertex::new([half_width - width_offset, -half_height, 0.0]),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             indices: NoIndices(PrimitiveType::TriangleStrip),
         }
     }
