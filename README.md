@@ -7,7 +7,7 @@ All angles have simple [exact trigonometric values](https://en.wikipedia.org/wik
 
 ## Polygons
 
-These are regular polygons with unit length.
+Regular polygons with unit length. The faces of the polyhedra.
 
 ### Triangle
 
@@ -51,9 +51,7 @@ Also notice how a reflected face can be symmetrically positioned in the circle.
 
 ## Platonic Solids
 
-The derivations are based on an assumption that the polyhedra can be circumscribed by spheres.
-The intuition behind this claim is that the uniform regularity of these polyhedra requires containment within a sphere.
-I do not have a proof for this premise, but let the program itself serve as evidence.
+Finite regular convex polyhedra with unit length edges.
 
 ### Tetrahedron
 
