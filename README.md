@@ -55,10 +55,10 @@ Finite regular convex polyhedra with unit length edges.
 
 ### Tetrahedron
 
-The relative positions of three vertices are known from the triangle,
-and we assume the last vertex is orthogonal to the circumscribing circle's center.
-Since the edges have unit length, the shortest distance from the last vertex to the center, $z$,
-satisfies $(h - c_y)^2 + z^2 = 1 \implies z = \sqrt { 1 - r^2 }$
+The relative positions of three vertices are known from the triangle.
+The last vertex is collinear with the center and orthogonal to the circle.
+Since the edges have unit length, the distance, $z$,
+from the last vertex to the center satisfies $(h - c_y)^2 + z^2 = 1 \implies z = \sqrt { 1 - r^2 }$
 
 The polyhedron is centred by solving for $a, b$ in $a^2 = b^2 + r^2$ such that $a - b = z$
 
@@ -100,5 +100,5 @@ The bottom edges of the triangles form a regular pentagon perimeter.
 From this we have our first ten vertices (the pentagon and its x-axis reflection).
 The distance betwen these vertices is $z_{inner} = \sqrt { 1 - 4(base - c)^2 }  = \sqrt { 1 - 4(r - top)^2 }$
 
-The final two vertices are assumed to be orthogonal to the circumscribing circle's center.
+The final two vertices are collinear with the center and orthogonal to the circle.
 The distance from the center is $z_{outer} = \sqrt { 1 - r^2 }$
