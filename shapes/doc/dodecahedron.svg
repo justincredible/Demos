@@ -1,0 +1,16 @@
+<svg viewBox="-125 -125 400 400" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="0,59 31,154 131,154 162,59 81,0" fill="none" stroke="black" />
+
+    <polygon points="81,0 81,-53 0,-26 -50,42 0,59
+                    -50,42 -50,128 0,196 31,154
+                    0,196 81,223 162,196 131,154
+                    162,196 212,128 212,42 162,59
+                    212,42 162,-26 81,-53" fill="none" stroke="black" />
+
+    <polygon points="81,-53 -50,42 0,196 162,196 212,42" stroke="black" fill="none" stroke-dasharray="2" />
+
+    <!-- phi -->
+    <path d="M 150 -15 C 143 -9 157 -11 154 -14 S 151 -13 151 -8 " stroke="black" fill="none" stroke-width="0.8" />
+
+    <text x="125" y="28" font-size="10" >1</text>
+</svg>

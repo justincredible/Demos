@@ -1,0 +1,14 @@
+<svg viewBox="-60 -60 225 225" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="0,100 0,0 100,0 100,100" fill="none" stroke="black" />
+
+    <line x1="0" y1="100" x2="100" y2="0" stroke="black" stroke-dasharray="3" />
+
+    <!-- sqrt -->
+    <polyline points="51,54 51.5,53 52,55 53,51 55,51" fill="none" stroke="black" stroke-width="0.3" />
+    <text x="53" y="55" font-size="5" >2</text>
+
+    <text x="-4.5" y="50" font-size="5" >1</text>
+    <text x="50" y="-2" font-size="5" >1</text>
+
+    <polyline points="10,0 10,10 0,10" fill="none" stroke="black" stroke-width="0.5" />
+</svg>
