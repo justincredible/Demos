@@ -2,6 +2,9 @@ use glium::{glutin, Surface};
 use glutin::dpi::PhysicalPosition;
 use glutin::{event::{Event, WindowEvent}, event_loop::ControlFlow};
 
+pub mod text;
+use text::text::Console;
+
 fn main() {
     let event_loop = glutin::event_loop::EventLoop::new();
     let wb = glutin::window::WindowBuilder::new()
@@ -12,6 +15,8 @@ fn main() {
         .with_multisampling(4)
         .with_vsync(true);
     let display = glium::Display::new(wb, cb, &event_loop).expect("unable to create a new display");
+
+    let mut console = Console::new();
 
     event_loop.run(move |event, _, control_flow| {
         match event {
@@ -24,6 +29,7 @@ fn main() {
             Event::WindowEvent { event, .. } => {
                 match event {
                     WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+                    WindowEvent::KeyboardInput { input, .. } => console.write(input),
                     _ => (),
                 }
             }
