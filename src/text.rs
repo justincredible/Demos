@@ -40,6 +40,18 @@ pub mod text {
 
                 KeyboardInput {
                     state: ElementState::Released,
+                    virtual_keycode: Some(VirtualKeyCode::Escape),
+                    ..
+                } => self.buffer.index = 0,
+
+                KeyboardInput {
+                    state: ElementState::Released,
+                    virtual_keycode: Some(VirtualKeyCode::Back),
+                    ..
+                } => self.buffer.index -= 1,
+
+                KeyboardInput {
+                    state: ElementState::Released,
                     ..
                 } => {
                     if self.buffer.index == MAX_LINE {
