@@ -4,30 +4,50 @@ pub mod text {
 
     const MAX_LINE: usize = 256;
 
+    #[derive(Clone, Copy)]
+    struct Key {
+        virtual_keycode: Option<VirtualKeyCode>,
+        modifiers: ModifiersState,
+    }
+
+    impl From<KeyboardInput> for Key {
+        fn from(input: KeyboardInput) -> Self {
+            Key {
+                virtual_keycode: input.virtual_keycode,
+                modifiers: ModifiersState::empty(),
+            }
+        }
+    }
+
     struct KeyBuffer {
         index: usize,
-        keys: [KeyboardInput; MAX_LINE],
+        keys: [Key; MAX_LINE],
     }
 
     pub struct Console {
         buffer: KeyBuffer,
+        modifiers: ModifiersState,
     }
 
     impl Console {
-        #![allow(deprecated)]
         pub fn new() -> Self {
+            let modifiers = ModifiersState::empty();
+
             Console {
                 buffer: KeyBuffer {
                     index: 0,
-                    keys: [ KeyboardInput {
-                            scancode: 0,
-                            state: ElementState::Pressed,
+                    keys: [ Key {
                             virtual_keycode: None,
-                            modifiers: ModifiersState::empty(),
+                            modifiers,
                         }; MAX_LINE
                     ]
-                }
+                },
+                modifiers,
             }
+        }
+
+        pub fn set_modifiers(&mut self, modifiers: ModifiersState) {
+            self.modifiers = modifiers;
         }
 
         pub fn write(&mut self, input: KeyboardInput) {
@@ -46,7 +66,7 @@ pub mod text {
 
                 KeyboardInput {
                     state: ElementState::Released,
-                    virtual_keycode: Some(VirtualKeyCode::Back),
+                    virtual_keycode: Some(VirtualKeyCode::Back), // Backspace),
                     ..
                 } => self.buffer.index -= 1,
 
@@ -57,7 +77,9 @@ pub mod text {
                     if self.buffer.index == MAX_LINE {
                         self.flush();
                     }
-                    self.buffer.keys[self.buffer.index] = input;
+                    let mut key: Key = input.into();
+                    key.modifiers = self.modifiers;
+                    self.buffer.keys[self.buffer.index] = key;
                     self.buffer.index += 1
                 },
 
@@ -68,7 +90,7 @@ pub mod text {
         fn flush(&mut self) {
             for key in &self.buffer.keys[0..self.buffer.index] {
                 match key {
-                    KeyboardInput {
+                    Key {
                         virtual_keycode: Some(virtual_keycode),
                         modifiers,
                         ..
@@ -88,7 +110,7 @@ pub mod text {
                 .eq(&ModifiersState::SHIFT);
 
             match key {
-                VirtualKeyCode::Space => String::from(" "),
+                VirtualKeyCode::Space | VirtualKeyCode::Tab => String::from(" "),
 
                 // Numpad keys cannot be shifted
                 VirtualKeyCode::Key1 | VirtualKeyCode::Numpad1 => if shifted {

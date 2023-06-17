@@ -30,6 +30,7 @@ fn main() {
                 match event {
                     WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
                     WindowEvent::KeyboardInput { input, .. } => console.write(input),
+                    WindowEvent::ModifiersChanged(mods) => console.set_modifiers(mods),
                     _ => (),
                 }
             }
