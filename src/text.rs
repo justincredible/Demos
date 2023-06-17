@@ -24,6 +24,21 @@ pub mod text {
         keys: [Key; MAX_LINE],
     }
 
+    macro_rules! key_mapper {
+        ($key:ident, $shifted:ident, $($pattern:pat, $shift_value:expr, $base_value:expr),*) => {
+            match $key {
+                $( $pattern => if $shifted {
+                        String::from($shift_value)
+                    } else {
+                        String::from($base_value)
+                    },
+                )*
+
+                _ => String::from(""),
+            }
+        }
+    }
+
     pub struct Console {
         buffer: KeyBuffer,
         modifiers: ModifiersState,
@@ -109,245 +124,59 @@ pub mod text {
                 .bitand(ModifiersState::SHIFT)
                 .eq(&ModifiersState::SHIFT);
 
-            match key {
-                VirtualKeyCode::Space | VirtualKeyCode::Tab => String::from(" "),
+            key_mapper!(key, shifted,
+                VirtualKeyCode::Space | VirtualKeyCode::Tab, "\t", " ",
 
                 // Numpad keys cannot be shifted
-                VirtualKeyCode::Key1 | VirtualKeyCode::Numpad1 => if shifted {
-                        String::from("!")
-                    } else {
-                        String::from("1")
-                    },
-                VirtualKeyCode::Key2 | VirtualKeyCode::Numpad2 => if shifted {
-                        String::from("@")
-                    } else {
-                        String::from("2")
-                    },
-                VirtualKeyCode::Key3 | VirtualKeyCode::Numpad3 => if shifted {
-                        String::from("#")
-                    } else {
-                        String::from("3")
-                    },
-                VirtualKeyCode::Key4 | VirtualKeyCode::Numpad4 => if shifted {
-                        String::from("$")
-                    } else {
-                        String::from("4")
-                    },
-                VirtualKeyCode::Key5 | VirtualKeyCode::Numpad5 => if shifted {
-                        String::from("%")
-                    } else {
-                        String::from("5")
-                    },
-                VirtualKeyCode::Key6 | VirtualKeyCode::Numpad6 => if shifted {
-                        String::from("^")
-                    } else {
-                        String::from("6")
-                    },
-                VirtualKeyCode::Key7 | VirtualKeyCode::Numpad7 => if shifted {
-                        String::from("&")
-                    } else {
-                        String::from("7")
-                    },
-                VirtualKeyCode::Key8 | VirtualKeyCode::Numpad8 => if shifted {
-                        String::from("*")
-                    } else {
-                        String::from("8")
-                    },
-                VirtualKeyCode::Key9 | VirtualKeyCode::Numpad9 => if shifted {
-                        String::from("(")
-                    } else {
-                        String::from("9")
-                    },
-                VirtualKeyCode::Key0 | VirtualKeyCode::Numpad0 => if shifted {
-                        String::from(")")
-                    } else {
-                        String::from("0")
-                    },
+                VirtualKeyCode::Key1 | VirtualKeyCode::Numpad1, "!", "1",
+                VirtualKeyCode::Key2 | VirtualKeyCode::Numpad2, "@", "2",
+                VirtualKeyCode::Key3 | VirtualKeyCode::Numpad3, "#", "3",
+                VirtualKeyCode::Key4 | VirtualKeyCode::Numpad4, "$", "4",
+                VirtualKeyCode::Key5 | VirtualKeyCode::Numpad5, "%", "5",
+                VirtualKeyCode::Key6 | VirtualKeyCode::Numpad6, "^", "6",
+                VirtualKeyCode::Key7 | VirtualKeyCode::Numpad7, "&", "7",
+                VirtualKeyCode::Key8 | VirtualKeyCode::Numpad8, "*", "8",
+                VirtualKeyCode::Key9 | VirtualKeyCode::Numpad9, "(", "9",
+                VirtualKeyCode::Key0 | VirtualKeyCode::Numpad0, ")", "0",
 
-                VirtualKeyCode::A => if shifted {
-                        String::from("A")
-                    } else {
-                        String::from("a")
-                    },
-                VirtualKeyCode::B => if shifted {
-                        String::from("B")
-                    } else {
-                        String::from("b")
-                    },
-                VirtualKeyCode::C => if shifted {
-                        String::from("C")
-                    } else {
-                        String::from("c")
-                    },
-                VirtualKeyCode::D => if shifted {
-                        String::from("D")
-                    } else {
-                        String::from("d")
-                    },
-                VirtualKeyCode::E => if shifted {
-                        String::from("E")
-                    } else {
-                        String::from("e")
-                    },
-                VirtualKeyCode::F => if shifted {
-                        String::from("F")
-                    } else {
-                        String::from("f")
-                    },
-                VirtualKeyCode::G => if shifted {
-                        String::from("G")
-                    } else {
-                        String::from("g")
-                    },
-                VirtualKeyCode::H => if shifted {
-                        String::from("H")
-                    } else {
-                        String::from("h")
-                    },
-                VirtualKeyCode::I => if shifted {
-                        String::from("I")
-                    } else {
-                        String::from("i")
-                    },
-                VirtualKeyCode::J => if shifted {
-                        String::from("J")
-                    } else {
-                        String::from("j")
-                    },
-                VirtualKeyCode::K => if shifted {
-                        String::from("K")
-                    } else {
-                        String::from("k")
-                    },
-                VirtualKeyCode::L => if shifted {
-                        String::from("L")
-                    } else {
-                        String::from("l")
-                    },
-                VirtualKeyCode::M => if shifted {
-                        String::from("M")
-                    } else {
-                        String::from("m")
-                    },
-                VirtualKeyCode::N => if shifted {
-                        String::from("N")
-                    } else {
-                        String::from("n")
-                    },
-                VirtualKeyCode::O => if shifted {
-                        String::from("O")
-                    } else {
-                        String::from("o")
-                    },
-                VirtualKeyCode::P => if shifted {
-                        String::from("P")
-                    } else {
-                        String::from("p")
-                    },
-                VirtualKeyCode::Q => if shifted {
-                        String::from("Q")
-                    } else {
-                        String::from("q")
-                    },
-                VirtualKeyCode::R => if shifted {
-                        String::from("R")
-                    } else {
-                        String::from("r")
-                    },
-                VirtualKeyCode::S => if shifted {
-                        String::from("S")
-                    } else {
-                        String::from("s")
-                    },
-                VirtualKeyCode::T => if shifted {
-                        String::from("T")
-                    } else {
-                        String::from("t")
-                    },
-                VirtualKeyCode::U => if shifted {
-                        String::from("U")
-                    } else {
-                        String::from("u")
-                    },
-                VirtualKeyCode::V => if shifted {
-                        String::from("V")
-                    } else {
-                        String::from("v")
-                    },
-                VirtualKeyCode::W => if shifted {
-                        String::from("W")
-                    } else {
-                        String::from("w")
-                    },
-                VirtualKeyCode::X => if shifted {
-                        String::from("X")
-                    } else {
-                        String::from("x")
-                    },
-                VirtualKeyCode::Y => if shifted {
-                        String::from("Y")
-                    } else {
-                        String::from("y")
-                    },
-                VirtualKeyCode::Z => if shifted {
-                        String::from("Z")
-                    } else {
-                        String::from("z")
-                    },
+                VirtualKeyCode::A, "A", "a",
+                VirtualKeyCode::B, "B", "b",
+                VirtualKeyCode::C, "C", "c",
+                VirtualKeyCode::D, "D", "d",
+                VirtualKeyCode::E, "E", "e",
+                VirtualKeyCode::F, "F", "f",
+                VirtualKeyCode::G, "G", "g",
+                VirtualKeyCode::H, "H", "h",
+                VirtualKeyCode::I, "I", "i",
+                VirtualKeyCode::J, "J", "j",
+                VirtualKeyCode::K, "K", "k",
+                VirtualKeyCode::L, "L", "l",
+                VirtualKeyCode::M, "M", "m",
+                VirtualKeyCode::N, "N", "n",
+                VirtualKeyCode::O, "O", "o",
+                VirtualKeyCode::P, "P", "p",
+                VirtualKeyCode::Q, "Q", "q",
+                VirtualKeyCode::R, "R", "r",
+                VirtualKeyCode::S, "S", "s",
+                VirtualKeyCode::T, "T", "t",
+                VirtualKeyCode::U, "U", "u",
+                VirtualKeyCode::V, "V", "v",
+                VirtualKeyCode::W, "W", "w",
+                VirtualKeyCode::X, "X", "x",
+                VirtualKeyCode::Y, "Y", "y",
+                VirtualKeyCode::Z, "Z", "z",
 
-                VirtualKeyCode::Minus => if shifted {
-                        String::from("_")
-                    } else {
-                        String::from("-")
-                    },
-                VirtualKeyCode::Equals => if shifted {
-                        String::from("+")
-                    } else {
-                        String::from("=")
-                    },
-                VirtualKeyCode::LBracket => if shifted {
-                        String::from("{")
-                    } else {
-                        String::from("[")
-                    },
-                VirtualKeyCode::RBracket => if shifted {
-                        String::from("}")
-                    } else {
-                        String::from("]")
-                    },
-                VirtualKeyCode::Backslash => if shifted {
-                        String::from("|")
-                    } else {
-                        String::from("\\")
-                    },
-                VirtualKeyCode::Semicolon => if shifted {
-                        String::from(":")
-                    } else {
-                        String::from(";")
-                    },
-                VirtualKeyCode::Apostrophe => if shifted {
-                        String::from("\"")
-                    } else {
-                        String::from("'")
-                    },
-                VirtualKeyCode::Comma => if shifted {
-                        String::from("<")
-                    } else {
-                        String::from(",")
-                    },
-                VirtualKeyCode::Period => if shifted {
-                        String::from(">")
-                    } else {
-                        String::from(".")
-                    },
-                VirtualKeyCode::Slash => if shifted {
-                        String::from("?")
-                    } else {
-                        String::from("/")
-                    },
-
-                _ => String::from(""),
-            }
+                VirtualKeyCode::Minus, "_", "-",
+                VirtualKeyCode::Equals, "+", "=",
+                VirtualKeyCode::LBracket, "{", "[",
+                VirtualKeyCode::RBracket, "}", "]",
+                VirtualKeyCode::Backslash, "|", "\\",
+                VirtualKeyCode::Semicolon, ":", ";",
+                VirtualKeyCode::Apostrophe, "\"", "'",
+                VirtualKeyCode::Comma, "<", ",",
+                VirtualKeyCode::Period, ">", ".",
+                VirtualKeyCode::Slash, "?", "/"
+            )
         }
     }
 }
