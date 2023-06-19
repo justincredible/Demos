@@ -166,6 +166,7 @@ pub mod text {
                 VirtualKeyCode::Y, "Y", "y",
                 VirtualKeyCode::Z, "Z", "z",
 
+                VirtualKeyCode::Grave, "~", "`",
                 VirtualKeyCode::Minus, "_", "-",
                 VirtualKeyCode::Equals, "+", "=",
                 VirtualKeyCode::LBracket, "{", "[",
