@@ -24,21 +24,6 @@ pub mod text {
         keys: [Key; MAX_LINE],
     }
 
-    macro_rules! key_mapper {
-        ($key:ident, $shifted:ident, $($pattern:pat, $shift_value:expr, $base_value:expr),*) => {
-            match $key {
-                $( $pattern => if $shifted {
-                        String::from($shift_value)
-                    } else {
-                        String::from($base_value)
-                    },
-                )*
-
-                _ => String::from(""),
-            }
-        }
-    }
-
     pub struct Console {
         buffer: KeyBuffer,
         modifiers: ModifiersState,
@@ -119,65 +104,67 @@ pub mod text {
             println!("");
         }
 
-        fn key_map(key: &VirtualKeyCode, modifiers: &ModifiersState) -> String {
+        fn key_map(key: &VirtualKeyCode, modifiers: &ModifiersState) -> char {
             let shifted = modifiers
                 .bitand(ModifiersState::SHIFT)
                 .eq(&ModifiersState::SHIFT);
 
-            key_mapper!(key, shifted,
-                VirtualKeyCode::Space | VirtualKeyCode::Tab, "\t", " ",
+            match key {
+                VirtualKeyCode::Space | VirtualKeyCode::Tab => if shifted { '\t' } else { ' ' },
 
                 // Numpad keys cannot be shifted
-                VirtualKeyCode::Key1 | VirtualKeyCode::Numpad1, "!", "1",
-                VirtualKeyCode::Key2 | VirtualKeyCode::Numpad2, "@", "2",
-                VirtualKeyCode::Key3 | VirtualKeyCode::Numpad3, "#", "3",
-                VirtualKeyCode::Key4 | VirtualKeyCode::Numpad4, "$", "4",
-                VirtualKeyCode::Key5 | VirtualKeyCode::Numpad5, "%", "5",
-                VirtualKeyCode::Key6 | VirtualKeyCode::Numpad6, "^", "6",
-                VirtualKeyCode::Key7 | VirtualKeyCode::Numpad7, "&", "7",
-                VirtualKeyCode::Key8 | VirtualKeyCode::Numpad8, "*", "8",
-                VirtualKeyCode::Key9 | VirtualKeyCode::Numpad9, "(", "9",
-                VirtualKeyCode::Key0 | VirtualKeyCode::Numpad0, ")", "0",
+                VirtualKeyCode::Key1 | VirtualKeyCode::Numpad1 => if shifted { '!' } else { '1' },
+                VirtualKeyCode::Key2 | VirtualKeyCode::Numpad2 => if shifted { '@' } else { '2' },
+                VirtualKeyCode::Key3 | VirtualKeyCode::Numpad3 => if shifted { '#' } else { '3' },
+                VirtualKeyCode::Key4 | VirtualKeyCode::Numpad4 => if shifted { '$' } else { '4' },
+                VirtualKeyCode::Key5 | VirtualKeyCode::Numpad5 => if shifted { '%' } else { '5' },
+                VirtualKeyCode::Key6 | VirtualKeyCode::Numpad6 => if shifted { '^' } else { '6' },
+                VirtualKeyCode::Key7 | VirtualKeyCode::Numpad7 => if shifted { '&' } else { '7' },
+                VirtualKeyCode::Key8 | VirtualKeyCode::Numpad8 => if shifted { '*' } else { '8' },
+                VirtualKeyCode::Key9 | VirtualKeyCode::Numpad9 => if shifted { '(' } else { '9' },
+                VirtualKeyCode::Key0 | VirtualKeyCode::Numpad0 => if shifted { ')' } else { '0' },
 
-                VirtualKeyCode::A, "A", "a",
-                VirtualKeyCode::B, "B", "b",
-                VirtualKeyCode::C, "C", "c",
-                VirtualKeyCode::D, "D", "d",
-                VirtualKeyCode::E, "E", "e",
-                VirtualKeyCode::F, "F", "f",
-                VirtualKeyCode::G, "G", "g",
-                VirtualKeyCode::H, "H", "h",
-                VirtualKeyCode::I, "I", "i",
-                VirtualKeyCode::J, "J", "j",
-                VirtualKeyCode::K, "K", "k",
-                VirtualKeyCode::L, "L", "l",
-                VirtualKeyCode::M, "M", "m",
-                VirtualKeyCode::N, "N", "n",
-                VirtualKeyCode::O, "O", "o",
-                VirtualKeyCode::P, "P", "p",
-                VirtualKeyCode::Q, "Q", "q",
-                VirtualKeyCode::R, "R", "r",
-                VirtualKeyCode::S, "S", "s",
-                VirtualKeyCode::T, "T", "t",
-                VirtualKeyCode::U, "U", "u",
-                VirtualKeyCode::V, "V", "v",
-                VirtualKeyCode::W, "W", "w",
-                VirtualKeyCode::X, "X", "x",
-                VirtualKeyCode::Y, "Y", "y",
-                VirtualKeyCode::Z, "Z", "z",
+                VirtualKeyCode::A => if shifted { 'A' } else { 'a' },
+                VirtualKeyCode::B => if shifted { 'B' } else { 'b' },
+                VirtualKeyCode::C => if shifted { 'C' } else { 'c' },
+                VirtualKeyCode::D => if shifted { 'D' } else { 'd' },
+                VirtualKeyCode::E => if shifted { 'E' } else { 'e' },
+                VirtualKeyCode::F => if shifted { 'F' } else { 'f' },
+                VirtualKeyCode::G => if shifted { 'G' } else { 'g' },
+                VirtualKeyCode::H => if shifted { 'H' } else { 'h' },
+                VirtualKeyCode::I => if shifted { 'I' } else { 'i' },
+                VirtualKeyCode::J => if shifted { 'J' } else { 'j' },
+                VirtualKeyCode::K => if shifted { 'K' } else { 'k' },
+                VirtualKeyCode::L => if shifted { 'L' } else { 'l' },
+                VirtualKeyCode::M => if shifted { 'M' } else { 'm' },
+                VirtualKeyCode::N => if shifted { 'N' } else { 'n' },
+                VirtualKeyCode::O => if shifted { 'O' } else { 'o' },
+                VirtualKeyCode::P => if shifted { 'P' } else { 'p' },
+                VirtualKeyCode::Q => if shifted { 'Q' } else { 'q' },
+                VirtualKeyCode::R => if shifted { 'R' } else { 'r' },
+                VirtualKeyCode::S => if shifted { 'S' } else { 's' },
+                VirtualKeyCode::T => if shifted { 'T' } else { 't' },
+                VirtualKeyCode::U => if shifted { 'U' } else { 'u' },
+                VirtualKeyCode::V => if shifted { 'V' } else { 'v' },
+                VirtualKeyCode::W => if shifted { 'W' } else { 'w' },
+                VirtualKeyCode::X => if shifted { 'X' } else { 'x' },
+                VirtualKeyCode::Y => if shifted { 'Y' } else { 'y' },
+                VirtualKeyCode::Z => if shifted { 'Z' } else { 'z' },
 
-                VirtualKeyCode::Grave, "~", "`",
-                VirtualKeyCode::Minus, "_", "-",
-                VirtualKeyCode::Equals, "+", "=",
-                VirtualKeyCode::LBracket, "{", "[",
-                VirtualKeyCode::RBracket, "}", "]",
-                VirtualKeyCode::Backslash, "|", "\\",
-                VirtualKeyCode::Semicolon, ":", ";",
-                VirtualKeyCode::Apostrophe, "\"", "'",
-                VirtualKeyCode::Comma, "<", ",",
-                VirtualKeyCode::Period, ">", ".",
-                VirtualKeyCode::Slash, "?", "/"
-            )
+                VirtualKeyCode::Grave => if shifted { '~' } else { '`' },
+                VirtualKeyCode::Minus => if shifted { '_' } else { '-' },
+                VirtualKeyCode::Equals => if shifted { '+' } else { '=' },
+                VirtualKeyCode::LBracket => if shifted { '{' } else { '[' },
+                VirtualKeyCode::RBracket => if shifted { '}' } else { ']' },
+                VirtualKeyCode::Backslash => if shifted { '|' } else { '\\' },
+                VirtualKeyCode::Semicolon => if shifted { ':' } else { ';' },
+                VirtualKeyCode::Apostrophe => if shifted { '"' } else { '\'' },
+                VirtualKeyCode::Comma => if shifted { '<' } else { ',' },
+                VirtualKeyCode::Period => if shifted { '>' } else { '.' },
+                VirtualKeyCode::Slash => if shifted { '?' } else { '/' },
+
+                _ => '\0',
+            }
         }
     }
 }
