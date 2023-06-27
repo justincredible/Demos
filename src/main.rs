@@ -96,6 +96,8 @@ const FONT_FS: &'static str = r#"
 
     void main() {
         colour = texture(font, coordinates);
+
+        if (colour.a == 0) discard;
     }
 "#;
 
