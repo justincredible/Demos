@@ -31,7 +31,7 @@ pub mod text {
 
             CharString {
                 vertex_count: 0,
-                vertices: VertexBuffer::empty_dynamic(facade, 4 * MAX_LINE).unwrap(),
+                vertices: VertexBuffer::dynamic(facade, &[Default::default(); 4 * MAX_LINE]).unwrap(),
                 indices: IndexBuffer::immutable(
                     facade,
                     PrimitiveType::TrianglesList,
@@ -53,38 +53,36 @@ pub mod text {
             const WIDTH: f32 = 0.03f32;
             const SPACE: f32 = 0.01f32;
 
-            let mut vertices = [Default::default(); 4 * MAX_LINE];
-
-            self.vertices.invalidate();
-
             let mut start = 0.0f32;
+            self.vertex_count = 0;
             for (i, ch) in line.chars().enumerate() {
                 let [left, right, bottom, top] = Self::tex_map(ch);
                 let index = 4 * i;
 
-                vertices[index] = CharVertex {
-                    pos: [start, 0.0],
-                    tex: [left, bottom],
-                };
-                vertices[index + 1] = CharVertex {
-                    pos: [start + WIDTH, 0.0],
-                    tex: [right, bottom],
-                };
-                vertices[index + 2] = CharVertex {
-                    pos: [start, HEIGHT],
-                    tex: [left, top],
-                };
-                vertices[index + 3] = CharVertex {
-                    pos: [start + WIDTH, HEIGHT],
-                    tex: [right, top],
-                };
+                let vertices = [
+                    CharVertex {
+                        pos: [start, 0.0],
+                        tex: [left, bottom],
+                    },
+                    CharVertex {
+                        pos: [start + WIDTH, 0.0],
+                        tex: [right, bottom],
+                    },
+                    CharVertex {
+                        pos: [start, HEIGHT],
+                        tex: [left, top],
+                    },
+                    CharVertex {
+                        pos: [start + WIDTH, HEIGHT],
+                        tex: [right, top],
+                    },
+                ];
 
+                self.vertices.slice_mut(index..(index + 4)).unwrap().write(&vertices);
+
+                self.vertex_count += 1;
                 start += WIDTH + SPACE;
             }
-
-            self.vertices.write(&vertices);
-
-            self.vertex_count = line.len();
         }
 
         fn tex_map(ch: char) -> [f32; 4] {
