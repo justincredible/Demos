@@ -164,7 +164,7 @@ pub mod text {
                     state: ElementState::Released,
                     virtual_keycode: Some(VirtualKeyCode::Back), // Backspace),
                     ..
-                } => self.buffer.index -= 1,
+                } => if self.buffer.index > 0 { self.buffer.index -= 1 },
 
                 KeyboardInput {
                     state: ElementState::Released,
