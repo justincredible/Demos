@@ -175,8 +175,11 @@ pub mod text {
                     }
                     let mut key: Key = input.into();
                     key.modifiers = self.modifiers;
-                    self.buffer.keys[self.buffer.index] = key;
-                    self.buffer.index += 1
+
+                    if Self::key_map(&key.virtual_keycode.unwrap(), &key.modifiers) != '\0' {
+                        self.buffer.keys[self.buffer.index] = key;
+                        self.buffer.index += 1;
+                    }
                 },
 
                 _ => (),
