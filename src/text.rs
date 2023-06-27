@@ -1,10 +1,100 @@
 pub mod text {
     use crate::glutin::event::{ElementState, KeyboardInput, ModifiersState, VirtualKeyCode};
+    use glium::{backend::Facade, index::PrimitiveType, IndexBuffer, VertexBuffer};
     use std::ops::BitAnd;
 
     const MAX_LINE: usize = 256;
 
-    #[derive(Clone, Copy)]
+    #[derive(Clone, Copy, Debug, Default)]
+    pub struct CharVertex {
+        pub pos: [f32; 2],
+        pub tex: [f32; 2],
+    }
+
+    implement_vertex!(CharVertex, pos, tex);
+
+    pub struct CharString {
+        vertex_count: usize,
+        vertices: VertexBuffer<CharVertex>,
+        indices: IndexBuffer<u16>,
+    }
+
+    impl CharString {
+        pub fn new(facade: &dyn Facade) -> Self {
+            let indices: Vec<u16> = (0..MAX_LINE as u16)
+                .map(| i | {
+                    let i = 4 * i;
+                    [i, i + 1, i + 2, i + 2, i + 1, i + 3]
+                })
+                .flatten()
+                .collect();
+
+            CharString {
+                vertex_count: 0,
+                vertices: VertexBuffer::empty_dynamic(facade, 4 * MAX_LINE).unwrap(),
+                indices: IndexBuffer::immutable(
+                    facade,
+                    PrimitiveType::TrianglesList,
+                    &indices
+                ).unwrap(),
+            }
+        }
+
+        pub fn vertices(&self) -> glium::vertex::VertexBufferSlice<CharVertex> {
+            self.vertices.slice(0..(4 * self.vertex_count)).unwrap()
+        }
+
+        pub fn indices(&self) -> glium::index::IndexBufferSlice<u16> {
+            self.indices.slice(0..(6 * self.vertex_count)).unwrap()
+        }
+
+        pub fn update(&mut self, line: String) {
+            const HEIGHT: f32 = 0.04f32;
+            const WIDTH: f32 = 0.03f32;
+            const SPACE: f32 = 0.01f32;
+
+            let mut vertices = [Default::default(); 4 * MAX_LINE];
+
+            self.vertices.invalidate();
+
+            let mut start = 0.0f32;
+            for (i, ch) in line.chars().enumerate() {
+                let [left, right, bottom, top] = Self::tex_map(ch);
+                let index = 4 * i;
+
+                vertices[index] = CharVertex {
+                    pos: [start, 0.0],
+                    tex: [left, bottom],
+                };
+                vertices[index + 1] = CharVertex {
+                    pos: [start + WIDTH, 0.0],
+                    tex: [right, bottom],
+                };
+                vertices[index + 2] = CharVertex {
+                    pos: [start, HEIGHT],
+                    tex: [left, top],
+                };
+                vertices[index + 3] = CharVertex {
+                    pos: [start + WIDTH, HEIGHT],
+                    tex: [right, top],
+                };
+
+                start += WIDTH + SPACE;
+            }
+
+            self.vertices.write(&vertices);
+
+            self.vertex_count = line.len();
+        }
+
+        fn tex_map(ch: char) -> [f32; 4] {
+            match ch {
+                _ => [0.0, 1.0, 0.0, 1.0]
+            }
+        }
+    }
+
+    #[derive(Clone, Copy, Debug)]
     struct Key {
         virtual_keycode: Option<VirtualKeyCode>,
         modifiers: ModifiersState,
@@ -48,6 +138,14 @@ pub mod text {
 
         pub fn set_modifiers(&mut self, modifiers: ModifiersState) {
             self.modifiers = modifiers;
+        }
+
+        pub fn read(&self) -> String {
+            self.buffer.keys
+                .iter()
+                .take(self.buffer.index)
+                .map(| k | Self::key_map(&k.virtual_keycode.unwrap(), &k.modifiers))
+                .collect()
         }
 
         pub fn write(&mut self, input: KeyboardInput) {
