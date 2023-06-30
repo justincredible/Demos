@@ -2,17 +2,20 @@
 extern crate glium;
 
 use glium::{glutin, Surface};
+use glium::texture::{RawImage2d, CompressedSrgbTexture2d};
 use glutin::dpi::PhysicalPosition;
-use glutin::{event::{Event, WindowEvent}, event_loop::ControlFlow};
+use glutin::event::{Event, WindowEvent};
+use glutin::event_loop::{EventLoop, ControlFlow};
+use glutin::window::{Icon, WindowBuilder};
 
 pub mod text;
 use text::text::{CharString, Console};
 
 fn main() {
     let icon = simple_targa::read_targa("res/icon.tga").unwrap();
-    let event_loop = glutin::event_loop::EventLoop::new();
-    let wb = glutin::window::WindowBuilder::new()
-        .with_window_icon(glutin::window::Icon::from_rgba(icon.bytes, icon.width, icon.height).ok())
+    let event_loop = EventLoop::new();
+    let wb = WindowBuilder::new()
+        .with_window_icon(Icon::from_rgba(icon.bytes, icon.width, icon.height).ok())
         .with_resizable(false)
         .with_title("text")
         .with_position(PhysicalPosition::<i32>::from((50, 50)));
@@ -25,8 +28,8 @@ fn main() {
     let mut char_string = CharString::new(&display);
 
     let targa = simple_targa::read_targa("res/font.tga").unwrap();
-    let font_img = glium::texture::RawImage2d::from_raw_rgba(targa.bytes, (targa.width, targa.height));
-    let font_tex = glium::texture::CompressedSrgbTexture2d::new(&display, font_img).unwrap();
+    let font_img = RawImage2d::from_raw_rgba(targa.bytes, (targa.width, targa.height));
+    let font_tex = CompressedSrgbTexture2d::new(&display, font_img).unwrap();
 
     let font_shader = glium::Program::from_source(&display, &FONT_VS, &FONT_FS, None).unwrap();
 
