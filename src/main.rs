@@ -53,7 +53,7 @@ fn main() {
                     &font_shader,
                     &uniform! {
                         translation: [-1.0f32, -1.0],
-                        font: glium::uniforms::Sampler::new(&font_tex),
+                        font: &font_tex,
                     },
                     &params,
                 )
