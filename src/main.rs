@@ -9,8 +9,10 @@ pub mod text;
 use text::text::{CharString, Console};
 
 fn main() {
+    let icon = simple_targa::read_targa("res/icon.tga").unwrap();
     let event_loop = glutin::event_loop::EventLoop::new();
     let wb = glutin::window::WindowBuilder::new()
+        .with_window_icon(glutin::window::Icon::from_rgba(icon.bytes, icon.width, icon.height).ok())
         .with_resizable(false)
         .with_title("text")
         .with_position(PhysicalPosition::<i32>::from((50, 50)));
