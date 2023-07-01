@@ -49,7 +49,7 @@ pub mod text {
         }
 
         pub fn update(&mut self, line: String) {
-            const HEIGHT: f32 = 0.04f32;
+            const HEIGHT: f32 = 0.05f32;
             const WIDTH: f32 = 0.03f32;
             const SPACE: f32 = 0.01f32;
 
