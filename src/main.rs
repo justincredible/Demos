@@ -9,7 +9,7 @@ use glutin::event_loop::{EventLoop, ControlFlow};
 use glutin::window::{Icon, WindowBuilder};
 
 pub mod text;
-use text::text::{CharString, Console};
+use text::{CharString, Console};
 
 fn main() {
     let icon = simple_targa::read_targa("res/icon.tga").unwrap();
