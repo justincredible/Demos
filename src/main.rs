@@ -11,7 +11,7 @@ use glutin::window::{Icon, WindowBuilder};
 mod simple_targa;
 use simple_targa::read_targa;
 mod text;
-use text::{CharString, Console};
+use text::Console;
 mod font;
 use font::Font;
 
@@ -28,8 +28,7 @@ fn main() {
         .with_vsync(true);
     let display = glium::Display::new(wb, cb, &event_loop).unwrap();
 
-    let mut console = Console::new();
-    let mut char_string = CharString::new(&display);
+    let mut console = Console::new(&display);
     let font = Font::new(&display, read_targa("res/font.tga").unwrap());
 
     let params = glium::DrawParameters {
@@ -44,11 +43,9 @@ fn main() {
                 let mut frame = display.draw();
                 frame.clear_color(0.0, 0.0, 0.0, 1.0);
 
-                char_string.update(console.read());
-
                 frame.draw(
-                    char_string.vertices(),
-                    char_string.indices(),
+                    console.echo_line().vertices(),
+                    console.echo_line().indices(),
                     &font.shader,
                     &uniform! {
                         translation: [-1.0f32, -1.0],

@@ -1,5 +1,5 @@
 use glium::glutin::event::{ElementState, KeyboardInput, ModifiersState, VirtualKeyCode};
-use crate::text::{key_map, MAX_LINE};
+use crate::text::{char_string::CharString, key_map, MAX_LINE};
 
 #[derive(Clone, Copy, Debug)]
 struct Key {
@@ -24,10 +24,13 @@ struct KeyBuffer {
 pub struct Console {
     buffer: KeyBuffer,
     modifiers: ModifiersState,
+    echo_line: CharString,
 }
 
 impl Console {
-    pub fn new() -> Self {
+    pub fn new(display: &glium::Display) -> Self {
+        let echo_line = CharString::new(display);
+
         let modifiers = ModifiersState::empty();
 
         Console {
@@ -40,19 +43,16 @@ impl Console {
                 ]
             },
             modifiers,
+            echo_line,
         }
+    }
+
+    pub fn echo_line(&self) -> &CharString {
+        &self.echo_line
     }
 
     pub fn set_modifiers(&mut self, modifiers: ModifiersState) {
         self.modifiers = modifiers;
-    }
-
-    pub fn read(&self) -> String {
-        self.buffer.keys
-            .iter()
-            .take(self.buffer.index)
-            .map(| k | key_map(&k.virtual_keycode.unwrap(), &k.modifiers))
-            .collect()
     }
 
     pub fn write(&mut self, input: KeyboardInput) {
@@ -67,13 +67,19 @@ impl Console {
                 state: ElementState::Released,
                 virtual_keycode: Some(VirtualKeyCode::Escape),
                 ..
-            } => self.buffer.index = 0,
+            } => {
+                self.buffer.index = 0;
+                self.echo_line.clear();
+            },
 
             KeyboardInput {
                 state: ElementState::Released,
                 virtual_keycode: Some(VirtualKeyCode::Back), // Backspace),
                 ..
-            } => if self.buffer.index > 0 { self.buffer.index -= 1 },
+            } => if self.buffer.index > 0 {
+                self.buffer.index -= 1;
+                self.echo_line.unappend();
+            },
 
             KeyboardInput {
                 state: ElementState::Released,
@@ -85,9 +91,11 @@ impl Console {
                 let mut key: Key = input.into();
                 key.modifiers = self.modifiers;
 
-                if key_map(&key.virtual_keycode.unwrap(), &key.modifiers) != '\0' {
+                let key_char = key_map(&key.virtual_keycode.unwrap(), &key.modifiers);
+                if key_char != '\0' {
                     self.buffer.keys[self.buffer.index] = key;
                     self.buffer.index += 1;
+                    self.echo_line.append(key_char);
                 }
             },
 
@@ -109,6 +117,7 @@ impl Console {
         }
 
         self.buffer.index = 0;
+        self.echo_line.clear();
         println!("");
     }
 }
