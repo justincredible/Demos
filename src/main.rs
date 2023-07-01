@@ -26,11 +26,11 @@ fn main() {
     let cb = glutin::ContextBuilder::new()
         .with_multisampling(4)
         .with_vsync(true);
-    let display = glium::Display::new(wb, cb, &event_loop).expect("unable to create a new display");
+    let display = glium::Display::new(wb, cb, &event_loop).unwrap();
 
     let mut console = Console::new();
     let mut char_string = CharString::new(&display);
-    let font = Font::new(&display);
+    let font = Font::new(&display, read_targa("res/font.tga").unwrap());
 
     let params = glium::DrawParameters {
         backface_culling: glium::BackfaceCullingMode::CullClockwise,
