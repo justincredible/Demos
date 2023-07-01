@@ -1,4 +1,4 @@
-use crate::glutin::event::{ElementState, KeyboardInput, ModifiersState, VirtualKeyCode};
+use glium::glutin::event::{ElementState, KeyboardInput, ModifiersState, VirtualKeyCode};
 use std::ops::BitAnd;
 use crate::text::MAX_LINE;
 
