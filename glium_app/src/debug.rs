@@ -26,7 +26,7 @@ pub struct DebugWindow {
 }
 
 impl DebugWindow {
-    pub fn new(config: &config::Config, event_loop: &winit::event_loop::EventLoop<()>) -> Self {
+    pub fn new(config: &config::Config, cab: context::ContextAttributesBuilder, event_loop: &winit::event_loop::EventLoop<()>) -> Self {
         let wb = winit::window::WindowBuilder::new()
             .with_position(winit::dpi::PhysicalPosition::<i32>::from((900, 50)))
             .with_decorations(false)
@@ -45,7 +45,7 @@ impl DebugWindow {
                         std::num::NonZeroU32::new(600).unwrap() ) )
                 .unwrap()
         };
-        let ca = context::ContextAttributesBuilder::new().build(Some(window.raw_window_handle()));
+        let ca = cab.build(Some(window.raw_window_handle()));
         // SAFETY: main window is kept alive indefinitely and window creation errors panic
         let ncc = unsafe {
             config.display().create_context(&config, &ca).unwrap()

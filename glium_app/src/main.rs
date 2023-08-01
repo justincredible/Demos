@@ -68,12 +68,14 @@ fn main() {
     };
     let context = ncc.treat_as_possibly_current();
 
+    let debug_cab = ContextAttributesBuilder::new().with_sharing(&context);
+
     let display = glium::Display::new(context, surface).expect("unable to create glium display");
     let windowed_display = WindowedDisplay::new(window, display);
 
     display_info(windowed_display.display());
 
-    let mut debug = DebugWindow::new(&dbc, &event_loop);
+    let mut debug = DebugWindow::new(&dbc, debug_cab, &event_loop);
 
     let cube = Cube::new(windowed_display.display());
     let cubes = CubeInstances::new(windowed_display.display());
