@@ -6,7 +6,7 @@ use camera::CameraState;
 pub mod debug;
 use debug::{DebugWindow, HALF_DEBUG};
 pub mod engine;
-use engine::engine::start_loop;
+use engine::{engine::start_loop, WindowedDisplay};
 use engine::input::{process_input, KeyboardState};
 use engine::screenshot::AsyncScreenshotTaker;
 use engine::simple_targa::{read_targa, write_targa, TargaImage};
@@ -16,7 +16,11 @@ use shapes::shapes::{Cube, CubeInstances, SpritesBatch, CUBE_INSTANCES, SPRITES_
 
 use glam::{Mat4, Quat, Vec3};
 use glium::glutin;
-use glium::glutin::window::Fullscreen;
+use glutin::surface::{SurfaceAttributesBuilder, WindowSurface};
+use glutin::context::{ContextAttributesBuilder, NotCurrentGlContext};
+use glutin::display::{GetGlDisplay, GlDisplay};
+use winit::window::Fullscreen;
+use raw_window_handle::HasRawWindowHandle;
 use glium::program::ProgramCreationInput;
 use glium::{Api, Profile, Surface, Version};
 use std::f32::consts::TAU;
@@ -26,35 +30,62 @@ use std::io::Read;
 fn main() {
     use fxaa::fxaa;
 
-    let event_loop = glutin::event_loop::EventLoop::new();
-    let wb = glutin::window::WindowBuilder::new()
+    let event_loop = winit::event_loop::EventLoop::new();
+    let wb = winit::window::WindowBuilder::new()
         .with_resizable(false)
         .with_title("Glium-based application")
         .with_window_icon(read_icon("resource/glium.tga").ok())
-        .with_position(glutin::dpi::PhysicalPosition::<i32>::from((50, 50)));
-    let cb = glutin::ContextBuilder::new()
-        .with_depth_buffer(24)
-        .with_stencil_buffer(8)
-        //.with_multisampling(4)
-        .with_vsync(true);
-    let display = glium::Display::new(wb, cb, &event_loop).expect("unable to create a new display");
+        .with_position(winit::dpi::PhysicalPosition::<i32>::from((50, 50)));
+    let ctb = glutin::config::ConfigTemplateBuilder::new();
+    // window and display backed config
+    let (window, dbc) = glutin_winit::DisplayBuilder::new()
+        .with_window_builder(Some(wb))
+        .build(
+            &event_loop,
+            ctb,
+            | mut config | config.next().unwrap(),
+        )
+        .unwrap(); // safety panic
+    let window = window.unwrap(); // safety panic
 
-    display_info(&display);
+    let glutin_display = &dbc.display();
+    let sab: SurfaceAttributesBuilder<WindowSurface> = SurfaceAttributesBuilder::new();
+    // SAFETY: main window is kept alive indefinitely and window creation errors panic
+    let surface = unsafe {
+        glutin_display
+            .create_window_surface(
+                &dbc,
+                &sab.build(
+                    window.raw_window_handle(),
+                    std::num::NonZeroU32::new(800).unwrap(),
+                    std::num::NonZeroU32::new(600).unwrap() ) )
+            .unwrap()
+    };
+    let ca = ContextAttributesBuilder::new().build(Some(window.raw_window_handle()));
+    // SAFETY: main window is kept alive indefinitely and window creation errors panic
+    let ncc = unsafe {
+        glutin_display.create_context(&dbc, &ca).unwrap()
+    };
+    let context = ncc.treat_as_possibly_current();
 
-    let mut debug = DebugWindow::new(display.gl_window().context(), &event_loop);
+    let display = glium::Display::new(context, surface).expect("unable to create glium display");
+    let windowed_display = WindowedDisplay::new(window, display);
 
-    let cube = Cube::new(&display);
-    let cubes = CubeInstances::new(&display);
+    display_info(windowed_display.display());
+
+    let mut debug = DebugWindow::new(&dbc, &event_loop);
+
+    let cube = Cube::new(windowed_display.display());
+    let cubes = CubeInstances::new(windowed_display.display());
 
     let subroutine_shader = glium::Program::from_source(
-        &display,
-        &read_shader("src/subroutine.vs").unwrap(),
-        &read_shader("src/subroutine.fs").unwrap(),
-        None,
-    )
-    .unwrap();
+            windowed_display.display(),
+            &read_shader("src/subroutine.vs").unwrap(),
+            &read_shader("src/subroutine.fs").unwrap(),
+            None )
+        .unwrap();
     let tessellancing_shader = glium::Program::new(
-        &display,
+        windowed_display.display(),
         glium::program::SourceCode {
             vertex_shader: &read_shader("src/tessellancing.vs").unwrap(),
             tessellation_control_shader: Some(&read_shader("src/tessellancing.tcs").unwrap()),
@@ -65,21 +96,21 @@ fn main() {
     )
     .unwrap();
     let sprites_shader = glium::Program::from_source(
-        &display,
+        windowed_display.display(),
         &read_shader("src/sprites.vs").unwrap(),
         &read_shader("src/sprites.fs").unwrap(),
         None,
     )
     .unwrap();
     let shadow_map_shader = glium::Program::from_source(
-        &display,
+        windowed_display.display(),
         &read_shader("src/shadow_map.vs").unwrap(),
         &read_shader("src/shadow_map.fs").unwrap(),
         None,
     )
     .unwrap();
     let shadows_shader = glium::Program::from_source(
-        &display,
+        windowed_display.display(),
         &read_shader("src/shadows.vs").unwrap(),
         &read_shader("src/shadows.fs").unwrap(),
         None,
@@ -94,8 +125,8 @@ fn main() {
         (tessell_img.width, tessell_img.height),
     );
     let opengl_texture =
-        glium::texture::CompressedSrgbTexture2d::new(&display, tessell_img).unwrap();
-    let debug_texture = glium::Texture2d::new(&display, dbg_img).unwrap();
+        glium::texture::CompressedSrgbTexture2d::new(windowed_display.display(), tessell_img).unwrap();
+    let debug_texture = glium::Texture2d::new(windowed_display.display(), dbg_img).unwrap();
     debug_texture.as_surface().blit_whole_color_to(
         &debug.image().as_surface(),
         &glium::BlitTarget {
@@ -110,7 +141,7 @@ fn main() {
     const SHADOW_MAP_SIZE: u32 = 1024;
 
     let shadow_texture =
-        glium::Texture2d::empty(&display, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE).unwrap();
+        glium::Texture2d::empty(windowed_display.display(), SHADOW_MAP_SIZE, SHADOW_MAP_SIZE).unwrap();
     let shadow_rect = glium::BlitTarget {
         left: 0,
         bottom: 0,
@@ -118,10 +149,10 @@ fn main() {
         height: SHADOW_MAP_SIZE as i32 / 2,
     };
     let depth_texture =
-        glium::texture::DepthTexture2d::empty(&display, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE).unwrap();
+        glium::texture::DepthTexture2d::empty(windowed_display.display(), SHADOW_MAP_SIZE, SHADOW_MAP_SIZE).unwrap();
 
     let config_texture_0 = glium::texture::UnsignedTexture2d::empty_with_format(
-        &display,
+        windowed_display.display(),
         glium::texture::UncompressedUintFormat::U8,
         glium::texture::MipmapsOption::NoMipmap,
         HALF_DEBUG,
@@ -129,7 +160,7 @@ fn main() {
     )
     .unwrap();
     let config_texture_1 = glium::texture::UnsignedTexture2d::empty_with_format(
-        &display,
+        windowed_display.display(),
         glium::texture::UncompressedUintFormat::U8,
         glium::texture::MipmapsOption::NoMipmap,
         HALF_DEBUG,
@@ -137,7 +168,7 @@ fn main() {
     )
     .unwrap();
     let final_texture = glium::texture::Texture2d::empty_with_format(
-        &display,
+        windowed_display.display(),
         glium::texture::UncompressedFloatFormat::U8U8U8U8,
         glium::texture::MipmapsOption::NoMipmap,
         HALF_DEBUG,
@@ -145,17 +176,17 @@ fn main() {
     )
     .unwrap();
     let gol_init_program = glium::program::ComputeShader::from_source(
-        &display,
+        windowed_display.display(),
         &read_shader("src/gol_init.cs").unwrap(),
     )
     .unwrap();
     let gol_exec_program = glium::program::ComputeShader::from_source(
-        &display,
+        windowed_display.display(),
         &read_shader("src/gol_exec.cs").unwrap(),
     )
     .unwrap();
     let gol_copy_program = glium::program::ComputeShader::from_source(
-        &display,
+        windowed_display.display(),
         &read_shader("src/gol_copy.cs").unwrap(),
     )
     .unwrap();
@@ -174,7 +205,7 @@ fn main() {
         1,
     );
 
-    let mut sprites_batch = SpritesBatch::new(&display);
+    let mut sprites_batch = SpritesBatch::new(windowed_display.display());
 
     let mut camera = CameraState::new();
     camera.set_position(10.0 * Vec3::Z);
@@ -192,7 +223,7 @@ fn main() {
 
     let mut cursor_position: Option<(i32, i32)> = None;
 
-    let fxaa = fxaa::FxaaSystem::new(&display);
+    let fxaa = fxaa::FxaaSystem::new(windowed_display.display());
     let mut fxaa_enabled = false;
 
     let mut switch = false;
@@ -296,8 +327,8 @@ fn main() {
             }
         };
 
-        let window_size = display.gl_window().window().inner_size();
-        let aspect_ratio = window_size.width as f32 / window_size.height as f32;
+        let window_size = windowed_display.display().get_framebuffer_dimensions();
+        let aspect_ratio = window_size.0 as f32 / window_size.1 as f32;
         camera.set_aspect_ratio(aspect_ratio);
 
         let angle = (std::time::Instant::now() - start).as_secs_f32();
@@ -323,7 +354,7 @@ fn main() {
             .unwrap();
 
         let per_instance_buffer =
-            glium::vertex::VertexBuffer::new(&display, &per_instance).unwrap();
+            glium::vertex::VertexBuffer::new(windowed_display.display(), &per_instance).unwrap();
 
         let mut params = glium::DrawParameters {
             depth: glium::Depth {
@@ -336,7 +367,7 @@ fn main() {
         };
 
         let mut depth_target = glium::framebuffer::SimpleFrameBuffer::with_depth_buffer(
-            &display,
+            windowed_display.display(),
             &shadow_texture,
             &depth_texture,
         )
@@ -381,7 +412,7 @@ fn main() {
 
         params.backface_culling = glium::BackfaceCullingMode::CullClockwise;
 
-        let mut target = display.draw();
+        let mut target = windowed_display.display().draw();
         fxaa::draw(&fxaa, &mut target, fxaa_enabled, |target| {
             target.clear_color_and_depth((1.0, 0.0, 1.0, 1.0), 1.0);
 
@@ -397,7 +428,7 @@ fn main() {
             ).unwrap();
 
             let subroutine_shader = glium::Program::new(
-                &display,
+                windowed_display.display(),
                 ProgramCreationInput::from(subroutine_shader.get_binary().unwrap()),
             )
             .unwrap();
@@ -511,7 +542,7 @@ fn main() {
         keyboard.s_pressed = false;
         keyboard.t_pressed = false;
         let action = process_input(
-            &display,
+            &windowed_display,
             &mut camera,
             &mut keyboard,
             &mut cursor_position,
@@ -520,35 +551,30 @@ fn main() {
 
         if keyboard.alt_pressed && keyboard.enter_pressed[0] {
             if fullscreen[0] {
-                display.gl_window().window().set_fullscreen(None);
+                windowed_display.window().set_fullscreen(None);
                 fullscreen[0] = false;
             } else {
-                let monitor_handle = display
-                    .gl_window()
+                let monitor_handle = windowed_display
                     .window()
                     .available_monitors()
                     .next()
                     .unwrap();
                 let fs = Fullscreen::Borderless(Some(monitor_handle));
-                display.gl_window().window().set_fullscreen(Some(fs));
+                windowed_display.window().set_fullscreen(Some(fs));
                 fullscreen[0] = true;
             }
         } else if keyboard.alt_pressed && keyboard.enter_pressed[1] {
             if fullscreen[1] {
-                debug.display().gl_window().window().set_fullscreen(None);
+                debug.window().set_fullscreen(None);
                 fullscreen[1] = false;
             } else {
                 let monitor_handle = debug
-                    .display()
-                    .gl_window()
                     .window()
                     .available_monitors()
                     .next()
                     .unwrap();
                 let fs = Fullscreen::Borderless(Some(monitor_handle));
                 debug
-                    .display()
-                    .gl_window()
                     .window()
                     .set_fullscreen(Some(fs));
                 fullscreen[1] = true;
@@ -574,11 +600,10 @@ fn main() {
         if keyboard.alt_pressed && keyboard.d_pressed {
             debug.enabled = !debug.enabled;
             let copy = debug.enabled;
-            debug.display().gl_window().window().set_visible(copy);
-            display
-                .gl_window()
+            debug.window().set_visible(copy);
+            windowed_display
                 .window()
-                .request_user_attention(Some(glutin::window::UserAttentionType::Informational));
+                .request_user_attention(Some(winit::window::UserAttentionType::Informational));
         }
 
         if keyboard.alt_pressed && keyboard.s_pressed {
@@ -588,7 +613,7 @@ fn main() {
         screenshot_taker.next_frame();
 
         if take_screenshot {
-            screenshot_taker.take_screenshot(&display);
+            screenshot_taker.take_screenshot(windowed_display.display());
         }
 
         screenshot_taker.process_screenshots();
@@ -603,10 +628,10 @@ fn main() {
     });
 }
 
-fn read_icon(path: &str) -> std::io::Result<glutin::window::Icon> {
+fn read_icon(path: &str) -> std::io::Result<winit::window::Icon> {
     let image = read_targa(path).unwrap();
 
-    let icon = glutin::window::Icon::from_rgba(image.bytes, image.width, image.height).unwrap();
+    let icon = winit::window::Icon::from_rgba(image.bytes, image.width, image.height).unwrap();
     Ok(icon)
 }
 
@@ -619,7 +644,7 @@ fn read_shader(path: &str) -> std::io::Result<String> {
     Ok(string)
 }
 
-fn display_info(display: &glium::Display) {
+fn display_info(display: &glium::Display<WindowSurface>) {
     let version = *display.get_opengl_version();
     let api = match version {
         Version(Api::Gl, _, _) => "OpenGL",

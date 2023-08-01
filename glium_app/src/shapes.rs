@@ -1,4 +1,6 @@
 pub mod shapes {
+    use glium::glutin::surface::WindowSurface;
+
     #[derive(Clone, Copy)]
     pub struct CubeVertex {
         position: [f32; 3],
@@ -24,7 +26,7 @@ pub mod shapes {
     }
 
     impl Cube {
-        pub fn new(display: &glium::Display) -> Self {
+        pub fn new(display: &glium::Display<WindowSurface>) -> Self {
             let vertices = glium::vertex::VertexBuffer::new(
                 display,
                 &[
@@ -246,7 +248,7 @@ pub mod shapes {
     }
 
     impl CubeInstances {
-        pub fn new(display: &glium::Display) -> Self {
+        pub fn new(display: &glium::Display<WindowSurface>) -> Self {
             let instances = glium::vertex::VertexBuffer::new(display, &CUBE_INSTANCES).unwrap();
 
             let picked = glium::texture::pixel_buffer::PixelBuffer::new_empty(display, 1);
@@ -283,7 +285,7 @@ pub mod shapes {
     }
 
     impl SpritesBatch {
-        pub fn new(display: &glium::Display) -> Self {
+        pub fn new(display: &glium::Display<WindowSurface>) -> Self {
             let sprites = {
                 let images = (0..64)
                     .map(|_| {
