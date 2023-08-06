@@ -19,12 +19,14 @@ fn key_map(key: &VirtualKeyCode, modifiers: &ModifiersState) -> char {
         // Numpad keys cannot be shifted
         VirtualKeyCode::Key1 | VirtualKeyCode::Numpad1 => if shifted { '!' } else { '1' },
         VirtualKeyCode::Key2 | VirtualKeyCode::Numpad2 => if shifted { '@' } else { '2' },
+        VirtualKeyCode::At => '@',
         VirtualKeyCode::Key3 | VirtualKeyCode::Numpad3 => if shifted { '#' } else { '3' },
         VirtualKeyCode::Key4 | VirtualKeyCode::Numpad4 => if shifted { '$' } else { '4' },
         VirtualKeyCode::Key5 | VirtualKeyCode::Numpad5 => if shifted { '%' } else { '5' },
         VirtualKeyCode::Key6 | VirtualKeyCode::Numpad6 => if shifted { '^' } else { '6' },
         VirtualKeyCode::Key7 | VirtualKeyCode::Numpad7 => if shifted { '&' } else { '7' },
         VirtualKeyCode::Key8 | VirtualKeyCode::Numpad8 => if shifted { '*' } else { '8' },
+        VirtualKeyCode::Asterisk => '*',
         VirtualKeyCode::Key9 | VirtualKeyCode::Numpad9 => if shifted { '(' } else { '9' },
         VirtualKeyCode::Key0 | VirtualKeyCode::Numpad0 => if shifted { ')' } else { '0' },
 
@@ -58,10 +60,12 @@ fn key_map(key: &VirtualKeyCode, modifiers: &ModifiersState) -> char {
         VirtualKeyCode::Grave => if shifted { '~' } else { '`' },
         VirtualKeyCode::Minus => if shifted { '_' } else { '-' },
         VirtualKeyCode::Equals => if shifted { '+' } else { '=' },
+        VirtualKeyCode::Plus => '+',
         VirtualKeyCode::LBracket => if shifted { '{' } else { '[' },
         VirtualKeyCode::RBracket => if shifted { '}' } else { ']' },
         VirtualKeyCode::Backslash => if shifted { '|' } else { '\\' },
         VirtualKeyCode::Semicolon => if shifted { ':' } else { ';' },
+        VirtualKeyCode::Colon => ':',
         VirtualKeyCode::Apostrophe => if shifted { '"' } else { '\'' },
         VirtualKeyCode::Comma => if shifted { '<' } else { ',' },
         VirtualKeyCode::Period => if shifted { '>' } else { '.' },
@@ -173,3 +177,4 @@ fn tex_map(ch: char) -> [f32; 4] {
         _ => [0.0; 4]
     }
 }
+

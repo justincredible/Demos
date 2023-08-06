@@ -10,7 +10,28 @@ struct Key {
 impl From<KeyboardInput> for Key {
     fn from(input: KeyboardInput) -> Self {
         Key {
-            virtual_keycode: input.virtual_keycode,
+            virtual_keycode: input.virtual_keycode.or_else(|| {
+                match input.scancode {
+                    2 => VirtualKeyCode::Key1.into(),
+                    4 => VirtualKeyCode::Key3.into(),
+                    5 => VirtualKeyCode::Key4.into(),
+                    6 => VirtualKeyCode::Key5.into(),
+                    7 => VirtualKeyCode::Key6.into(),
+                    8 => VirtualKeyCode::Key7.into(),
+                    10 => VirtualKeyCode::Key9.into(),
+                    11 => VirtualKeyCode::Key0.into(),
+                    12 => VirtualKeyCode::Minus.into(),
+                    26 => VirtualKeyCode::LBracket.into(),
+                    27 => VirtualKeyCode::RBracket.into(),
+                    40 => VirtualKeyCode::Apostrophe.into(),
+                    41 => VirtualKeyCode::Grave.into(),
+                    43 => VirtualKeyCode::Backslash.into(),
+                    51 => VirtualKeyCode::Comma.into(),
+                    52 => VirtualKeyCode::Period.into(),
+                    53 => VirtualKeyCode::Slash.into(),
+                    _ => None,
+                }
+            }),
             modifiers: ModifiersState::empty(),
         }
     }
@@ -121,3 +142,4 @@ impl Console {
         println!("");
     }
 }
+
