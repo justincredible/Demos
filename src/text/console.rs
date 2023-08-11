@@ -37,13 +37,8 @@ impl From<KeyboardInput> for Key {
     }
 }
 
-struct KeyBuffer {
-    index: usize,
-    keys: [Key; MAX_LINE],
-}
-
 pub struct Console {
-    buffer: KeyBuffer,
+    buffer: Vec<Key>,
     modifiers: ModifiersState,
     echo_line: CharString,
 }
@@ -55,14 +50,7 @@ impl Console {
         let modifiers = ModifiersState::empty();
 
         Console {
-            buffer: KeyBuffer {
-                index: 0,
-                keys: [ Key {
-                        virtual_keycode: None,
-                        modifiers,
-                    }; MAX_LINE
-                ]
-            },
+            buffer: Vec::with_capacity(MAX_LINE),
             modifiers,
             echo_line,
         }
@@ -89,7 +77,7 @@ impl Console {
                 virtual_keycode: Some(VirtualKeyCode::Escape),
                 ..
             } => {
-                self.buffer.index = 0;
+                self.buffer.clear();
                 self.echo_line.clear();
             },
 
@@ -97,8 +85,8 @@ impl Console {
                 state: ElementState::Released,
                 virtual_keycode: Some(VirtualKeyCode::Back), // Backspace),
                 ..
-            } => if self.buffer.index > 0 {
-                self.buffer.index -= 1;
+            } => if self.buffer.len() > 0 {
+                self.buffer.pop();
                 self.echo_line.unappend();
             },
 
@@ -106,7 +94,7 @@ impl Console {
                 state: ElementState::Released,
                 ..
             } => {
-                if self.buffer.index == MAX_LINE {
+                if self.buffer.len() == MAX_LINE {
                     self.flush();
                 }
                 let mut key: Key = input.into();
@@ -114,8 +102,7 @@ impl Console {
 
                 let key_char = key_map(&key.virtual_keycode.unwrap(), &key.modifiers);
                 if key_char != '\0' {
-                    self.buffer.keys[self.buffer.index] = key;
-                    self.buffer.index += 1;
+                    self.buffer.push(key);
                     self.echo_line.append(key_char);
                 }
             },
@@ -125,7 +112,7 @@ impl Console {
     }
 
     fn flush(&mut self) {
-        for key in &self.buffer.keys[0..self.buffer.index] {
+        for key in &self.buffer {
             match key {
                 Key {
                     virtual_keycode: Some(virtual_keycode),
@@ -137,7 +124,7 @@ impl Console {
             }
         }
 
-        self.buffer.index = 0;
+        self.buffer.clear();
         self.echo_line.clear();
         println!("");
     }
