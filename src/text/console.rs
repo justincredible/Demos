@@ -38,7 +38,7 @@ impl From<KeyboardInput> for Key {
 }
 
 pub struct Console {
-    buffer: Vec<Key>,
+    history: Vec<Key>,
     modifiers: ModifiersState,
     echo_line: CharString,
 }
@@ -50,7 +50,7 @@ impl Console {
         let modifiers = ModifiersState::empty();
 
         Console {
-            buffer: Vec::with_capacity(MAX_LINE),
+            history: Vec::with_capacity(MAX_LINE),
             modifiers,
             echo_line,
         }
@@ -77,7 +77,7 @@ impl Console {
                 virtual_keycode: Some(VirtualKeyCode::Escape),
                 ..
             } => {
-                self.buffer.clear();
+                self.history.clear();
                 self.echo_line.clear();
             },
 
@@ -85,8 +85,8 @@ impl Console {
                 state: ElementState::Released,
                 virtual_keycode: Some(VirtualKeyCode::Back), // Backspace),
                 ..
-            } => if self.buffer.len() > 0 {
-                self.buffer.pop();
+            } => if self.history.len() > 0 {
+                self.history.pop();
                 self.echo_line.unappend();
             },
 
@@ -94,7 +94,7 @@ impl Console {
                 state: ElementState::Released,
                 ..
             } => {
-                if self.buffer.len() == MAX_LINE {
+                if self.history.len() == MAX_LINE {
                     self.flush();
                 }
                 let mut key: Key = input.into();
@@ -102,7 +102,7 @@ impl Console {
 
                 let key_char = key_map(&key.virtual_keycode.unwrap(), &key.modifiers);
                 if key_char != '\0' {
-                    self.buffer.push(key);
+                    self.history.push(key);
                     self.echo_line.append(key_char);
                 }
             },
@@ -112,7 +112,7 @@ impl Console {
     }
 
     fn flush(&mut self) {
-        for key in &self.buffer {
+        for key in &self.history {
             match key {
                 Key {
                     virtual_keycode: Some(virtual_keycode),
@@ -124,7 +124,7 @@ impl Console {
             }
         }
 
-        self.buffer.clear();
+        self.history.clear();
         self.echo_line.clear();
         println!("");
     }
