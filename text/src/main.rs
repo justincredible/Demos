@@ -2,10 +2,14 @@
 extern crate glium;
 
 use glium::{glutin, Surface};
-use glutin::dpi::PhysicalPosition;
-use glutin::event::{Event, WindowEvent};
-use glutin::event_loop::{EventLoop, ControlFlow};
-use glutin::window::{Icon, WindowBuilder};
+use glutin::context::NotCurrentGlContext;
+use glutin::display::{GetGlDisplay, GlDisplay};
+use glutin::surface::{SurfaceAttributesBuilder, WindowSurface};
+use winit::dpi::PhysicalPosition;
+use winit::event::{Event, WindowEvent};
+use winit::event_loop::{EventLoop, ControlFlow};
+use winit::window::{Icon, WindowBuilder};
+use raw_window_handle::HasRawWindowHandle;
 
 #[allow(dead_code)]
 mod simple_targa;
@@ -23,10 +27,31 @@ fn main() {
         .with_resizable(false)
         .with_title("text")
         .with_position(PhysicalPosition::<i32>::from((50, 50)));
-    let cb = glutin::ContextBuilder::new()
-        .with_multisampling(4)
-        .with_vsync(true);
-    let display = glium::Display::new(wb, cb, &event_loop).unwrap();
+    let (window, config) = glutin_winit::DisplayBuilder::new().with_window_builder(Some(wb)).build(
+        &event_loop,
+        glutin::config::ConfigTemplateBuilder::new(),
+        | mut config | {
+            config.next().unwrap()
+        }
+    ).unwrap();
+    let window = window.unwrap();
+    let cab = glutin::context::ContextAttributesBuilder::new();
+    let not_current_context = unsafe {
+        config.display().create_context(&config, &cab.build(Some(window.raw_window_handle()))).unwrap()
+    };
+    let sab: SurfaceAttributesBuilder<WindowSurface> = SurfaceAttributesBuilder::new();
+    let window_surface = unsafe {
+        config.display().create_window_surface(
+            &config,
+            &sab.build(
+                window.raw_window_handle(),
+                std::num::NonZeroU32::new(800u32).unwrap(),
+                std::num::NonZeroU32::new(600u32).unwrap()
+            )
+        ).unwrap()
+    };
+    let current_context = not_current_context.treat_as_possibly_current();
+    let display = glium::Display::new(current_context, window_surface).expect("unable to create a new display");
 
     let mut console = Console::new(&display);
     let font = Font::new(&display, read_targa("res/font.tga").unwrap());
@@ -38,7 +63,7 @@ fn main() {
 
     event_loop.run(move |event, _, control_flow| {
         match event {
-            Event::RedrawEventsCleared => display.gl_window().window().request_redraw(),
+            Event::RedrawEventsCleared => window.request_redraw(),
             Event::RedrawRequested(_) => {
                 let mut frame = display.draw();
                 frame.clear_color(0.0, 0.0, 0.0, 1.0);
