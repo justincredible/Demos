@@ -97,7 +97,7 @@ and the distance between this and the previous set is again $z_{outer} = r$
 ### Icosahedron
 
 The bottom edges of the triangles form a regular pentagon perimeter.
-From this we have our first ten vertices (the pentagon and its x-axis reflection).
+From this we have our first ten vertices (the pentagon and its xy-plane reflection).
 The distance betwen these vertices is $z_{inner} = \sqrt { 1 - 4(base - c)^2 }  = \sqrt { 1 - 4(r - top)^2 }$
 
 The final two vertices are collinear with the center and orthogonal to the circle.
