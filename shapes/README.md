@@ -1,21 +1,21 @@
 # Shapes
 
-The Platonic Solids and necessary polygons.
+Polygons and the Platonic Solids.
 
 The derivation of vertex positions requires only elementary trigonometry and algebra.
-All angles have simple [exact trigonometric values](https://en.wikipedia.org/wiki/Exact_trigonometric_values).
+All angles for the Platonic Solids have simple [exact trigonometric values](https://en.wikipedia.org/wiki/Exact_trigonometric_values).
 
 ## Polygons
 
 Regular polygons with unit length. The faces of the polyhedra.
 
-### Triangle
+### Trigon
 
 An equilateral triangle has $60^\circ$ vertex angles, so the height is $h = { \sqrt 3 \over 2 }$
 
 <img src="https://github.com/justincredible/Demos/assets/3183562/d1da94a8-8314-47f0-81cb-6e5ae63ed4a2" height="200" width="200" >
 
-### Square
+### Tetragon
 
 A square has $90^\circ$ vertex angles, and the distance between non-adjacent vertices is $\sqrt 2$
 
@@ -33,7 +33,7 @@ A regular pentagon has $108^\circ$ vertex angles, leading to several facts:
 
 ### Circumscribing circle
 
-The circle's center, relative to the bottom edge of the polygon,
+The circumcircle's center, relative to the bottom edge of the polygon,
 and the radius can be determined by positioning the bottom of the face on the x-axis
 as well as symmetrically with respect to the y-axis.
 With this positioning we know three vertices of the polygon,
@@ -47,7 +47,14 @@ The vertices are centred by subtracting $c$
 
 <img src="https://github.com/justincredible/Demos/assets/3183562/1bed5bcd-f34e-4ece-84be-e254bfde83dd" height="200" width="200" >
 
-Also notice how a reflected face can be symmetrically positioned in the circle.
+Also notice how a reflected face can be symmetrically positioned in the circumcircle.
+
+### Remaining polygons
+
+No other polygon is the face of a Platonic Solid, but all are simple to generate.
+The techniques used thus far will continue to determine vertex positions for higher-sided polygons.
+However, this gets tedious quickly,
+so we plot the vertices in a more convenient manner.
 
 ## Platonic Solids
 
