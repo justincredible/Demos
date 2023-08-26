@@ -47,7 +47,7 @@ The vertices are centred by subtracting $c$
 
 <img src="https://github.com/justincredible/Demos/assets/3183562/1bed5bcd-f34e-4ece-84be-e254bfde83dd" height="200" width="200" >
 
-Also notice how a reflected face can be symmetrically positioned in the circumcircle.
+Also notice how a face can be reflected in the circumcircle.
 
 ### Remaining polygons
 
