@@ -7,6 +7,13 @@ pub enum Polygons {
     Trigon,
     Tetragon,
     Pentagon,
+    Hexagon,
+    Heptagon,
+    Octagon,
+    Enneagon,
+    Decagon,
+    Hendecagon,
+    Dodecagon,
 }
 
 pub struct Polygon {
@@ -65,6 +72,197 @@ impl Polygon {
                                 PosVertex::new([half_width, half_height - height_offset, 0.0]),
                                 PosVertex::new([-half_width + width_offset, -half_height, 0.0]),
                                 PosVertex::new([half_width - width_offset, -half_height, 0.0]),
+                            ],
+                        )
+                        .unwrap(),
+                    indices: NoIndices(PrimitiveType::TriangleStrip),
+                }
+            },
+            Polygons::Hexagon => {
+                let sin_60 = 0.5 * f32::sqrt(3.0);
+
+                Polygon {
+                    vertices: VertexBuffer::new(
+                            facade,
+                            &[
+                                PosVertex::new([-1.0, 0.0, 0.0]),
+                                PosVertex::new([-0.5, -sin_60, 0.0]),
+                                PosVertex::new([-0.5, sin_60, 0.0]),
+                                PosVertex::new([0.5, -sin_60, 0.0]),
+                                PosVertex::new([0.5, sin_60, 0.0]),
+                                PosVertex::new([1.0, 0.0, 0.0]),
+                            ],
+                        )
+                        .unwrap(),
+                    indices: NoIndices(PrimitiveType::TriangleStrip),
+                }
+            },
+            Polygons::Heptagon => {
+                let pi = std::f32::consts::PI;
+
+                let inner_span = f32::cos(pi / 7.0);
+                let span = inner_span + f32::cos(3.0 / 7.0 * pi);
+                let bottom = f32::sin(2.0 / 7.0 * pi);
+                let base = bottom + f32::sin(3.0 / 7.0 * pi);
+                let height = base + f32::sin(pi / 7.0);
+                let offset = 0.5 * height - 0.125 / height;
+
+                Polygon {
+                    vertices: VertexBuffer::new(
+                            facade,
+                            &[
+                                PosVertex::new([0.0, height - offset, 0.0]),
+                                PosVertex::new([-inner_span, base - offset, 0.0]),
+                                PosVertex::new([inner_span, base - offset, 0.0]),
+                                PosVertex::new([-span, bottom - offset, 0.0]),
+                                PosVertex::new([span, bottom - offset, 0.0]),
+                                PosVertex::new([-0.5, -offset, 0.0]),
+                                PosVertex::new([0.5, -offset, 0.0]),
+                            ],
+                        )
+                        .unwrap(),
+                    indices: NoIndices(PrimitiveType::TriangleStrip),
+                }
+            },
+            Polygons::Octagon => {
+                let extend = 1.0 / f32::sqrt(2.0);
+
+                Polygon {
+                    vertices: VertexBuffer::new(
+                            facade,
+                            &[
+                                PosVertex::new([0.5, 0.5 + extend, 0.0]),
+                                PosVertex::new([-0.5, 0.5 + extend, 0.0]),
+                                PosVertex::new([0.5 + extend, 0.5, 0.0]),
+                                PosVertex::new([-0.5 - extend, 0.5, 0.0]),
+                                PosVertex::new([0.5 + extend, -0.5, 0.0]),
+                                PosVertex::new([-0.5 - extend, -0.5, 0.0]),
+                                PosVertex::new([0.5, -0.5 - extend, 0.0]),
+                                PosVertex::new([-0.5, -0.5 - extend, 0.0]),
+                            ],
+                        )
+                        .unwrap(),
+                    indices: NoIndices(PrimitiveType::TriangleStrip),
+                }
+            },
+            Polygons::Enneagon => {
+                let pi = std::f32::consts::PI;
+
+                let inner_span = f32::cos(pi / 9.0);
+                let top_span = inner_span + f32::cos(1.0 / 3.0 * pi);
+                let bot_span = 0.5 + f32::cos(2.0 / 9.0 * pi);
+                let bottom = f32::sin(2.0 / 9.0 * pi);
+                let lower = bottom + f32::sin(4.0 / 9.0 * pi);
+                let upper = lower + f32::sin(1.0 / 3.0 * pi);
+                let height = upper + f32::sin(pi / 9.0);
+                let offset = 0.5 * height - 0.125 / height;
+
+                Polygon {
+                    vertices: VertexBuffer::new(
+                            facade,
+                            &[
+                                PosVertex::new([0.0, height - offset, 0.0]),
+                                PosVertex::new([-inner_span, upper - offset, 0.0]),
+                                PosVertex::new([inner_span, upper - offset, 0.0]),
+                                PosVertex::new([-top_span, lower - offset, 0.0]),
+                                PosVertex::new([top_span, lower - offset, 0.0]),
+                                PosVertex::new([-bot_span, bottom - offset, 0.0]),
+                                PosVertex::new([bot_span, bottom - offset, 0.0]),
+                                PosVertex::new([-0.5, -offset, 0.0]),
+                                PosVertex::new([0.5, -offset, 0.0]),
+                            ],
+                        )
+                        .unwrap(),
+                    indices: NoIndices(PrimitiveType::TriangleStrip),
+                }
+            },
+            Polygons::Decagon => {
+                let pi = std::f32::consts::PI;
+
+                let upper_span = 0.5 + f32::cos(pi / 5.0);
+                let lower_span = upper_span + f32::cos(2.0 / 5.0 * pi);
+                let inner_height = f32::sin(2.0 / 5.0 * pi);
+                let outer_height = inner_height + f32::sin(pi / 5.0);
+
+                Polygon {
+                    vertices: VertexBuffer::new(
+                            facade,
+                            &[
+                                PosVertex::new([0.5, outer_height, 0.0]),
+                                PosVertex::new([-0.5, outer_height, 0.0]),
+                                PosVertex::new([upper_span, inner_height, 0.0]),
+                                PosVertex::new([-upper_span, inner_height, 0.0]),
+                                PosVertex::new([lower_span, 0.0, 0.0]),
+                                PosVertex::new([-lower_span, 0.0, 0.0]),
+                                PosVertex::new([upper_span, -inner_height, 0.0]),
+                                PosVertex::new([-upper_span, -inner_height, 0.0]),
+                                PosVertex::new([0.5, -outer_height, 0.0]),
+                                PosVertex::new([-0.5, -outer_height, 0.0]),
+                            ],
+                        )
+                        .unwrap(),
+                    indices: NoIndices(PrimitiveType::TriangleStrip),
+                }
+            },
+            Polygons::Hendecagon => {
+                let pi = std::f32::consts::PI;
+
+                let inner_span = f32::cos(pi / 11.0);
+                let middle_span = inner_span + f32::cos(3.0 / 11.0 * pi);
+                let outer_span = middle_span + f32::cos(5.0 / 11.0 * pi);
+                let bottom_span = 0.5 + f32::cos(2.0 / 11.0 * pi);
+                let bottom = f32::sin(2.0 / 11.0 * pi);
+                let lower = bottom + f32::sin(4.0 / 11.0 * pi);
+                let middle = lower + f32::sin(5.0 / 11.0 * pi);
+                let upper = middle + f32::sin(3.0 / 11.0 * pi);
+                let height = upper + f32::sin(pi / 11.0);
+                let offset = 0.5 * height - 0.125 / height;
+
+                Polygon {
+                    vertices: VertexBuffer::new(
+                            facade,
+                            &[
+                                PosVertex::new([0.0, height - offset, 0.0]),
+                                PosVertex::new([-inner_span, upper - offset, 0.0]),
+                                PosVertex::new([inner_span, upper - offset, 0.0]),
+                                PosVertex::new([-middle_span, middle - offset, 0.0]),
+                                PosVertex::new([middle_span, middle - offset, 0.0]),
+                                PosVertex::new([-outer_span, lower - offset, 0.0]),
+                                PosVertex::new([outer_span, lower - offset, 0.0]),
+                                PosVertex::new([-bottom_span, bottom - offset, 0.0]),
+                                PosVertex::new([bottom_span, bottom - offset, 0.0]),
+                                PosVertex::new([-0.5, -offset, 0.0]),
+                                PosVertex::new([0.5, -offset, 0.0]),
+                            ],
+                        )
+                        .unwrap(),
+                    indices: NoIndices(PrimitiveType::TriangleStrip),
+                }
+            },
+            Polygons::Dodecagon => {
+                let pi = std::f32::consts::PI;
+
+                let upper_span = 0.5 + f32::cos(pi / 6.0);
+                let lower_span = upper_span + f32::cos(pi / 3.0);
+                let inner_height = 0.5 + f32::sin(pi / 3.0);
+                let outer_height = inner_height + f32::sin(pi / 6.0);
+
+                Polygon {
+                    vertices: VertexBuffer::new(
+                            facade,
+                            &[
+                                PosVertex::new([0.5, outer_height, 0.0]),
+                                PosVertex::new([-0.5, outer_height, 0.0]),
+                                PosVertex::new([upper_span, inner_height, 0.0]),
+                                PosVertex::new([-upper_span, inner_height, 0.0]),
+                                PosVertex::new([lower_span, 0.5, 0.0]),
+                                PosVertex::new([-lower_span, 0.5, 0.0]),
+                                PosVertex::new([lower_span, -0.5, 0.0]),
+                                PosVertex::new([-lower_span, -0.5, 0.0]),
+                                PosVertex::new([upper_span, -inner_height, 0.0]),
+                                PosVertex::new([-upper_span, -inner_height, 0.0]),
+                                PosVertex::new([0.5, -outer_height, 0.0]),
+                                PosVertex::new([-0.5, -outer_height, 0.0]),
                             ],
                         )
                         .unwrap(),
