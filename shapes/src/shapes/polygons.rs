@@ -14,6 +14,7 @@ pub enum Polygons {
     Decagon,
     Hendecagon,
     Dodecagon,
+    NGon(u16),
 }
 
 pub struct Polygon {
@@ -266,6 +267,38 @@ impl Polygon {
                             ],
                         )
                         .unwrap(),
+                    indices: NoIndices(PrimitiveType::TriangleStrip),
+                }
+            },
+            Polygons::NGon(sides) => {
+                let pi = std::f32::consts::PI;
+
+                let exterior = 2.0 / sides as f32 * pi;
+                let start = 0.5 * pi;
+                let offset = 0.5 * exterior;
+                let radius = f32::sin(start - offset) / f32::sin(exterior);
+
+                let mut vertices = vec![];
+                if sides % 2 == 0 {
+                    for step in 0..sides/2 {
+                        let left = start + offset + step as f32 * exterior;
+                        let right = start - offset - step as f32 * exterior;
+                        vertices.push(PosVertex::new([radius * f32::cos(right), radius * f32::sin(right), 0.0]));
+                        vertices.push(PosVertex::new([radius * f32::cos(left), radius * f32::sin(left), 0.0]));
+                    }
+                } else {
+                    vertices.push(PosVertex::new([0.0, radius, 0.0]));
+
+                    for step in 1..=sides/2 {
+                        let left = start + step as f32 * exterior;
+                        let right = start - step as f32 * exterior;
+                        vertices.push(PosVertex::new([radius * f32::cos(left), radius * f32::sin(left), 0.0]));
+                        vertices.push(PosVertex::new([radius * f32::cos(right), radius * f32::sin(right), 0.0]));
+                    }
+                };
+
+                Polygon {
+                    vertices: VertexBuffer::new(facade, &vertices).unwrap(),
                     indices: NoIndices(PrimitiveType::TriangleStrip),
                 }
             },
