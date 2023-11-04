@@ -1,6 +1,9 @@
 use crate::read_shader;
 use glium::glutin::*;
 use glium::*;
+use display::{GetGlDisplay, GlDisplay};
+use context::NotCurrentGlContext;
+use raw_window_handle::HasRawWindowHandle;
 
 pub const HALF_DEBUG: u32 = 512;
 
@@ -17,20 +20,39 @@ pub struct DebugWindow {
     indices: glium::index::NoIndices,
     shader: glium::Program,
     pub enabled: bool,
-    display: glium::Display,
+    display: glium::Display<surface::WindowSurface>,
+    window: winit::window::Window,
     image: glium::texture::Texture2d,
 }
 
 impl DebugWindow {
-    pub fn new(context: &Context<PossiblyCurrent>, event_loop: &event_loop::EventLoop<()>) -> Self {
-        let wb = window::WindowBuilder::new()
-            .with_position(dpi::PhysicalPosition::<i32>::from((900, 50)))
+    pub fn new(config: &config::Config, cab: context::ContextAttributesBuilder, event_loop: &winit::event_loop::EventLoop<()>) -> Self {
+        let wb = winit::window::WindowBuilder::new()
+            .with_position(winit::dpi::PhysicalPosition::<i32>::from((900, 50)))
             .with_decorations(false)
             .with_visible(false);
 
-        let cb = ContextBuilder::new().with_shared_lists(context);
+        let window = wb.build(&event_loop).unwrap();
 
-        let display = glium::Display::new(wb, cb, event_loop).unwrap();
+        let sab: surface::SurfaceAttributesBuilder<surface::WindowSurface> = surface::SurfaceAttributesBuilder::new();
+        // SAFETY: main window is kept alive indefinitely and window creation errors panic
+        let surface = unsafe {
+            config.display().create_window_surface(
+                    &config,
+                    &sab.build(
+                        window.raw_window_handle(),
+                        std::num::NonZeroU32::new(800).unwrap(),
+                        std::num::NonZeroU32::new(600).unwrap() ) )
+                .unwrap()
+        };
+        let ca = cab.build(Some(window.raw_window_handle()));
+        // SAFETY: main window is kept alive indefinitely and window creation errors panic
+        let ncc = unsafe {
+            config.display().create_context(&config, &ca).unwrap()
+        };
+        let context = ncc.treat_as_possibly_current();
+
+        let display = glium::Display::new(context, surface).expect("unable to create glium display");
 
         let vertices = vertex::VertexBuffer::new(
             &display,
@@ -83,6 +105,7 @@ impl DebugWindow {
             shader,
             enabled: false,
             display,
+            window,
             image,
         }
     }
@@ -99,8 +122,12 @@ impl DebugWindow {
         &self.shader
     }
 
-    pub fn display(&mut self) -> &mut Display {
+    pub fn display(&mut self) -> &mut Display<surface::WindowSurface> {
         &mut self.display
+    }
+
+    pub fn window(&mut self) -> &mut winit::window::Window {
+        &mut self.window
     }
 
     pub fn image(&mut self) -> &mut Texture2d {

@@ -1,4 +1,5 @@
-use glium::glutin::event::{ElementState, KeyboardInput, ModifiersState, VirtualKeyCode};
+use glium::glutin::surface::WindowSurface;
+use winit::event::{ElementState, KeyboardInput, ModifiersState, VirtualKeyCode};
 use crate::text::{char_string::CharString, key_map, MAX_LINE};
 
 #[derive(Clone, Copy, Debug)]
@@ -44,7 +45,7 @@ pub struct Console {
 }
 
 impl Console {
-    pub fn new(display: &glium::Display) -> Self {
+    pub fn new(display: &glium::Display<WindowSurface>) -> Self {
         let echo_line = CharString::new(display);
 
         let modifiers = ModifiersState::empty();

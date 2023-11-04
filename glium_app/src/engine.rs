@@ -6,8 +6,8 @@ pub enum Action {
 pub mod engine {
     use crate::engine::Action;
 
-    use glium::glutin::event::{Event, StartCause};
-    use glium::glutin::event_loop::{ControlFlow, EventLoop};
+    use winit::event::{Event, StartCause};
+    use winit::event_loop::{ControlFlow, EventLoop};
 
     pub fn start_loop<F>(event_loop: EventLoop<()>, mut callback: F) -> !
     where
@@ -48,11 +48,35 @@ pub mod engine {
     }
 }
 
+use glium::glutin::surface::WindowSurface;
+
+pub struct WindowedDisplay {
+    window: winit::window::Window,
+    display: glium::Display<WindowSurface>,
+}
+
+impl WindowedDisplay {
+    pub fn new(
+            window: winit::window::Window,
+            display: glium::Display<WindowSurface>,
+            ) -> Self {
+        WindowedDisplay { window, display }
+    }
+
+    pub fn window(&self) -> &winit::window::Window {
+        &self.window
+    }
+
+    pub fn display(&self) -> &glium::Display<WindowSurface> {
+        &self.display
+    }
+}
+
 pub mod input {
     use crate::engine::Action;
     use crate::CameraState;
 
-    use glium::glutin::event::{ElementState, Event, VirtualKeyCode, WindowEvent};
+    use winit::event::{ElementState, Event, VirtualKeyCode, WindowEvent};
 
     pub struct KeyboardState {
         pub alt_pressed: bool,
@@ -79,7 +103,7 @@ pub mod input {
     }
 
     pub fn process_input(
-        display: &glium::Display,
+        display: &super::WindowedDisplay,
         camera: &mut CameraState,
         keyboard: &mut KeyboardState,
         cursor: &mut Option<(i32, i32)>,
@@ -90,7 +114,7 @@ pub mod input {
         for event in events {
             match event {
                 Event::WindowEvent { event, window_id } => {
-                    let main_display = *window_id == display.gl_window().window().id();
+                    let main_display = *window_id == display.window().id();
 
                     match event {
                         WindowEvent::CloseRequested => {

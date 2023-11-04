@@ -1,6 +1,5 @@
-use glium::glutin::event::{ModifiersState, VirtualKeyCode};
+use winit::event::{ModifiersState, VirtualKeyCode};
 use std::ops::BitAnd;
-
 mod char_string;
 mod console;
 pub use char_string::CharString;

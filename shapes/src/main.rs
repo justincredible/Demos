@@ -3,28 +3,54 @@ extern crate glium;
 
 use glam::{Mat4, Quat, Vec3};
 use glium::{glutin, Surface};
-use glutin::dpi::PhysicalPosition;
-use glutin::{
+use winit::dpi::PhysicalPosition;
+use winit::{
     event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
     event_loop::ControlFlow,
 };
-
+use glutin::context::NotCurrentGlContext;
+use glutin::display::{GetGlDisplay, GlDisplay};
+use glutin::surface::{SurfaceAttributesBuilder, WindowSurface};
+use raw_window_handle::HasRawWindowHandle;
 pub mod shapes;
 use shapes::platonic_solids::{PlatonicSolid, PlatonicSolids};
+
+use std::num::NonZeroU32;
 
 use crate::simple_targa::read_targa;
 
 fn main() {
-    let event_loop = glutin::event_loop::EventLoop::new();
-    let wb = glutin::window::WindowBuilder::new()
+    let event_loop = winit::event_loop::EventLoop::new();
+    let wb = winit::window::WindowBuilder::new()
         .with_window_icon(read_icon("res/icon.tga").ok())
         .with_resizable(false)
         .with_title("Shapes")
         .with_position(PhysicalPosition::<i32>::from((50, 50)));
-    let cb = glutin::ContextBuilder::new()
-        .with_multisampling(4)
-        .with_vsync(true);
-    let display = glium::Display::new(wb, cb, &event_loop).expect("unable to create a new display");
+    let (window, config) = glutin_winit::DisplayBuilder::new().with_window_builder(Some(wb)).build(
+        &event_loop,
+        glutin::config::ConfigTemplateBuilder::new(),
+        | mut config | {
+            config.next().unwrap()
+        }
+    ).unwrap();
+    let window = window.unwrap();
+    let cab = glutin::context::ContextAttributesBuilder::new();
+    let not_current_context = unsafe {
+        config.display().create_context(&config, &cab.build(Some(window.raw_window_handle()))).unwrap()
+    };
+    let sab: SurfaceAttributesBuilder<WindowSurface> = SurfaceAttributesBuilder::new();
+    let window_surface = unsafe {
+        config.display().create_window_surface(
+            &config,
+            &sab.build(
+                window.raw_window_handle(),
+                NonZeroU32::new(800u32).unwrap(),
+                NonZeroU32::new(600u32).unwrap()
+            )
+        ).unwrap()
+    };
+    let current_context = not_current_context.treat_as_possibly_current();
+    let display = glium::Display::new(current_context, window_surface).expect("unable to create a new display");
 
     let program = glium::Program::from_source(
         &display,
@@ -126,7 +152,7 @@ fn main() {
     );
     event_loop.run(move |event, _, control_flow| {
         match event {
-            Event::RedrawEventsCleared => display.gl_window().window().request_redraw(),
+            Event::RedrawEventsCleared => window.request_redraw(),
             Event::RedrawRequested(_) => {
                 rotation *= rotation_delta;
                 let scale = Vec3::ONE
@@ -205,10 +231,10 @@ fn main() {
     });
 }
 
-fn read_icon(path: &str) -> std::io::Result<glutin::window::Icon> {
+fn read_icon(path: &str) -> std::io::Result<winit::window::Icon> {
     let image = read_targa(path)?;
 
-    Ok(glutin::window::Icon::from_rgba(image.bytes, image.width, image.height).unwrap())
+    Ok(winit::window::Icon::from_rgba(image.bytes, image.width, image.height).unwrap())
 }
 
 pub mod simple_targa {

@@ -1,4 +1,5 @@
 use glium::texture::{RawImage2d, CompressedSrgbTexture2d};
+use glium::glutin::surface::WindowSurface;
 
 pub struct Font {
     pub texture: CompressedSrgbTexture2d,
@@ -6,7 +7,7 @@ pub struct Font {
 }
 
 impl Font {
-    pub fn new(display: &glium::Display, targa: crate::simple_targa::TargaImage) -> Self {
+    pub fn new(display: &glium::Display<WindowSurface>, targa: crate::simple_targa::TargaImage) -> Self {
         let image = RawImage2d::from_raw_rgba(targa.bytes, (targa.width, targa.height));
         let texture = CompressedSrgbTexture2d::new(display, image).unwrap();
 
