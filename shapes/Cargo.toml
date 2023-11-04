@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 glam = "*"
-glium = { path = "../../forks/glium" }
+glium = "*"
 winit = "*"
 glutin-winit = "*"
 raw-window-handle = "*"
