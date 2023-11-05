@@ -97,7 +97,7 @@ impl DebugWindow {
         .unwrap();
         image
             .as_surface()
-            .clear(None, Some((0.0, 0.0, 0.0, 1.0)), false, None, None);
+            .clear(None, Some((0.0, 0.0, 0.0, 1.0)), true, None, None);
 
         DebugWindow {
             vertices,
