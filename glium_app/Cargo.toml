@@ -7,8 +7,8 @@ edition = "2021"
 
 [dependencies]
 glam = "*"
-glium = "*"
-glutin-winit = "*"
-winit = "*"
-raw-window-handle = "*"
+glium = "0.33"
+glutin-winit = "0.3"
+winit = "0.28"
+raw-window-handle = "0.5"
 rand = "0.8"
