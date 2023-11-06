@@ -21,7 +21,6 @@ use glutin::context::{ContextAttributesBuilder, NotCurrentGlContext};
 use glutin::display::{GetGlDisplay, GlDisplay};
 use winit::window::Fullscreen;
 use raw_window_handle::HasRawWindowHandle;
-use glium::program::ProgramCreationInput;
 use glium::{Api, Profile, Surface, Version};
 use std::f32::consts::TAU;
 use std::fs::File;
@@ -429,11 +428,6 @@ fn main() {
                 &params,
             ).unwrap();
 
-            let subroutine_shader = glium::Program::new(
-                windowed_display.display(),
-                ProgramCreationInput::from(subroutine_shader.get_binary().unwrap()),
-            )
-            .unwrap();
             target
                 .draw(
                     cube.vertices(),
