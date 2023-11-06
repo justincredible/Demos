@@ -304,7 +304,7 @@ fn main() {
 
         let picked_object = {
             let data = cubes.picked().read().map(|d| d[0]).unwrap_or(8);
-            if data != 8 {
+            if data < 8 {
                 per_instance.binary_search_by(|x| x.id.cmp(&data)).ok()
             } else {
                 None
