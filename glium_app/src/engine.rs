@@ -6,27 +6,27 @@ pub enum Action {
 pub mod engine {
     use crate::engine::Action;
 
+    use winit::error::EventLoopError;
     use winit::event::{Event, StartCause};
     use winit::event_loop::{ControlFlow, EventLoop};
 
-    pub fn start_loop<F>(event_loop: EventLoop<()>, mut callback: F) -> !
+    pub fn start_loop<F>(event_loop: EventLoop<()>, mut callback: F) -> Result<(), EventLoopError>
     where
-        F: 'static + FnMut(&Vec<Event<'_, ()>>) -> Action,
+        F: 'static + FnMut(&Vec<Event<()>>) -> Action,
     {
         let mut events_buffer = Vec::new();
         let next_frame_time =
             std::time::Instant::now() + std::time::Duration::from_nanos(16_666_667);
-        event_loop.run(move |event, _, control_flow| {
-            let run_callback = match event.to_static() {
-                Some(Event::NewEvents(cause)) => match cause {
+        event_loop.run(move |event, elwt| {
+            let run_callback = match event {
+                Event::NewEvents(cause) => match cause {
                     StartCause::ResumeTimeReached { .. } | StartCause::Init => true,
                     _ => false,
                 },
-                Some(event) => {
+                event => {
                     events_buffer.push(event);
                     false
                 }
-                None => false,
             };
 
             let action = if run_callback {
@@ -40,9 +40,9 @@ pub mod engine {
 
             match action {
                 Action::Continue => {
-                    *control_flow = ControlFlow::WaitUntil(next_frame_time);
+                    elwt.set_control_flow(ControlFlow::WaitUntil(next_frame_time));
                 }
-                Action::Stop => *control_flow = ControlFlow::Exit,
+                Action::Stop => elwt.exit(),
             }
         })
     }
@@ -76,7 +76,8 @@ pub mod input {
     use crate::engine::Action;
     use crate::CameraState;
 
-    use winit::event::{ElementState, Event, VirtualKeyCode, WindowEvent};
+    use winit::event::{ElementState, Event, KeyEvent, WindowEvent};
+    use winit::keyboard::{KeyCode, PhysicalKey::Code};
 
     pub struct KeyboardState {
         pub alt_pressed: bool,
@@ -107,7 +108,7 @@ pub mod input {
         camera: &mut CameraState,
         keyboard: &mut KeyboardState,
         cursor: &mut Option<(i32, i32)>,
-        events: &Vec<Event<'_, ()>>,
+        events: &Vec<Event<()>>,
     ) -> Action {
         let mut action = Action::Continue;
 
@@ -125,47 +126,73 @@ pub mod input {
                         WindowEvent::CursorMoved { position, .. } => {
                             *cursor = Some(position.cast::<i32>().into());
                         }
-                        ev @ WindowEvent::KeyboardInput { input, .. } => {
-                            match (input.state, input.virtual_keycode) {
-                                (ElementState::Pressed, Some(VirtualKeyCode::Return)) => {
-                                    keyboard.enter_pressed[if main_display { 0 } else { 1 }] = true
-                                }
-                                (ElementState::Pressed, Some(VirtualKeyCode::LAlt)) => {
-                                    keyboard.alt_pressed = true
-                                }
-                                (ElementState::Pressed, Some(VirtualKeyCode::RAlt)) => {
-                                    keyboard.alt_pressed = true
-                                }
-                                (ElementState::Released, Some(VirtualKeyCode::LAlt)) => {
-                                    keyboard.alt_pressed = false
-                                }
-                                (ElementState::Released, Some(VirtualKeyCode::RAlt)) => {
-                                    keyboard.alt_pressed = false
-                                }
-                                (ElementState::Pressed, Some(VirtualKeyCode::LShift)) => {
-                                    keyboard.shift_pressed = true
-                                }
-                                (ElementState::Pressed, Some(VirtualKeyCode::RShift)) => {
-                                    keyboard.shift_pressed = true
-                                }
-                                (ElementState::Released, Some(VirtualKeyCode::LShift)) => {
-                                    keyboard.shift_pressed = false
-                                }
-                                (ElementState::Released, Some(VirtualKeyCode::RShift)) => {
-                                    keyboard.shift_pressed = false
-                                }
-                                (ElementState::Pressed, Some(VirtualKeyCode::Space)) => {
-                                    keyboard.space_pressed = true
-                                }
-                                (ElementState::Pressed, Some(VirtualKeyCode::D)) => {
-                                    keyboard.d_pressed = true
-                                }
-                                (ElementState::Pressed, Some(VirtualKeyCode::S)) => {
-                                    keyboard.s_pressed = true
-                                }
-                                (ElementState::Pressed, Some(VirtualKeyCode::T)) => {
-                                    keyboard.t_pressed = true
-                                }
+                        ev @ WindowEvent::KeyboardInput { event, .. } => {
+                            match event {
+                                KeyEvent {
+                                    state: ElementState::Pressed,
+                                    physical_key: Code(KeyCode::Enter),
+                                    ..
+                                } => keyboard.enter_pressed[if main_display { 0 } else { 1 }] = true,
+                                KeyEvent {
+                                    state: ElementState::Pressed,
+                                    physical_key: Code(KeyCode::AltLeft),
+                                    ..
+                                } => keyboard.alt_pressed = true,
+                                KeyEvent {
+                                    state: ElementState::Pressed,
+                                    physical_key: Code(KeyCode::AltRight),
+                                    ..
+                                } => keyboard.alt_pressed = true,
+                                KeyEvent {
+                                    state: ElementState::Released,
+                                    physical_key: Code(KeyCode::AltLeft),
+                                    ..
+                                } => keyboard.alt_pressed = false,
+                                KeyEvent {
+                                    state: ElementState::Released,
+                                    physical_key: Code(KeyCode::AltRight),
+                                    ..
+                                } => keyboard.alt_pressed = false,
+                                KeyEvent {
+                                    state: ElementState::Pressed,
+                                    physical_key: Code(KeyCode::ShiftLeft),
+                                    ..
+                                } => keyboard.shift_pressed = true,
+                                KeyEvent {
+                                    state: ElementState::Pressed,
+                                    physical_key: Code(KeyCode::ShiftRight),
+                                    ..
+                                } => keyboard.shift_pressed = true,
+                                KeyEvent {
+                                    state: ElementState::Released,
+                                    physical_key: Code(KeyCode::ShiftLeft),
+                                    ..
+                                } => keyboard.shift_pressed = false,
+                                KeyEvent {
+                                    state: ElementState::Released,
+                                    physical_key: Code(KeyCode::ShiftRight),
+                                    ..
+                                } => keyboard.shift_pressed = false,
+                                KeyEvent {
+                                    state: ElementState::Pressed,
+                                    physical_key: Code(KeyCode::Space),
+                                    ..
+                                } => keyboard.space_pressed = true,
+                                KeyEvent {
+                                    state: ElementState::Pressed,
+                                    physical_key: Code(KeyCode::KeyD),
+                                    ..
+                                } => keyboard.d_pressed = true,
+                                KeyEvent {
+                                    state: ElementState::Pressed,
+                                    physical_key: Code(KeyCode::KeyS),
+                                    ..
+                                } => keyboard.s_pressed = true,
+                                KeyEvent {
+                                    state: ElementState::Pressed,
+                                    physical_key: Code(KeyCode::KeyT),
+                                    ..
+                                } => keyboard.t_pressed = true,
                                 _ => (),
                             }
 

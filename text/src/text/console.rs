@@ -1,39 +1,27 @@
 use glium::glutin::surface::WindowSurface;
-use winit::event::{ElementState, KeyboardInput, ModifiersState, VirtualKeyCode};
+use winit::event::{ElementState, KeyEvent};
+use winit::keyboard::{KeyCode, ModifiersState, PhysicalKey};
 use crate::text::{char_string::CharString, key_map, MAX_LINE};
 
 #[derive(Clone, Copy, Debug)]
 struct Key {
-    virtual_keycode: Option<VirtualKeyCode>,
+    keycode: KeyCode,
     modifiers: ModifiersState,
 }
 
-impl From<KeyboardInput> for Key {
-    fn from(input: KeyboardInput) -> Self {
-        Key {
-            virtual_keycode: input.virtual_keycode.or_else(|| {
-                match input.scancode {
-                    2 => VirtualKeyCode::Key1.into(),
-                    4 => VirtualKeyCode::Key3.into(),
-                    5 => VirtualKeyCode::Key4.into(),
-                    6 => VirtualKeyCode::Key5.into(),
-                    7 => VirtualKeyCode::Key6.into(),
-                    8 => VirtualKeyCode::Key7.into(),
-                    10 => VirtualKeyCode::Key9.into(),
-                    11 => VirtualKeyCode::Key0.into(),
-                    12 => VirtualKeyCode::Minus.into(),
-                    26 => VirtualKeyCode::LBracket.into(),
-                    27 => VirtualKeyCode::RBracket.into(),
-                    40 => VirtualKeyCode::Apostrophe.into(),
-                    41 => VirtualKeyCode::Grave.into(),
-                    43 => VirtualKeyCode::Backslash.into(),
-                    51 => VirtualKeyCode::Comma.into(),
-                    52 => VirtualKeyCode::Period.into(),
-                    53 => VirtualKeyCode::Slash.into(),
-                    _ => None,
+impl From<KeyEvent> for Key {
+    fn from(event: KeyEvent) -> Self {
+        match event {
+            KeyEvent {
+                physical_key: PhysicalKey::Code(keycode),
+                ..
+            } => {
+                Key {
+                    keycode,
+                    modifiers: ModifiersState::empty(),
                 }
-            }),
-            modifiers: ModifiersState::empty(),
+            },
+            _ => panic!("Unexpected event"),
         }
     }
 }
@@ -65,43 +53,43 @@ impl Console {
         self.modifiers = modifiers;
     }
 
-    pub fn write(&mut self, input: KeyboardInput) {
-        match input {
-            KeyboardInput {
+    pub fn write(&mut self, event: KeyEvent) {
+        match event {
+            KeyEvent {
                 state: ElementState::Released,
-                virtual_keycode: Some(VirtualKeyCode::Return),
+                physical_key: PhysicalKey::Code(KeyCode::Enter),
                 ..
             } => self.flush(),
 
-            KeyboardInput {
+            KeyEvent {
                 state: ElementState::Released,
-                virtual_keycode: Some(VirtualKeyCode::Escape),
+                physical_key: PhysicalKey::Code(KeyCode::Escape),
                 ..
             } => {
                 self.history.clear();
                 self.echo_line.clear();
             },
 
-            KeyboardInput {
+            KeyEvent {
                 state: ElementState::Released,
-                virtual_keycode: Some(VirtualKeyCode::Back), // Backspace),
+                physical_key: PhysicalKey::Code(KeyCode::Backspace),
                 ..
             } => if self.history.len() > 0 {
                 self.history.pop();
                 self.echo_line.unappend();
             },
 
-            KeyboardInput {
+            KeyEvent {
                 state: ElementState::Released,
                 ..
             } => {
                 if self.history.len() == MAX_LINE {
                     self.flush();
                 }
-                let mut key: Key = input.into();
+                let mut key: Key = event.into();
                 key.modifiers = self.modifiers;
 
-                let key_char = key_map(&key.virtual_keycode.unwrap(), &key.modifiers);
+                let key_char = key_map(&key.keycode, &key.modifiers);
                 if key_char != '\0' {
                     self.history.push(key);
                     self.echo_line.append(key_char);
@@ -114,15 +102,7 @@ impl Console {
 
     fn flush(&mut self) {
         for key in &self.history {
-            match key {
-                Key {
-                    virtual_keycode: Some(virtual_keycode),
-                    modifiers,
-                    ..
-                } => print!("{}", key_map(virtual_keycode, modifiers)),
-
-                _ => (),
-            }
+            print!("{}", key_map(&key.keycode, &key.modifiers));
         }
 
         self.history.clear();

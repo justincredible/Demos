@@ -4,10 +4,8 @@ extern crate glium;
 use glam::{Mat4, Quat, Vec3};
 use glium::{glutin, Surface};
 use winit::dpi::PhysicalPosition;
-use winit::{
-    event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
-    event_loop::ControlFlow,
-};
+use winit::event::{ElementState, Event, KeyEvent, WindowEvent};
+use winit::keyboard::{KeyCode, PhysicalKey::Code};
 use glutin::context::NotCurrentGlContext;
 use glutin::display::{GetGlDisplay, GlDisplay};
 use glutin::surface::{SurfaceAttributesBuilder, WindowSurface};
@@ -20,7 +18,7 @@ use std::num::NonZeroU32;
 use crate::simple_targa::read_targa;
 
 fn main() {
-    let event_loop = winit::event_loop::EventLoop::new();
+    let event_loop = winit::event_loop::EventLoop::new().unwrap();
     let wb = winit::window::WindowBuilder::new()
         .with_window_icon(read_icon("res/icon.tga").ok())
         .with_resizable(false)
@@ -150,71 +148,66 @@ fn main() {
         "Up and Down arrows modify vertices per face.\n\
         Left and Right arrows modify faces per vertex."
     );
-    event_loop.run(move |event, _, control_flow| {
+    event_loop.run(move |event, window_target| {
         match event {
-            Event::RedrawEventsCleared => window.request_redraw(),
-            Event::RedrawRequested(_) => {
-                rotation *= rotation_delta;
-                let scale = Vec3::ONE
-                    * if shape != 3 {
-                        1.0
-                    // the dodecahedron is rather large
-                    } else {
-                        0.5
-                    };
-                let matrix =
-                    Mat4::from_scale_rotation_translation(scale, rotation.normalize(), Vec3::ZERO);
-
-                let mut frame = display.draw();
-
-                frame.clear_color_and_depth((0.0, 0.0, 0.0, 1.0), -1.0);
-
-                frame
-                    .draw(
-                        &shapes[shape].vertices,
-                        &shapes[shape].indices,
-                        &program,
-                        &uniform! { transform: matrix.to_cols_array_2d() },
-                        &params,
-                    )
-                    .unwrap();
-
-                frame.finish().unwrap();
-            }
-
             Event::WindowEvent { event, .. } => match event {
-                WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
-                WindowEvent::KeyboardInput { input, .. } => match input {
-                    KeyboardInput {
+                WindowEvent::CloseRequested => window_target.exit(),
+                WindowEvent::RedrawRequested => {
+                    rotation *= rotation_delta;
+                    // the dodecahedron is rather large
+                    let scale = Vec3::ONE * if shape != 3 { 1.0 } else { 0.5 };
+                    let matrix =
+                        Mat4::from_scale_rotation_translation(scale, rotation.normalize(), Vec3::ZERO);
+
+                    let mut frame = display.draw();
+
+                    frame.clear_color_and_depth((0.0, 0.0, 0.0, 1.0), -1.0);
+
+                    frame
+                        .draw(
+                            &shapes[shape].vertices,
+                            &shapes[shape].indices,
+                            &program,
+                            &uniform! { transform: matrix.to_cols_array_2d() },
+                            &params,
+                        )
+                        .unwrap();
+
+                    frame.finish().unwrap();
+
+                    window.request_redraw();
+                },
+                WindowEvent::KeyboardInput { event, .. } => match event {
+                    KeyEvent {
                         state: ElementState::Pressed,
-                        virtual_keycode: Some(VirtualKeyCode::Up),
+                        physical_key: Code(KeyCode::ArrowUp),
                         ..
                     } => match shape {
                         0 | 2 | 4 => shape = 1,
                         1 => shape = 3,
                         _ => (),
                     },
-                    KeyboardInput {
+                    KeyEvent {
                         state: ElementState::Pressed,
-                        virtual_keycode: Some(VirtualKeyCode::Down),
+                        physical_key: Code(KeyCode::ArrowDown),
                         ..
                     } => match shape {
                         3 => shape = 1,
                         1 => shape = 0,
                         _ => (),
                     },
-                    KeyboardInput {
+                    KeyEvent {
                         state: ElementState::Pressed,
-                        virtual_keycode: Some(VirtualKeyCode::Left),
+                        physical_key: Code(KeyCode::ArrowLeft),
                         ..
                     } => match shape {
                         4 => shape = 2,
                         2 => shape = 0,
                         _ => (),
                     },
-                    KeyboardInput {
+                    KeyEvent {
                         state: ElementState::Pressed,
-                        virtual_keycode: Some(VirtualKeyCode::Right),
+                        physical_key: Code(KeyCode::ArrowRight),
                         ..
                     } => match shape {
                         0 => shape = 2,
@@ -228,7 +221,7 @@ fn main() {
 
             _ => (),
         }
-    });
+    }).unwrap();
 }
 
 fn read_icon(path: &str) -> std::io::Result<winit::window::Icon> {

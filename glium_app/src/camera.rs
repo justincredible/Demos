@@ -1,4 +1,6 @@
 use glam::{Mat4, Vec3};
+use winit::event::{ElementState, KeyEvent, WindowEvent};
+use winit::keyboard::{KeyCode, PhysicalKey::Code};
 use std::f32::consts::TAU;
 
 pub struct CameraState {
@@ -146,23 +148,24 @@ impl CameraState {
         }
     }
 
-    pub fn process_input(&mut self, event: &winit::event::WindowEvent<'_>) {
-        let input = match *event {
-            winit::event::WindowEvent::KeyboardInput { input, .. } => input,
+    pub fn process_input(&mut self, event: &WindowEvent) {
+        let event = match event {
+            WindowEvent::KeyboardInput { event, .. } => event,
             _ => return,
         };
-        let pressed = input.state == winit::event::ElementState::Pressed;
-        let key = match input.virtual_keycode {
-            Some(key) => key,
-            None => return,
-        };
-        match key {
-            winit::event::VirtualKeyCode::Up => self.moving_up = pressed,
-            winit::event::VirtualKeyCode::Down => self.moving_down = pressed,
-            winit::event::VirtualKeyCode::A => self.moving_left = pressed,
-            winit::event::VirtualKeyCode::D => self.moving_right = pressed,
-            winit::event::VirtualKeyCode::W => self.moving_forward = pressed,
-            winit::event::VirtualKeyCode::S => self.moving_backward = pressed,
+        match event {
+            KeyEvent { state, physical_key: Code(KeyCode::ArrowUp), .. } =>
+                self.moving_up = *state == ElementState::Pressed,
+            KeyEvent { state, physical_key: Code(KeyCode::ArrowDown), .. } =>
+                self.moving_down = *state == ElementState::Pressed,
+            KeyEvent { state, physical_key: Code(KeyCode::KeyA), .. } =>
+                self.moving_left = *state == ElementState::Pressed,
+            KeyEvent { state, physical_key: Code(KeyCode::KeyD), .. } =>
+                self.moving_right = *state == ElementState::Pressed,
+            KeyEvent { state, physical_key: Code(KeyCode::KeyW), .. } =>
+                self.moving_forward = *state == ElementState::Pressed,
+            KeyEvent { state, physical_key: Code(KeyCode::KeyS), .. } =>
+                self.moving_backward = *state == ElementState::Pressed,
             _ => (),
         };
     }

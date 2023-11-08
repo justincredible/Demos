@@ -7,7 +7,7 @@ use glutin::display::{GetGlDisplay, GlDisplay};
 use glutin::surface::{SurfaceAttributesBuilder, WindowSurface};
 use winit::dpi::PhysicalPosition;
 use winit::event::{Event, WindowEvent};
-use winit::event_loop::{EventLoop, ControlFlow};
+use winit::event_loop::EventLoop;
 use winit::window::{Icon, WindowBuilder};
 use raw_window_handle::HasRawWindowHandle;
 
@@ -21,7 +21,7 @@ use font::Font;
 
 fn main() {
     let icon = read_targa("res/icon.tga").unwrap();
-    let event_loop = EventLoop::new();
+    let event_loop = EventLoop::new().unwrap();
     let wb = WindowBuilder::new()
         .with_window_icon(Icon::from_rgba(icon.bytes, icon.width, icon.height).ok())
         .with_resizable(false)
@@ -61,36 +61,37 @@ fn main() {
         ..Default::default()
     };
 
-    event_loop.run(move |event, _, control_flow| {
+    event_loop.run(move |event, elwt| {
         match event {
-            Event::RedrawEventsCleared => window.request_redraw(),
-            Event::RedrawRequested(_) => {
-                let mut frame = display.draw();
-                frame.clear_color(0.0, 0.0, 0.0, 1.0);
-
-                frame.draw(
-                    console.echo_line().vertices(),
-                    console.echo_line().indices(),
-                    &font.shader,
-                    &uniform! {
-                        translation: [-1.0f32, -1.0],
-                        font: &font.texture,
-                    },
-                    &params,
-                )
-                .unwrap();
-
-                frame.finish().unwrap();
-            }
             Event::WindowEvent { event, .. } => {
                 match event {
-                    WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
-                    WindowEvent::KeyboardInput { input, .. } => console.write(input),
-                    WindowEvent::ModifiersChanged(mods) => console.set_modifiers(mods),
+                    WindowEvent::CloseRequested => elwt.exit(),
+                    WindowEvent::RedrawRequested => {
+                        let mut frame = display.draw();
+                        frame.clear_color(0.0, 0.0, 0.0, 1.0);
+
+                        frame.draw(
+                            console.echo_line().vertices(),
+                            console.echo_line().indices(),
+                            &font.shader,
+                            &uniform! {
+                                translation: [-1.0f32, -1.0],
+                                font: &font.texture,
+                            },
+                            &params,
+                        )
+                        .unwrap();
+
+                        frame.finish().unwrap();
+                        window.request_redraw();
+                    },
+                    WindowEvent::KeyboardInput { event, .. } => console.write(event),
+                    WindowEvent::ModifiersChanged(mods) => console.set_modifiers(mods.state()),
                     _ => (),
                 }
             }
             _ => (),
         }
-    });
+    })
+    .unwrap();
 }

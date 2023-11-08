@@ -29,7 +29,7 @@ use std::io::Read;
 fn main() {
     use fxaa::fxaa;
 
-    let event_loop = winit::event_loop::EventLoop::new();
+    let event_loop = winit::event_loop::EventLoop::new().unwrap();
     let wb = winit::window::WindowBuilder::new()
         .with_resizable(false)
         .with_title("Glium-based application")
@@ -621,7 +621,8 @@ fn main() {
         j = std::cmp::min(j + 1, SUBR_DUR);
 
         action
-    });
+    })
+    .unwrap();
 }
 
 fn read_icon(path: &str) -> std::io::Result<winit::window::Icon> {
