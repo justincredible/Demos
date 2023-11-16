@@ -22,11 +22,10 @@ pub struct CharString {
 impl CharString {
     pub fn new(facade: &dyn Facade) -> Self {
         let indices: Vec<u16> = (0..MAX_LINE as u16)
-            .map(| i | {
+            .flat_map(| i | {
                 let i = 4 * i;
                 [i, i + 1, i + 2, i + 2, i + 1, i + 3]
             })
-            .flatten()
             .collect();
 
         CharString {

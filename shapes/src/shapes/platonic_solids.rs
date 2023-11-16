@@ -1,4 +1,4 @@
-use crate::shapes::shapes::PosVertex;
+use crate::shapes::PosVertex;
 use glium::backend::Facade;
 use glium::index::{IndexBuffer, PrimitiveType};
 use glium::vertex::VertexBuffer;

@@ -11,13 +11,13 @@ impl Font {
         let image = RawImage2d::from_raw_rgba(targa.bytes, (targa.width, targa.height));
         let texture = CompressedSrgbTexture2d::new(display, image).unwrap();
 
-        let shader = glium::Program::from_source(display, &FONT_VS, &FONT_FS, None).unwrap();
+        let shader = glium::Program::from_source(display, FONT_VS, FONT_FS, None).unwrap();
 
         Font { texture, shader }
     }
 }
 
-const FONT_VS: &'static str = r#"
+const FONT_VS: &str = r#"
     #version 150
 
     in vec2 pos;
@@ -33,7 +33,7 @@ const FONT_VS: &'static str = r#"
     }
 "#;
 
-const FONT_FS: &'static str = r#"
+const FONT_FS: &str = r#"
     #version 150
 
     in vec2 coordinates;

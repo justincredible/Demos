@@ -149,8 +149,8 @@ fn main() {
         Left and Right arrows modify faces per vertex."
     );
     event_loop.run(move |event, window_target| {
-        match event {
-            Event::WindowEvent { event, .. } => match event {
+        if let Event::WindowEvent { event, .. } = event {
+            match event {
                 WindowEvent::CloseRequested => window_target.exit(),
                 WindowEvent::RedrawRequested => {
                     rotation *= rotation_delta;
@@ -217,9 +217,7 @@ fn main() {
                     _ => (),
                 },
                 _ => (),
-            },
-
-            _ => (),
+            }
         }
     }).unwrap();
 }

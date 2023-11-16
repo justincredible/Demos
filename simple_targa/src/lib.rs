@@ -44,7 +44,7 @@ pub fn read_targa(path: &str) -> Result<TargaImage> {
 
         bytes.push(data[index + 2]);
         bytes.push(data[index + 1]);
-        bytes.push(data[index + 0]);
+        bytes.push(data[index]);
         bytes.push(data[index + 3]);
     }
 
@@ -69,9 +69,7 @@ pub fn write_targa(path: &str, mut image: TargaImage) -> Result<()> {
     for i in 0..(image.width * image.height) as usize {
         let index = 4 * i;
 
-        let byte = image.bytes[index];
-        image.bytes[index] = image.bytes[index + 2];
-        image.bytes[index + 2] = byte;
+        image.bytes.swap(index, index + 2);
     }
     file.write_all(&image.bytes)?;
 

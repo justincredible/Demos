@@ -60,35 +60,32 @@ fn main() {
     };
 
     event_loop.run(move |event, elwt| {
-        match event {
-            Event::WindowEvent { event, .. } => {
-                match event {
-                    WindowEvent::CloseRequested => elwt.exit(),
-                    WindowEvent::RedrawRequested => {
-                        let mut frame = display.draw();
-                        frame.clear_color(0.0, 0.0, 0.0, 1.0);
+        if let Event::WindowEvent { event, .. } = event {
+            match event {
+                WindowEvent::CloseRequested => elwt.exit(),
+                WindowEvent::RedrawRequested => {
+                    let mut frame = display.draw();
+                    frame.clear_color(0.0, 0.0, 0.0, 1.0);
 
-                        frame.draw(
-                            console.echo_line().vertices(),
-                            console.echo_line().indices(),
-                            &font.shader,
-                            &uniform! {
-                                translation: [-1.0f32, -1.0],
-                                font: &font.texture,
-                            },
-                            &params,
-                        )
-                        .unwrap();
+                    frame.draw(
+                        console.echo_line().vertices(),
+                        console.echo_line().indices(),
+                        &font.shader,
+                        &uniform! {
+                            translation: [-1.0f32, -1.0],
+                            font: &font.texture,
+                        },
+                        &params,
+                    )
+                    .unwrap();
 
-                        frame.finish().unwrap();
-                        window.request_redraw();
-                    },
-                    WindowEvent::KeyboardInput { event, .. } => console.write(event),
-                    WindowEvent::ModifiersChanged(mods) => console.set_modifiers(mods.state()),
-                    _ => (),
-                }
+                    frame.finish().unwrap();
+                    window.request_redraw();
+                },
+                WindowEvent::KeyboardInput { event, .. } => console.write(event),
+                WindowEvent::ModifiersChanged(mods) => console.set_modifiers(mods.state()),
+                _ => (),
             }
-            _ => (),
         }
     })
     .unwrap();

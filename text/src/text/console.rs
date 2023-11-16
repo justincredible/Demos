@@ -74,7 +74,7 @@ impl Console {
                 state: ElementState::Released,
                 physical_key: PhysicalKey::Code(KeyCode::Backspace),
                 ..
-            } => if self.history.len() > 0 {
+            } => if !self.history.is_empty() {
                 self.history.pop();
                 self.echo_line.unappend();
             },
@@ -107,7 +107,7 @@ impl Console {
 
         self.history.clear();
         self.echo_line.clear();
-        println!("");
+        println!();
     }
 }
 

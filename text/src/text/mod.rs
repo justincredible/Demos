@@ -71,7 +71,7 @@ fn key_map(key: &KeyCode, modifiers: &ModifiersState) -> char {
 }
 
 fn tex_map(ch: char) -> [f32; 4] {
-    let thirteenth = 0.076923076923;
+    let thirteenth = 0.07692308;
     let eighth = 0.125;
 
     match ch {
