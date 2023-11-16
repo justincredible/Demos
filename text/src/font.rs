@@ -7,7 +7,7 @@ pub struct Font {
 }
 
 impl Font {
-    pub fn new(display: &glium::Display<WindowSurface>, targa: crate::simple_targa::TargaImage) -> Self {
+    pub fn new(display: &glium::Display<WindowSurface>, targa: simple_targa::TargaImage) -> Self {
         let image = RawImage2d::from_raw_rgba(targa.bytes, (targa.width, targa.height));
         let texture = CompressedSrgbTexture2d::new(display, image).unwrap();
 

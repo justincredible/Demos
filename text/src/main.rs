@@ -11,8 +11,6 @@ use winit::event_loop::EventLoop;
 use winit::window::{Icon, WindowBuilder};
 use raw_window_handle::HasRawWindowHandle;
 
-#[allow(dead_code)]
-mod simple_targa;
 use simple_targa::read_targa;
 mod text;
 use text::Console;
