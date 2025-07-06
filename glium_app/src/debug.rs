@@ -32,13 +32,13 @@ impl DebugWindow {
             .with_decorations(false)
             .with_visible(false);
 
-        let window = wb.build(&event_loop).unwrap();
+        let window = wb.build(event_loop).unwrap();
 
         let sab: surface::SurfaceAttributesBuilder<surface::WindowSurface> = surface::SurfaceAttributesBuilder::new();
         // SAFETY: main window is kept alive indefinitely and window creation errors panic
         let surface = unsafe {
             config.display().create_window_surface(
-                    &config,
+                    config,
                     &sab.build(
                         window.raw_window_handle(),
                         std::num::NonZeroU32::new(800).unwrap(),
@@ -48,7 +48,7 @@ impl DebugWindow {
         let ca = cab.build(Some(window.raw_window_handle()));
         // SAFETY: main window is kept alive indefinitely and window creation errors panic
         let ncc = unsafe {
-            config.display().create_context(&config, &ca).unwrap()
+            config.display().create_context(config, &ca).unwrap()
         };
         let context = ncc.treat_as_possibly_current();
 

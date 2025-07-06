@@ -1,51 +1,44 @@
+use winit::error::EventLoopError;
+use winit::event::{Event, StartCause};
+use winit::event_loop::{ControlFlow, EventLoop};
+
 pub enum Action {
     Stop,
     Continue,
 }
 
-pub mod engine {
-    use crate::engine::Action;
-
-    use winit::error::EventLoopError;
-    use winit::event::{Event, StartCause};
-    use winit::event_loop::{ControlFlow, EventLoop};
-
-    pub fn start_loop<F>(event_loop: EventLoop<()>, mut callback: F) -> Result<(), EventLoopError>
-    where
-        F: 'static + FnMut(&Vec<Event<()>>) -> Action,
-    {
-        let mut events_buffer = Vec::new();
-        let next_frame_time =
-            std::time::Instant::now() + std::time::Duration::from_nanos(16_666_667);
-        event_loop.run(move |event, elwt| {
-            let run_callback = match event {
-                Event::NewEvents(cause) => match cause {
-                    StartCause::ResumeTimeReached { .. } | StartCause::Init => true,
-                    _ => false,
-                },
-                event => {
-                    events_buffer.push(event);
-                    false
-                }
-            };
-
-            let action = if run_callback {
-                let action = callback(&events_buffer);
-
-                events_buffer.clear();
-                action
-            } else {
-                Action::Continue
-            };
-
-            match action {
-                Action::Continue => {
-                    elwt.set_control_flow(ControlFlow::WaitUntil(next_frame_time));
-                }
-                Action::Stop => elwt.exit(),
+pub fn start_loop<F>(event_loop: EventLoop<()>, mut callback: F) -> Result<(), EventLoopError>
+where
+    F: 'static + FnMut(&Vec<Event<()>>) -> Action,
+{
+    let mut events_buffer = Vec::new();
+    let next_frame_time =
+        std::time::Instant::now() + std::time::Duration::from_nanos(16_666_667);
+    event_loop.run(move |event, elwt| {
+        let run_callback = match event {
+            Event::NewEvents(cause) => matches!(cause, StartCause::ResumeTimeReached { .. } | StartCause::Init),
+            event => {
+                events_buffer.push(event);
+                false
             }
-        })
-    }
+        };
+
+        let action = if run_callback {
+            let action = callback(&events_buffer);
+
+            events_buffer.clear();
+            action
+        } else {
+            Action::Continue
+        };
+
+        match action {
+            Action::Continue => {
+                elwt.set_control_flow(ControlFlow::WaitUntil(next_frame_time));
+            }
+            Action::Stop => elwt.exit(),
+        }
+    })
 }
 
 use glium::glutin::surface::WindowSurface;
@@ -79,6 +72,7 @@ pub mod input {
     use winit::event::{ElementState, Event, KeyEvent, WindowEvent};
     use winit::keyboard::{KeyCode, PhysicalKey::Code};
 
+    #[derive(Default)]
     pub struct KeyboardState {
         pub alt_pressed: bool,
         pub shift_pressed: bool,
@@ -113,97 +107,94 @@ pub mod input {
         let mut action = Action::Continue;
 
         for event in events {
-            match event {
-                Event::WindowEvent { event, window_id } => {
-                    let main_display = *window_id == display.window().id();
+            if let Event::WindowEvent { event, window_id } = event {
+                let main_display = *window_id == display.window().id();
 
-                    match event {
-                        WindowEvent::CloseRequested => {
-                            if main_display {
-                                action = Action::Stop
-                            }
+                match event {
+                    WindowEvent::CloseRequested => {
+                        if main_display {
+                            action = Action::Stop
                         }
-                        WindowEvent::CursorMoved { position, .. } => {
-                            *cursor = Some(position.cast::<i32>().into());
-                        }
-                        ev @ WindowEvent::KeyboardInput { event, .. } => {
-                            match event {
-                                KeyEvent {
-                                    state: ElementState::Pressed,
-                                    physical_key: Code(KeyCode::Enter),
-                                    ..
-                                } => keyboard.enter_pressed[if main_display { 0 } else { 1 }] = true,
-                                KeyEvent {
-                                    state: ElementState::Pressed,
-                                    physical_key: Code(KeyCode::AltLeft),
-                                    ..
-                                } => keyboard.alt_pressed = true,
-                                KeyEvent {
-                                    state: ElementState::Pressed,
-                                    physical_key: Code(KeyCode::AltRight),
-                                    ..
-                                } => keyboard.alt_pressed = true,
-                                KeyEvent {
-                                    state: ElementState::Released,
-                                    physical_key: Code(KeyCode::AltLeft),
-                                    ..
-                                } => keyboard.alt_pressed = false,
-                                KeyEvent {
-                                    state: ElementState::Released,
-                                    physical_key: Code(KeyCode::AltRight),
-                                    ..
-                                } => keyboard.alt_pressed = false,
-                                KeyEvent {
-                                    state: ElementState::Pressed,
-                                    physical_key: Code(KeyCode::ShiftLeft),
-                                    ..
-                                } => keyboard.shift_pressed = true,
-                                KeyEvent {
-                                    state: ElementState::Pressed,
-                                    physical_key: Code(KeyCode::ShiftRight),
-                                    ..
-                                } => keyboard.shift_pressed = true,
-                                KeyEvent {
-                                    state: ElementState::Released,
-                                    physical_key: Code(KeyCode::ShiftLeft),
-                                    ..
-                                } => keyboard.shift_pressed = false,
-                                KeyEvent {
-                                    state: ElementState::Released,
-                                    physical_key: Code(KeyCode::ShiftRight),
-                                    ..
-                                } => keyboard.shift_pressed = false,
-                                KeyEvent {
-                                    state: ElementState::Pressed,
-                                    physical_key: Code(KeyCode::Space),
-                                    ..
-                                } => keyboard.space_pressed = true,
-                                KeyEvent {
-                                    state: ElementState::Pressed,
-                                    physical_key: Code(KeyCode::KeyD),
-                                    ..
-                                } => keyboard.d_pressed = true,
-                                KeyEvent {
-                                    state: ElementState::Pressed,
-                                    physical_key: Code(KeyCode::KeyS),
-                                    ..
-                                } => keyboard.s_pressed = true,
-                                KeyEvent {
-                                    state: ElementState::Pressed,
-                                    physical_key: Code(KeyCode::KeyT),
-                                    ..
-                                } => keyboard.t_pressed = true,
-                                _ => (),
-                            }
-
-                            if main_display {
-                                camera.process_input(&ev);
-                            }
-                        }
-                        _ => (),
                     }
+                    WindowEvent::CursorMoved { position, .. } => {
+                        *cursor = Some(position.cast::<i32>().into());
+                    }
+                    ev @ WindowEvent::KeyboardInput { event, .. } => {
+                        match event {
+                            KeyEvent {
+                                state: ElementState::Pressed,
+                                physical_key: Code(KeyCode::Enter),
+                                ..
+                            } => keyboard.enter_pressed[if main_display { 0 } else { 1 }] = true,
+                            KeyEvent {
+                                state: ElementState::Pressed,
+                                physical_key: Code(KeyCode::AltLeft),
+                                ..
+                            } => keyboard.alt_pressed = true,
+                            KeyEvent {
+                                state: ElementState::Pressed,
+                                physical_key: Code(KeyCode::AltRight),
+                                ..
+                            } => keyboard.alt_pressed = true,
+                            KeyEvent {
+                                state: ElementState::Released,
+                                physical_key: Code(KeyCode::AltLeft),
+                                ..
+                            } => keyboard.alt_pressed = false,
+                            KeyEvent {
+                                state: ElementState::Released,
+                                physical_key: Code(KeyCode::AltRight),
+                                ..
+                            } => keyboard.alt_pressed = false,
+                            KeyEvent {
+                                state: ElementState::Pressed,
+                                physical_key: Code(KeyCode::ShiftLeft),
+                                ..
+                            } => keyboard.shift_pressed = true,
+                            KeyEvent {
+                                state: ElementState::Pressed,
+                                physical_key: Code(KeyCode::ShiftRight),
+                                ..
+                            } => keyboard.shift_pressed = true,
+                            KeyEvent {
+                                state: ElementState::Released,
+                                physical_key: Code(KeyCode::ShiftLeft),
+                                ..
+                            } => keyboard.shift_pressed = false,
+                            KeyEvent {
+                                state: ElementState::Released,
+                                physical_key: Code(KeyCode::ShiftRight),
+                                ..
+                            } => keyboard.shift_pressed = false,
+                            KeyEvent {
+                                state: ElementState::Pressed,
+                                physical_key: Code(KeyCode::Space),
+                                ..
+                            } => keyboard.space_pressed = true,
+                            KeyEvent {
+                                state: ElementState::Pressed,
+                                physical_key: Code(KeyCode::KeyD),
+                                ..
+                            } => keyboard.d_pressed = true,
+                            KeyEvent {
+                                state: ElementState::Pressed,
+                                physical_key: Code(KeyCode::KeyS),
+                                ..
+                            } => keyboard.s_pressed = true,
+                            KeyEvent {
+                                state: ElementState::Pressed,
+                                physical_key: Code(KeyCode::KeyT),
+                                ..
+                            } => keyboard.t_pressed = true,
+                            _ => (),
+                        }
+
+                        if main_display {
+                            camera.process_input(ev);
+                        }
+                    }
+                    _ => (),
                 }
-                _ => (),
             }
         }
 
@@ -399,6 +390,7 @@ pub mod simple_targa {
 
             bytes.push(data[index + 2]);
             bytes.push(data[index + 1]);
+            #[allow(clippy::identity_op)]
             bytes.push(data[index + 0]);
             bytes.push(data[index + 3]);
         }
@@ -424,9 +416,7 @@ pub mod simple_targa {
         for i in 0..(image.width * image.height) as usize {
             let index = 4 * i;
 
-            let byte = image.bytes[index];
-            image.bytes[index] = image.bytes[index + 2];
-            image.bytes[index + 2] = byte;
+            image.bytes.swap(index, index + 2);
         }
         file.write_all(&image.bytes)?;
 

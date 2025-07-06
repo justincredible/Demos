@@ -3,6 +3,7 @@ use winit::event::{ElementState, KeyEvent, WindowEvent};
 use winit::keyboard::{KeyCode, PhysicalKey::Code};
 use std::f32::consts::TAU;
 
+#[derive(Default)]
 pub struct CameraState {
     aspect_ratio: f32,
     position: Vec3,

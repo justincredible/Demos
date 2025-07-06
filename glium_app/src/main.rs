@@ -6,13 +6,13 @@ use camera::CameraState;
 pub mod debug;
 use debug::{DebugWindow, HALF_DEBUG};
 pub mod engine;
-use engine::{engine::start_loop, WindowedDisplay};
+use engine::{start_loop, WindowedDisplay};
 use engine::input::{process_input, KeyboardState};
 use engine::screenshot::AsyncScreenshotTaker;
 use engine::simple_targa::{read_targa, write_targa, TargaImage};
 pub mod fxaa;
 pub mod shapes;
-use shapes::shapes::{Cube, CubeInstances, SpritesBatch, CUBE_INSTANCES, SPRITES_COUNT};
+use shapes::{Cube, CubeInstances, SpritesBatch, CUBE_INSTANCES, SPRITES_COUNT};
 
 use glam::{Mat4, Quat, Vec3};
 use glium::glutin;
@@ -27,8 +27,6 @@ use std::fs::File;
 use std::io::Read;
 
 fn main() {
-    use fxaa::fxaa;
-
     let event_loop = winit::event_loop::EventLoop::new().unwrap();
     let wb = winit::window::WindowBuilder::new()
         .with_resizable(false)
@@ -122,7 +120,7 @@ fn main() {
     let tessell_img =
         glium::texture::RawImage2d::from_raw_rgba(targa.bytes, (targa.width, targa.height));
     let dbg_img = glium::texture::RawImage2d::from_raw_rgba(
-        (&tessell_img.data).to_vec(),
+        tessell_img.data.to_vec(),
         (tessell_img.width, tessell_img.height),
     );
     let opengl_texture =
@@ -220,7 +218,7 @@ fn main() {
     const SUBR_DUR: usize = 100;
     let mut tess_level = 64;
 
-    let mut per_instance = CUBE_INSTANCES.clone();
+    let mut per_instance = CUBE_INSTANCES;
 
     let mut cursor_position: Option<(i32, i32)> = None;
 
@@ -311,7 +309,7 @@ fn main() {
             }
         };
 
-        per_instance = CUBE_INSTANCES.clone();
+        per_instance = CUBE_INSTANCES;
 
         let subroutine = match picked_object {
             Some(0) => "ColourBlack",
@@ -343,7 +341,7 @@ fn main() {
             -3.0 * Vec3::Z,
         );
         let ring = Mat4::from_rotation_z(i as f32 / 8.0 / SUBR_DUR as f32 * TAU);
-        const LIGHT_LOC: [f32; 3] = [-2.24593993, 5.0, 7.98890769];
+        const LIGHT_LOC: [f32; 3] = [-2.24594, 5.0, 7.988908];
         let depth_projection = Mat4::orthographic_rh(-4.0, 4.0, -4.0, 4.0, -10.0, 20.0);
         let depth_view = Mat4::look_at_rh(LIGHT_LOC.into(), Vec3::ZERO, Vec3::Y);
         let project_depth = depth_projection * depth_view;
@@ -586,10 +584,8 @@ fn main() {
                 if tess_level > 1 {
                     tess_level -= 1;
                 }
-            } else {
-                if tess_level < 64 {
-                    tess_level += 1;
-                }
+            } else if tess_level < 64 {
+                tess_level += 1;
             }
         }
 
@@ -652,7 +648,7 @@ fn display_info(display: &glium::Display<WindowSurface>) {
         api,
         display.get_opengl_version_string()
     );
-    print!("{} context flags:", api);
+    print!("{api} context flags:");
     if display.is_forward_compatible() {
         print!(" forward-compatible");
     }
@@ -662,7 +658,7 @@ fn display_info(display: &glium::Display<WindowSurface>) {
     if display.is_robust() {
         print!(" robustness");
     }
-    print!("\n");
+    println!();
     if version >= Version(Api::Gl, 3, 2) {
         println!(
             "{} profile mask: {}",
