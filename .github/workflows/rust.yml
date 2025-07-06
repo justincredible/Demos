@@ -1,0 +1,28 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        path: ["glium_app", "shapes", "simple_targa", "text"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build
+      working-directory: ${{ matrix.path }}
+      run: cargo build --verbose --all-targets
+    - name: Run tests
+      working-directory: ${{ matrix.path }}
+      run: cargo test --verbose
+
