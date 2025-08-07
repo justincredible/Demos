@@ -1,5 +1,10 @@
 #[macro_use]
 extern crate glium;
+extern crate glam;
+extern crate winit;
+extern crate raw_window_handle;
+extern crate simple_targa;
+extern crate shapes;
 
 use glam::{Mat4, Quat, Vec3};
 use glium::{backend::Facade, glutin, index::PrimitiveType, IndexBuffer, Surface, VertexBuffer};

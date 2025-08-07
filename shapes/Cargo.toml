@@ -1,13 +1,10 @@
+[workspace]
+members = [".", "app"]
+
 [package]
 name = "shapes"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-glam = "0.24"
-glium = "0.34"
-winit = "0.29"
-glutin-winit = "0.4"
-raw-window-handle = "0.5"
-simple_targa = { path = "../simple_targa" }
 
