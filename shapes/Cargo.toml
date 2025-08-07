@@ -10,3 +10,4 @@ winit = "0.29"
 glutin-winit = "0.4"
 raw-window-handle = "0.5"
 simple_targa = { path = "../simple_targa" }
+

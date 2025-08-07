@@ -182,7 +182,7 @@ impl PlatonicSolid {
 
 #[cfg(test)]
 mod tests {
-    use crate::PlatonicSolid;
+    use super::PlatonicSolid;
 
     const TOLERANCE: f32 = 1.2e-7f32;
 
@@ -202,10 +202,10 @@ mod tests {
         ($polyhedron:ident) => {
             let (vertices, _) = PlatonicSolid::$polyhedron();
 
-            let r_squared = magnitude_squared(&vertices[0].position);
+            let r_squared = magnitude_squared(&vertices[0]);
 
             for vertex in vertices {
-                assert!(f32::abs(r_squared - magnitude_squared(&vertex.position)) <= TOLERANCE);
+                assert!(f32::abs(r_squared - magnitude_squared(&vertex)) <= TOLERANCE);
             }
         };
     }
@@ -213,7 +213,7 @@ mod tests {
     macro_rules! unit_neighbour {
         ($vertices:expr, $a:expr, $b:expr) => {
             let difference_length =
-                magnitude_squared_diff(&$vertices[$a].position, &$vertices[$b].position);
+                magnitude_squared_diff(&$vertices[$a], &$vertices[$b]);
 
             assert!(f32::abs(1.0 - difference_length) <= TOLERANCE);
         };
