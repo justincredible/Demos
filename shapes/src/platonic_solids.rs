@@ -1,8 +1,4 @@
-use crate::shapes::PosVertex;
-use glium::backend::Facade;
-use glium::index::{IndexBuffer, PrimitiveType};
-use glium::vertex::VertexBuffer;
-
+/// All possible Platonic solids.
 pub enum PlatonicSolids {
     Tetrahedron,
     Hexahedron,
@@ -12,12 +8,15 @@ pub enum PlatonicSolids {
 }
 
 pub struct PlatonicSolid {
-    pub vertices: VertexBuffer<PosVertex>,
-    pub indices: IndexBuffer<u8>,
+    vertices: Vec<[f32; 3]>,
+    indices: Vec<u8>,
 }
 
 impl PlatonicSolid {
-    pub fn new(facade: &dyn Facade, polyhedron: PlatonicSolids) -> Self {
+    /// Create a Platonic solid of the supplied variant.
+    /// The indices are in triangle strip order,
+    /// but some of the polyhedrons contain degenerate or internal triangles.
+    pub fn new(polyhedron: PlatonicSolids) -> Self {
         let (vertices, indices) = match polyhedron {
             PlatonicSolids::Tetrahedron => Self::tetrahedron(),
             PlatonicSolids::Hexahedron => Self::hexahedron(),
@@ -26,22 +25,22 @@ impl PlatonicSolid {
             PlatonicSolids::Icosahedron => Self::icosahedron(),
         };
 
-        PlatonicSolid {
-            vertices: VertexBuffer::new(facade, &vertices).unwrap(),
-            indices: IndexBuffer::new(facade, PrimitiveType::TriangleStrip, &indices).unwrap(),
+        Self {
+            vertices,
+            indices,
         }
     }
 
-    fn tetrahedron() -> (Vec<PosVertex>, Vec<u8>) {
+    fn tetrahedron() -> (Vec<[f32; 3]>, Vec<u8>) {
         let sr2 = f32::sqrt(2.0);
         let sr3 = f32::sqrt(3.0);
         let base = -0.5 / sr2 / sr3;
 
         let vertices = vec![
-            PosVertex::new([-0.5, base, 0.5 / sr3]),
-            PosVertex::new([0.5, base, 0.5 / sr3]),
-            PosVertex::new([0.0, base + sr2 / sr3, 0.0]),
-            PosVertex::new([0.0, base, -1.0 / sr3]),
+            [-0.5, base, 0.5 / sr3],
+            [0.5, base, 0.5 / sr3],
+            [0.0, base + sr2 / sr3, 0.0],
+            [0.0, base, -1.0 / sr3],
         ];
 
         let indices = vec![0u8, 1, 2, 3, 0, 1];
@@ -49,16 +48,16 @@ impl PlatonicSolid {
         (vertices, indices)
     }
 
-    fn hexahedron() -> (Vec<PosVertex>, Vec<u8>) {
+    fn hexahedron() -> (Vec<[f32; 3]>, Vec<u8>) {
         let vertices = vec![
-            PosVertex::new([-0.5, -0.5, 0.5]),
-            PosVertex::new([0.5, -0.5, 0.5]),
-            PosVertex::new([-0.5, 0.5, 0.5]),
-            PosVertex::new([0.5, 0.5, 0.5]),
-            PosVertex::new([-0.5, -0.5, -0.5]),
-            PosVertex::new([0.5, -0.5, -0.5]),
-            PosVertex::new([-0.5, 0.5, -0.5]),
-            PosVertex::new([0.5, 0.5, -0.5]),
+            [-0.5, -0.5, 0.5],
+            [0.5, -0.5, 0.5],
+            [-0.5, 0.5, 0.5],
+            [0.5, 0.5, 0.5],
+            [-0.5, -0.5, -0.5],
+            [0.5, -0.5, -0.5],
+            [-0.5, 0.5, -0.5],
+            [0.5, 0.5, -0.5],
         ];
 
         let indices = vec![0u8, 1, 2, 3, 7, 1, 5, 0, 4, 2, 6, 7, 4, 5];
@@ -66,16 +65,16 @@ impl PlatonicSolid {
         (vertices, indices)
     }
 
-    fn octahedron() -> (Vec<PosVertex>, Vec<u8>) {
+    fn octahedron() -> (Vec<[f32; 3]>, Vec<u8>) {
         let half_height = 1.0 / f32::sqrt(2.0);
 
         let vertices = vec![
-            PosVertex::new([0.0, half_height, 0.0]),
-            PosVertex::new([-0.5, 0.0, -0.5]),
-            PosVertex::new([-0.5, 0.0, 0.5]),
-            PosVertex::new([0.5, 0.0, 0.5]),
-            PosVertex::new([0.5, 0.0, -0.5]),
-            PosVertex::new([0.0, -half_height, 0.0]),
+            [0.0, half_height, 0.0],
+            [-0.5, 0.0, -0.5],
+            [-0.5, 0.0, 0.5],
+            [0.5, 0.0, 0.5],
+            [0.5, 0.0, -0.5],
+            [0.0, -half_height, 0.0],
         ];
 
         //let indices = vec![0u8, 1, 2, 5, 3, 4, 1, 5, 2, 3, 0, 4, 1]
@@ -85,7 +84,7 @@ impl PlatonicSolid {
         (vertices, indices)
     }
 
-    fn dodecahedron() -> (Vec<PosVertex>, Vec<u8>) {
+    fn dodecahedron() -> (Vec<[f32; 3]>, Vec<u8>) {
         let sr5 = f32::sqrt(5.0);
         let phi = 0.5 * (1.0 + sr5);
 
@@ -106,26 +105,26 @@ impl PlatonicSolid {
         let half_iz = 0.5 * f32::sqrt(0.5 - 0.1 * sr5);
 
         let vertices = vec![
-            PosVertex::new([0.0, circle_radius, circle_radius + half_iz]),
-            PosVertex::new([-width, centred_mid, circle_radius + half_iz]),
-            PosVertex::new([width, centred_mid, circle_radius + half_iz]),
-            PosVertex::new([-0.5, -circle_offset, circle_radius + half_iz]),
-            PosVertex::new([0.5, -circle_offset, circle_radius + half_iz]),
-            PosVertex::new([0.0, phi_radius, half_iz]),
-            PosVertex::new([-phi_width, phi_mid, half_iz]),
-            PosVertex::new([phi_width, phi_mid, half_iz]),
-            PosVertex::new([-width, -phi * circle_offset, half_iz]),
-            PosVertex::new([width, -phi * circle_offset, half_iz]),
-            PosVertex::new([-width, phi * circle_offset, -half_iz]),
-            PosVertex::new([width, phi * circle_offset, -half_iz]),
-            PosVertex::new([-phi_width, -phi_mid, -half_iz]),
-            PosVertex::new([phi_width, -phi_mid, -half_iz]),
-            PosVertex::new([0.0, -phi_radius, -half_iz]),
-            PosVertex::new([-0.5, circle_offset, -circle_radius - half_iz]),
-            PosVertex::new([0.5, circle_offset, -circle_radius - half_iz]),
-            PosVertex::new([-width, -centred_mid, -circle_radius - half_iz]),
-            PosVertex::new([width, -centred_mid, -circle_radius - half_iz]),
-            PosVertex::new([0.0, -circle_radius, -circle_radius - half_iz]),
+            [0.0, circle_radius, circle_radius + half_iz],
+            [-width, centred_mid, circle_radius + half_iz],
+            [width, centred_mid, circle_radius + half_iz],
+            [-0.5, -circle_offset, circle_radius + half_iz],
+            [0.5, -circle_offset, circle_radius + half_iz],
+            [0.0, phi_radius, half_iz],
+            [-phi_width, phi_mid, half_iz],
+            [phi_width, phi_mid, half_iz],
+            [-width, -phi * circle_offset, half_iz],
+            [width, -phi * circle_offset, half_iz],
+            [-width, phi * circle_offset, -half_iz],
+            [width, phi * circle_offset, -half_iz],
+            [-phi_width, -phi_mid, -half_iz],
+            [phi_width, -phi_mid, -half_iz],
+            [0.0, -phi_radius, -half_iz],
+            [-0.5, circle_offset, -circle_radius - half_iz],
+            [0.5, circle_offset, -circle_radius - half_iz],
+            [-width, -centred_mid, -circle_radius - half_iz],
+            [width, -centred_mid, -circle_radius - half_iz],
+            [0.0, -circle_radius, -circle_radius - half_iz],
         ];
 
         let indices = vec![
@@ -136,7 +135,7 @@ impl PlatonicSolid {
         (vertices, indices)
     }
 
-    fn icosahedron() -> (Vec<PosVertex>, Vec<u8>) {
+    fn icosahedron() -> (Vec<[f32; 3]>, Vec<u8>) {
         let sr5 = f32::sqrt(5.0);
 
         let mid = 0.25 * f32::sqrt(10.0 + 2.0 * sr5);
@@ -150,18 +149,18 @@ impl PlatonicSolid {
         let half_middle = 0.5 * f32::sqrt(0.5 + 0.1 * sr5);
 
         let vertices = vec![
-            PosVertex::new([0.0, half_middle + y_diff, 0.0]),
-            PosVertex::new([0.0, half_middle, -radius]),
-            PosVertex::new([-width, half_middle, -radius + top]),
-            PosVertex::new([width, half_middle, -radius + top]),
-            PosVertex::new([-0.5, half_middle, center]),
-            PosVertex::new([0.5, half_middle, center]),
-            PosVertex::new([-0.5, -half_middle, -center]),
-            PosVertex::new([0.5, -half_middle, -center]),
-            PosVertex::new([-width, -half_middle, radius - top]),
-            PosVertex::new([width, -half_middle, radius - top]),
-            PosVertex::new([0.0, -half_middle, radius]),
-            PosVertex::new([0.0, -half_middle - y_diff, 0.0]),
+            [0.0, half_middle + y_diff, 0.0],
+            [0.0, half_middle, -radius],
+            [-width, half_middle, -radius + top],
+            [width, half_middle, -radius + top],
+            [-0.5, half_middle, center],
+            [0.5, half_middle, center],
+            [-0.5, -half_middle, -center],
+            [0.5, -half_middle, -center],
+            [-width, -half_middle, radius - top],
+            [width, -half_middle, radius - top],
+            [0.0, -half_middle, radius],
+            [0.0, -half_middle - y_diff, 0.0],
         ];
 
         let indices = vec![
@@ -170,6 +169,14 @@ impl PlatonicSolid {
         ];
 
         (vertices, indices)
+    }
+
+    pub fn vertices(&self) -> &Vec<[f32; 3]> {
+	&self.vertices
+    }
+
+    pub fn indices(&self) -> &Vec<u8> {
+	&self.indices
     }
 }
 

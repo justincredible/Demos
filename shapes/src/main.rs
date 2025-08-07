@@ -2,7 +2,7 @@
 extern crate glium;
 
 use glam::{Mat4, Quat, Vec3};
-use glium::{glutin, Surface};
+use glium::{backend::Facade, glutin, index::PrimitiveType, IndexBuffer, Surface, VertexBuffer};
 use winit::dpi::PhysicalPosition;
 use winit::event::{ElementState, Event, KeyEvent, WindowEvent};
 use winit::keyboard::{KeyCode, PhysicalKey::Code};
@@ -10,7 +10,6 @@ use glutin::context::NotCurrentGlContext;
 use glutin::display::{GetGlDisplay, GlDisplay};
 use glutin::surface::{SurfaceAttributesBuilder, WindowSurface};
 use raw_window_handle::HasRawWindowHandle;
-pub mod shapes;
 use shapes::platonic_solids::{PlatonicSolid, PlatonicSolids};
 
 use std::num::NonZeroU32;
@@ -121,11 +120,11 @@ fn main() {
     .unwrap();
 
     let shapes = vec![
-        PlatonicSolid::new(&display, PlatonicSolids::Tetrahedron),
-        PlatonicSolid::new(&display, PlatonicSolids::Hexahedron),
-        PlatonicSolid::new(&display, PlatonicSolids::Octahedron),
-        PlatonicSolid::new(&display, PlatonicSolids::Dodecahedron),
-        PlatonicSolid::new(&display, PlatonicSolids::Icosahedron),
+        Shape::new(&display, PlatonicSolid::new(PlatonicSolids::Tetrahedron)),
+        Shape::new(&display, PlatonicSolid::new(PlatonicSolids::Hexahedron)),
+        Shape::new(&display, PlatonicSolid::new(PlatonicSolids::Octahedron)),
+        Shape::new(&display, PlatonicSolid::new(PlatonicSolids::Dodecahedron)),
+        Shape::new(&display, PlatonicSolid::new(PlatonicSolids::Icosahedron)),
     ];
 
     let params = glium::DrawParameters {
@@ -220,6 +219,41 @@ fn main() {
             }
         }
     }).unwrap();
+}
+
+#[derive(Clone, Copy)]
+struct PosVertex {
+    position: [f32; 3],
+}
+
+impl From<[f32; 3]> for PosVertex {
+    fn from(position: [f32; 3]) -> Self {
+	Self { position }
+    }
+}
+
+implement_vertex!(PosVertex, position);
+
+struct Shape {
+    vertices: VertexBuffer<PosVertex>,
+    indices: IndexBuffer<u8>,
+}
+
+impl Shape {
+    pub fn new(display: &impl Facade, polyhedron: PlatonicSolid) -> Self {
+	let vertices = VertexBuffer::new(
+	    display,
+	    &polyhedron.vertices()
+		.iter()
+		.map(|p| (*p).into())
+		.collect::<Vec<_>>()).unwrap();
+	let indices = IndexBuffer::new(
+	    display,
+	    PrimitiveType::TriangleStrip,
+	    &polyhedron.indices()).unwrap();
+
+	Self { vertices, indices }
+    }
 }
 
 fn read_icon(path: &str) -> std::io::Result<winit::window::Icon> {
