@@ -255,7 +255,7 @@ impl Shape {
 	let indices = IndexBuffer::new(
 	    display,
 	    PrimitiveType::TriangleStrip,
-	    &polyhedron.indices()).unwrap();
+	    polyhedron.indices()).unwrap();
 
 	Self { vertices, indices }
     }
