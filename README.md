@@ -3,5 +3,5 @@
 
 Simple demonstration programs.
 
-`cargo run` is expected to be sufficient, except for shapes which now uses `cargo run -p app`.
+`cargo run` is expected to be sufficient, except for shapes which now uses `cargo run -p example`.
 
