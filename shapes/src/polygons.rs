@@ -27,15 +27,15 @@ impl Polygon {
 
                 Self {
                     vertices: vec![
-			[-0.5, -half_sin_60, 0.0],
-			[0.5, -half_sin_60, 0.0],
-			[0.0, half_sin_60, 0.0],
+                        [-0.5, -half_sin_60, 0.0],
+                        [0.5, -half_sin_60, 0.0],
+                        [0.0, half_sin_60, 0.0],
                     ],
                 }
             }
             Polygons::Tetragon => {
                 Self {
-		    vertices: vec![
+                    vertices: vec![
                         [-0.5, -0.5, 0.0],
                         [0.5, -0.5, 0.0],
                         [-0.5, 0.5, 0.0],
@@ -253,6 +253,6 @@ impl Polygon {
 
     /// The vertices comprising the polygon.
     pub fn vertices(&self) -> &Vec<[f32; 3]> {
-	&self.vertices
+        &self.vertices
     }
 }

@@ -124,12 +124,14 @@ fn main() {
     )
     .unwrap();
 
+    use shapes::shapes::Shaper;
+    let config = Default::default();
     let shapes = vec![
-        Shape::new(&display, PlatonicSolid::new(PlatonicSolids::Tetrahedron)),
-        Shape::new(&display, PlatonicSolid::new(PlatonicSolids::Hexahedron)),
-        Shape::new(&display, PlatonicSolid::new(PlatonicSolids::Octahedron)),
-        Shape::new(&display, PlatonicSolid::new(PlatonicSolids::Dodecahedron)),
-        Shape::new(&display, PlatonicSolid::new(PlatonicSolids::Icosahedron)),
+        Shape::new2(&display, PlatonicSolids::Tetrahedron.make(config)),
+        Shape::new2(&display, PlatonicSolids::Hexahedron.make(config)),
+        Shape::new2(&display, PlatonicSolids::Octahedron.make(config)),
+        Shape::new2(&display, PlatonicSolids::Dodecahedron.make(config)),
+        Shape::new2(&display, PlatonicSolids::Icosahedron.make(config)),
     ];
 
     let params = glium::DrawParameters {
@@ -233,7 +235,7 @@ struct PosVertex {
 
 impl From<[f32; 3]> for PosVertex {
     fn from(position: [f32; 3]) -> Self {
-	Self { position }
+       Self { position }
     }
 }
 
@@ -246,18 +248,35 @@ struct Shape {
 
 impl Shape {
     pub fn new(display: &impl Facade, polyhedron: PlatonicSolid) -> Self {
-	let vertices = VertexBuffer::new(
-	    display,
-	    &polyhedron.vertices()
-		.iter()
-		.map(|p| (*p).into())
-		.collect::<Vec<_>>()).unwrap();
-	let indices = IndexBuffer::new(
-	    display,
-	    PrimitiveType::TriangleStrip,
-	    polyhedron.indices()).unwrap();
+        let vertices = VertexBuffer::new(
+            display,
+            &polyhedron.vertices()
+                .iter()
+                .map(|p| (*p).into())
+                .collect::<Vec<_>>()).unwrap();
+        let indices = IndexBuffer::new(
+            display,
+            PrimitiveType::TriangleStrip,
+            polyhedron.indices()).unwrap();
 
-	Self { vertices, indices }
+        Self { vertices, indices }
+    }
+
+    pub fn new2(display: &impl Facade, shape: shapes::shapes::Shape<f32, u8>) -> Self {
+        if let shapes::shapes::Shape::Strips { vertices, strips } = shape {
+            let vertices = VertexBuffer::new(
+                display,
+                &vertices
+                    .iter()
+                    .map(|p| (*p).into())
+                    .collect::<Vec<_>>()).unwrap();
+            let indices = IndexBuffer::new(
+                display,
+                PrimitiveType::TriangleStrip,
+                &strips[0]).unwrap();
+
+            Self { vertices, indices }
+        } else { panic!() }
     }
 }
 
