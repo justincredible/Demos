@@ -30,9 +30,7 @@ impl<C: Float + FloatConst, I: Copy + NumCast + Unsigned> Shaper<C, I> for Plato
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..4)
-                        .into_iter()
-                        .map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..4).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 let indices = vec![i[0], i[1], i[2], i[3], i[0], i[1]];
@@ -55,9 +53,7 @@ impl<C: Float + FloatConst, I: Copy + NumCast + Unsigned> Shaper<C, I> for Plato
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..8)
-                        .into_iter()
-                        .map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..8).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 let indices = vec![
@@ -83,9 +79,7 @@ impl<C: Float + FloatConst, I: Copy + NumCast + Unsigned> Shaper<C, I> for Plato
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..6)
-                        .into_iter()
-                        .map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..6).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 let indices = vec![
@@ -150,9 +144,7 @@ impl<C: Float + FloatConst, I: Copy + NumCast + Unsigned> Shaper<C, I> for Plato
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..20)
-                        .into_iter()
-                        .map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..20).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 let indices = vec![
@@ -202,9 +194,7 @@ impl<C: Float + FloatConst, I: Copy + NumCast + Unsigned> Shaper<C, I> for Plato
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..12)
-                        .into_iter()
-                        .map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..12).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 let indices = vec![
@@ -219,182 +209,9 @@ impl<C: Float + FloatConst, I: Copy + NumCast + Unsigned> Shaper<C, I> for Plato
     }
 }
 
-pub struct PlatonicSolid {
-    vertices: Vec<[f32; 3]>,
-    indices: Vec<u8>,
-}
-
-impl PlatonicSolid {
-    /// Create a Platonic solid of the supplied variant.
-    /// The indices are in triangle strip order,
-    /// but some of the polyhedrons contain degenerate or internal triangles.
-    pub fn new(polyhedron: PlatonicSolids) -> Self {
-        let (vertices, indices) = match polyhedron {
-            PlatonicSolids::Tetrahedron => Self::tetrahedron(),
-            PlatonicSolids::Hexahedron => Self::hexahedron(),
-            PlatonicSolids::Octahedron => Self::octahedron(),
-            PlatonicSolids::Dodecahedron => Self::dodecahedron(),
-            PlatonicSolids::Icosahedron => Self::icosahedron(),
-        };
-
-        Self {
-            vertices,
-            indices,
-        }
-    }
-
-    fn tetrahedron() -> (Vec<[f32; 3]>, Vec<u8>) {
-        let sr2 = f32::sqrt(2.0);
-        let sr3 = f32::sqrt(3.0);
-        let base = -0.5 / sr2 / sr3;
-
-        let vertices = vec![
-            [-0.5, base, 0.5 / sr3],
-            [0.5, base, 0.5 / sr3],
-            [0.0, base + sr2 / sr3, 0.0],
-            [0.0, base, -1.0 / sr3],
-        ];
-
-        let indices = vec![0u8, 1, 2, 3, 0, 1];
-
-        (vertices, indices)
-    }
-
-    fn hexahedron() -> (Vec<[f32; 3]>, Vec<u8>) {
-        let vertices = vec![
-            [-0.5, -0.5, 0.5],
-            [0.5, -0.5, 0.5],
-            [-0.5, 0.5, 0.5],
-            [0.5, 0.5, 0.5],
-            [-0.5, -0.5, -0.5],
-            [0.5, -0.5, -0.5],
-            [-0.5, 0.5, -0.5],
-            [0.5, 0.5, -0.5],
-        ];
-
-        let indices = vec![0u8, 1, 2, 3, 7, 1, 5, 0, 4, 2, 6, 7, 4, 5];
-
-        (vertices, indices)
-    }
-
-    fn octahedron() -> (Vec<[f32; 3]>, Vec<u8>) {
-        let half_height = 1.0 / f32::sqrt(2.0);
-
-        let vertices = vec![
-            [0.0, half_height, 0.0],
-            [-0.5, 0.0, -0.5],
-            [-0.5, 0.0, 0.5],
-            [0.5, 0.0, 0.5],
-            [0.5, 0.0, -0.5],
-            [0.0, -half_height, 0.0],
-        ];
-
-        //let indices = vec![0u8, 1, 2, 5, 3, 4, 1, 5, 2, 3, 0, 4, 1];
-        //let indices = vec![1u8, 2, 0, 3, 4, 5, 1, 2, 3, 5, 4, 1, 0];
-        let indices = vec![2u8, 0, 1, 4, 5, 3, 2, 0, 4, 3, 5, 2, 1];
-
-        (vertices, indices)
-    }
-
-    fn dodecahedron() -> (Vec<[f32; 3]>, Vec<u8>) {
-        let sr5 = f32::sqrt(5.0);
-        let phi = 0.5 * (1.0 + sr5);
-
-        let mid = 0.25 * f32::sqrt(10.0 + 2.0 * sr5);
-        let top = 0.25 * f32::sqrt(10.0 - 2.0 * sr5);
-        let width = 0.25 * (1.0 + sr5); // phi/2
-        let height = top + mid;
-        let circle_offset = 0.25 * (2.0 + sr5) / height;
-        let circle_radius = 0.25 * (3.0 + sr5) / height;
-        let centred_mid = 0.125 * (1.0 + sr5) / height;
-        let phi_width = 0.25 * (3.0 + sr5);
-        // we use the less accurate (phi * circle_offset)
-        // to offset some accumulated error in the tests
-        let _phi_offset = 0.125 * (7.0 + 3.0 * sr5) / height;
-        let phi_radius = 0.5 * (2.0 + sr5) / height; // 2 * circle_offset
-        let phi_mid = 0.125 * (3.0 + sr5) / height; // circle_radius / 2
-
-        let half_iz = 0.5 * f32::sqrt(0.5 - 0.1 * sr5);
-
-        let vertices = vec![
-            [0.0, circle_radius, circle_radius + half_iz],
-            [-width, centred_mid, circle_radius + half_iz],
-            [width, centred_mid, circle_radius + half_iz],
-            [-0.5, -circle_offset, circle_radius + half_iz],
-            [0.5, -circle_offset, circle_radius + half_iz],
-            [0.0, phi_radius, half_iz],
-            [-phi_width, phi_mid, half_iz],
-            [phi_width, phi_mid, half_iz],
-            [-width, -phi * circle_offset, half_iz],
-            [width, -phi * circle_offset, half_iz],
-            [-width, phi * circle_offset, -half_iz],
-            [width, phi * circle_offset, -half_iz],
-            [-phi_width, -phi_mid, -half_iz],
-            [phi_width, -phi_mid, -half_iz],
-            [0.0, -phi_radius, -half_iz],
-            [-0.5, circle_offset, -circle_radius - half_iz],
-            [0.5, circle_offset, -circle_radius - half_iz],
-            [-width, -centred_mid, -circle_radius - half_iz],
-            [width, -centred_mid, -circle_radius - half_iz],
-            [0.0, -circle_radius, -circle_radius - half_iz],
-        ];
-
-        let indices = vec![
-            1u8, 3, 0, 4, 2, 7, 0, 11, 5, 10, 0, 6, 1, 12, 3, 8, 4, 9, 7, 13, 11, 16, 10, 15,
-            6, 17, 12, 19, 8, 14, 9, 19, 13, 18, 16, 19, 15, 17
-        ];
-
-        (vertices, indices)
-    }
-
-    fn icosahedron() -> (Vec<[f32; 3]>, Vec<u8>) {
-        let sr5 = f32::sqrt(5.0);
-
-        let mid = 0.25 * f32::sqrt(10.0 + 2.0 * sr5);
-        let top = 0.25 * f32::sqrt(10.0 - 2.0 * sr5);
-        let width = 0.25 * (1.0 + sr5); // phi/2
-        let depth = top + mid;
-        let center = 0.25 * (2.0 + sr5) / depth;
-        let radius = 0.25 * (3.0 + sr5) / depth;
-
-        let y_diff = f32::sqrt(0.5 - 0.1 * sr5);
-        let half_middle = 0.5 * f32::sqrt(0.5 + 0.1 * sr5);
-
-        let vertices = vec![
-            [0.0, half_middle + y_diff, 0.0],
-            [0.0, half_middle, -radius],
-            [-width, half_middle, -radius + top],
-            [width, half_middle, -radius + top],
-            [-0.5, half_middle, center],
-            [0.5, half_middle, center],
-            [-0.5, -half_middle, -center],
-            [0.5, -half_middle, -center],
-            [-width, -half_middle, radius - top],
-            [width, -half_middle, radius - top],
-            [0.0, -half_middle, radius],
-            [0.0, -half_middle - y_diff, 0.0],
-        ];
-
-        let indices = vec![
-            4u8, 10, 5, 9, 3, 7, 1, 6, 2, 8, 4, 10, 9, 11, 7, 6, 6, 11, 8, 10, 4, 5, 0, 3, 1, 1, 0,
-            2, 4,
-        ];
-
-        (vertices, indices)
-    }
-
-    pub fn vertices(&self) -> &Vec<[f32; 3]> {
-        &self.vertices
-    }
-
-    pub fn indices(&self) -> &Vec<u8> {
-        &self.indices
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::PlatonicSolid;
+    use super::{PlatonicSolids, Shape, Shaper};
 
     const TOLERANCE: f32 = 1.2e-7f32;
 
@@ -412,7 +229,9 @@ mod tests {
 
     macro_rules! uniform_distance {
         ($polyhedron:ident) => {
-            let (vertices, _) = PlatonicSolid::$polyhedron();
+            let Shape::Strips { vertices, .. } = Shaper::<f32, u8>::make(
+                &PlatonicSolids::$polyhedron,
+                Default::default()) else { todo!() };
 
             let r_squared = magnitude_squared(&vertices[0]);
 
@@ -433,12 +252,14 @@ mod tests {
 
     #[test]
     fn tetrahedron_centered() {
-        uniform_distance!(tetrahedron);
+        uniform_distance!(Tetrahedron);
     }
 
     #[test]
     fn tetrahedron_edges() {
-        let (vertices, _) = PlatonicSolid::tetrahedron();
+        let Shape::Strips { vertices, .. } = Shaper::<f32, u8>::make(
+            &PlatonicSolids::Tetrahedron,
+            Default::default()) else { todo!() };
 
         unit_neighbour!(vertices, 0, 1);
         unit_neighbour!(vertices, 0, 2);
@@ -450,12 +271,14 @@ mod tests {
 
     #[test]
     fn hexahedron_centered() {
-        uniform_distance!(hexahedron);
+        uniform_distance!(Hexahedron);
     }
 
     #[test]
     fn hexahedron_edges() {
-        let (vertices, _) = PlatonicSolid::hexahedron();
+        let Shape::Strips { vertices, .. } = Shaper::<f32, u8>::make(
+            &PlatonicSolids::Hexahedron,
+            Default::default()) else { todo!() };
 
         unit_neighbour!(vertices, 0, 1);
         unit_neighbour!(vertices, 0, 2);
@@ -473,12 +296,14 @@ mod tests {
 
     #[test]
     fn octahedron_centered() {
-        uniform_distance!(octahedron);
+        uniform_distance!(Octahedron);
     }
 
     #[test]
     fn octahedron_edges() {
-        let (vertices, _) = PlatonicSolid::octahedron();
+        let Shape::Strips { vertices, .. } = Shaper::<f32, u8>::make(
+            &PlatonicSolids::Octahedron,
+            Default::default()) else { todo!() };
 
         unit_neighbour!(vertices, 0, 1);
         unit_neighbour!(vertices, 0, 2);
@@ -496,12 +321,14 @@ mod tests {
 
     #[test]
     fn dodecahedron_centered() {
-        uniform_distance!(dodecahedron);
+        uniform_distance!(Dodecahedron);
     }
 
     #[test]
     fn dodecahedron_edges() {
-        let (vertices, _) = PlatonicSolid::dodecahedron();
+        let Shape::Strips { vertices, .. } = Shaper::<f32, u8>::make(
+            &PlatonicSolids::Dodecahedron,
+            Default::default()) else { todo!() };
 
         unit_neighbour!(vertices, 0, 1);
         unit_neighbour!(vertices, 0, 2);
@@ -537,12 +364,14 @@ mod tests {
 
     #[test]
     fn icosahedron_centered() {
-        uniform_distance!(icosahedron);
+        uniform_distance!(Icosahedron);
     }
 
     #[test]
     fn icosahedron_edges() {
-        let (vertices, _) = PlatonicSolid::icosahedron();
+        let Shape::Strips { vertices, .. } = Shaper::<f32, u8>::make(
+            &PlatonicSolids::Icosahedron,
+            Default::default()) else { todo!() };
 
         unit_neighbour!(vertices, 0, 1);
         unit_neighbour!(vertices, 0, 2);

@@ -6,6 +6,8 @@ extern crate raw_window_handle;
 extern crate simple_targa;
 extern crate shapes;
 
+use std::num::NonZeroU32;
+
 use glam::{Mat4, Quat, Vec3};
 use glium::{backend::Facade, glutin, index::PrimitiveType, IndexBuffer, Surface, VertexBuffer};
 use winit::dpi::PhysicalPosition;
@@ -15,11 +17,11 @@ use glutin::context::NotCurrentGlContext;
 use glutin::display::{GetGlDisplay, GlDisplay};
 use glutin::surface::{SurfaceAttributesBuilder, WindowSurface};
 use raw_window_handle::HasRawWindowHandle;
-use shapes::platonic_solids::{PlatonicSolid, PlatonicSolids};
-
-use std::num::NonZeroU32;
 
 use simple_targa::read_targa;
+
+use shapes::platonic_solids::PlatonicSolids;
+use shapes::Shaper;
 
 fn main() {
     let event_loop = winit::event_loop::EventLoop::new().unwrap();
@@ -124,14 +126,13 @@ fn main() {
     )
     .unwrap();
 
-    use shapes::shapes::Shaper;
     let config = Default::default();
     let shapes = vec![
-        Shape::new2(&display, PlatonicSolids::Tetrahedron.make(config)),
-        Shape::new2(&display, PlatonicSolids::Hexahedron.make(config)),
-        Shape::new2(&display, PlatonicSolids::Octahedron.make(config)),
-        Shape::new2(&display, PlatonicSolids::Dodecahedron.make(config)),
-        Shape::new2(&display, PlatonicSolids::Icosahedron.make(config)),
+        Shape::new(&display, PlatonicSolids::Tetrahedron.make(config)),
+        Shape::new(&display, PlatonicSolids::Hexahedron.make(config)),
+        Shape::new(&display, PlatonicSolids::Octahedron.make(config)),
+        Shape::new(&display, PlatonicSolids::Dodecahedron.make(config)),
+        Shape::new(&display, PlatonicSolids::Icosahedron.make(config)),
     ];
 
     let params = glium::DrawParameters {
@@ -247,28 +248,13 @@ struct Shape {
 }
 
 impl Shape {
-    pub fn new(display: &impl Facade, polyhedron: PlatonicSolid) -> Self {
-        let vertices = VertexBuffer::new(
-            display,
-            &polyhedron.vertices()
-                .iter()
-                .map(|p| (*p).into())
-                .collect::<Vec<_>>()).unwrap();
-        let indices = IndexBuffer::new(
-            display,
-            PrimitiveType::TriangleStrip,
-            polyhedron.indices()).unwrap();
-
-        Self { vertices, indices }
-    }
-
-    pub fn new2(display: &impl Facade, shape: shapes::shapes::Shape<f32, u8>) -> Self {
+    pub fn new(display: &impl Facade, shape: shapes::shapes::Shape<f32, u8>) -> Self {
         if let shapes::shapes::Shape::Strips { vertices, strips } = shape {
             let vertices = VertexBuffer::new(
                 display,
                 &vertices
                     .iter()
-                    .map(|p| (*p).into())
+                    .map(|&p| p.into())
                     .collect::<Vec<_>>()).unwrap();
             let indices = IndexBuffer::new(
                 display,
