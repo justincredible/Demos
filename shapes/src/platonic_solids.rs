@@ -213,7 +213,7 @@ impl<C: Float + FloatConst, I: Copy + NumCast + Unsigned> Shaper<C, I> for Plato
 mod tests {
     use super::{PlatonicSolids, Shape, Shaper};
 
-    const TOLERANCE: f32 = 1.2e-7f32;
+    const TOLERANCE: f32 = f32::EPSILON;
 
     fn magnitude_squared(vertex: &[f32; 3]) -> f32 {
         vertex[0] * vertex[0] + vertex[1] * vertex[1] + vertex[2] * vertex[2]
