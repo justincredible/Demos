@@ -20,33 +20,30 @@ impl Polygon {
 
 impl<C: Float + FloatConst, I: Unsigned> Shaper<C, I> for Polygon {
     fn make(&self, _request: Configuration) -> Shape<C, I> {
-        let pi = FloatConst::PI();
-
         let zero = zero();
-        let half = cast::<_, C>(0.5).unwrap();
-        let exterior = cast::<_, C>(2.0 / self.sides as f64).unwrap() * pi;
-        let start = half * pi;
-        let offset = half * exterior;
-        let radius = (start - offset).sin() / exterior.sin();
+        let tau: C = FloatConst::TAU();
+        let exterior = tau / cast::<_, C>(self.sides).unwrap();
+        let offset = cast::<_, C>(0.5).unwrap() * exterior;
+        let radius = offset.cos() / exterior.sin();
 
         let mut vertices = vec![];
         if self.sides % 2 == 0 {
             for step in 0..self.sides/2 {
                 let stepf = cast::<_, C>(step).unwrap();
-                let left = start + offset + stepf * exterior;
-                let right = start - offset - stepf * exterior;
-                vertices.push([radius * right.cos(), radius * right.sin(), zero]);
-                vertices.push([radius * left.cos(), radius * left.sin(), zero]);
+                let s_val = (offset + stepf * exterior).sin();
+                let c_val = (offset + stepf * exterior).cos();
+                vertices.push([radius * s_val, radius * c_val, zero]);
+                vertices.push([radius * -s_val, radius * c_val, zero]);
             }
         } else {
             vertices.push([zero, radius, zero]);
 
             for step in 1..=self.sides/2 {
                 let stepf = cast::<_, C>(step).unwrap();
-                let left = start + stepf * exterior;
-                let right = start - stepf * exterior;
-                vertices.push([radius * left.cos(), radius * left.sin(), zero]);
-                vertices.push([radius * right.cos(), radius * right.sin(), zero]);
+                let s_val = (stepf * exterior).sin();
+                let c_val = (stepf * exterior).cos();
+                vertices.push([radius * -s_val, radius * c_val, zero]);
+                vertices.push([radius * s_val, radius * c_val, zero]);
             }
         };
 
