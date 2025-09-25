@@ -7,9 +7,10 @@ extern crate simple_targa;
 extern crate shapes;
 
 use std::num::NonZeroU32;
+use std::f32::consts;
 
 use glam::{Mat4, Quat, Vec3};
-use glium::{backend::Facade, glutin, index::PrimitiveType, IndexBuffer, Surface, VertexBuffer};
+use glium::{backend::Facade, glutin, index::{IndicesSource, NoIndices, PrimitiveType}, IndexBuffer, Surface, VertexBuffer};
 use winit::dpi::PhysicalPosition;
 use winit::event::{ElementState, Event, KeyEvent, WindowEvent};
 use winit::keyboard::{KeyCode, PhysicalKey::Code};
@@ -20,6 +21,7 @@ use raw_window_handle::HasRawWindowHandle;
 
 use simple_targa::read_targa;
 
+use shapes::polygons::Polygon;
 use shapes::platonic_solids::PlatonicSolids;
 use shapes::Shaper;
 
@@ -126,8 +128,10 @@ fn main() {
     )
     .unwrap();
 
+    let mut sides = 3;
     let config = Default::default();
-    let shapes = vec![
+    let mut shapes = vec![
+        Shape::new(&display, Polygon::new(sides).make(config)),
         Shape::new(&display, PlatonicSolids::Tetrahedron.make(config)),
         Shape::new(&display, PlatonicSolids::Hexahedron.make(config)),
         Shape::new(&display, PlatonicSolids::Octahedron.make(config)),
@@ -146,23 +150,36 @@ fn main() {
         ..Default::default()
     };
 
-    let mut rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
+    let initial_rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
+    let mut rotation = initial_rotation;
     let rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01);
 
-    let mut shape = 4;
+    let mut shape = 5;
 
     println!(
         "Up and Down arrows modify vertices per face.\n\
-        Left and Right arrows modify faces per vertex."
+        Left and Right arrows modify faces per vertex.\n\
+        G switches to and from polygons."
     );
     event_loop.run(move |event, window_target| {
         if let Event::WindowEvent { event, .. } = event {
             match event {
                 WindowEvent::CloseRequested => window_target.exit(),
                 WindowEvent::RedrawRequested => {
-                    rotation *= rotation_delta;
-                    // the dodecahedron is rather large
-                    let scale = Vec3::ONE * if shape != 3 { 1.0 } else { 0.5 };
+                    if shape == 0 {
+                        rotation = initial_rotation;
+                    } else {
+                        rotation *= rotation_delta;
+                    }
+                    let scale = Vec3::ONE * if shape == 0 {
+                        let angle = consts::TAU / sides as f32;
+                        f32::sin(angle) / f32::cos(0.5 * angle)
+                    } else if shape == 4 {
+                        // the dodecahedron is rather large
+                        0.5
+                    } else {
+                        1.0
+                    };
                     let matrix =
                         Mat4::from_scale_rotation_translation(scale, rotation.normalize(), Vec3::ZERO);
 
@@ -173,7 +190,7 @@ fn main() {
                     frame
                         .draw(
                             &shapes[shape].vertices,
-                            &shapes[shape].indices,
+                            shapes[shape].indices.source(),
                             &program,
                             &uniform! { transform: matrix.to_cols_array_2d() },
                             &params,
@@ -190,8 +207,14 @@ fn main() {
                         physical_key: Code(KeyCode::ArrowUp),
                         ..
                     } => match shape {
-                        0 | 2 | 4 => shape = 1,
-                        1 => shape = 3,
+                        1 | 3 | 5 => shape = 2,
+                        2 => shape = 4,
+                        0 => {
+                            if sides < u16::MAX {
+                                sides += 1;
+                            }
+                            shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
+                        },
                         _ => (),
                     },
                     KeyEvent {
@@ -199,8 +222,14 @@ fn main() {
                         physical_key: Code(KeyCode::ArrowDown),
                         ..
                     } => match shape {
-                        3 => shape = 1,
-                        1 => shape = 0,
+                        4 => shape = 2,
+                        2 => shape = 1,
+                        0 => {
+                            if sides > 3 {
+                                sides -= 1;
+                            }
+                            shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
+                        },
                         _ => (),
                     },
                     KeyEvent {
@@ -208,8 +237,8 @@ fn main() {
                         physical_key: Code(KeyCode::ArrowLeft),
                         ..
                     } => match shape {
-                        4 => shape = 2,
-                        2 => shape = 0,
+                        5 => shape = 3,
+                        3 => shape = 1,
                         _ => (),
                     },
                     KeyEvent {
@@ -217,9 +246,21 @@ fn main() {
                         physical_key: Code(KeyCode::ArrowRight),
                         ..
                     } => match shape {
-                        0 => shape = 2,
-                        2 => shape = 4,
+                        1 => shape = 3,
+                        3 => shape = 5,
                         _ => (),
+                    },
+                    KeyEvent {
+                        state: ElementState::Pressed,
+                        physical_key: Code(KeyCode::KeyG),
+                        ..
+                    } => match shape {
+                        0 => {
+                            sides = 3;
+                            shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
+                            shape = 5;
+                        },
+                        _ => shape = 0,
                     },
                     _ => (),
                 },
@@ -242,24 +283,42 @@ impl From<[f32; 3]> for PosVertex {
 
 implement_vertex!(PosVertex, position);
 
+enum Indices {
+    None(NoIndices),
+    One(IndexBuffer<u8>),
+}
+
+impl Indices {
+    pub fn source<'a>(&'a self) -> IndicesSource<'a> {
+        match self {
+            Indices::None(i) => i.into(),
+            Indices::One(i) => i.into(),
+        }
+    }
+}
+
 struct Shape {
     vertices: VertexBuffer<PosVertex>,
-    indices: IndexBuffer<u8>,
+    indices: Indices,
 }
 
 impl Shape {
-    pub fn new(display: &impl Facade, shape: shapes::shapes::Shape<f32, u8>) -> Self {
-        if let shapes::shapes::Shape::Strips { vertices, strips } = shape {
+    pub fn new(display: &impl Facade, shape: shapes::Shape<f32, u8>) -> Self {
+        if let shapes::Shape::Strips { vertices, strips } = shape {
             let vertices = VertexBuffer::new(
                 display,
                 &vertices
                     .iter()
                     .map(|&p| p.into())
                     .collect::<Vec<_>>()).unwrap();
-            let indices = IndexBuffer::new(
+            let indices = if strips.is_empty() {
+                Indices::None(NoIndices(PrimitiveType::TriangleStrip))
+            } else {
+                Indices::One(IndexBuffer::new(
                 display,
                 PrimitiveType::TriangleStrip,
-                &strips[0]).unwrap();
+                &strips[0]).unwrap())
+            };
 
             Self { vertices, indices }
         } else { panic!() }
