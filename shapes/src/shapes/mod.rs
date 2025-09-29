@@ -17,11 +17,23 @@ pub enum Shape<C: Float, I: Unsigned> {
 }
 
 #[derive(Default, Clone, Copy)]
-pub enum Orientation {
+pub enum Chirality {
+    Left,
     #[default]
-    RH,
-    LH,
-    Arbitrary((i32,i32),(i32,i32),(i32,i32)),
+    Right,
+}
+
+#[derive(Default, Clone, Copy)]
+pub enum Winding {
+    Clockwise,
+    #[default]
+    CounterClockwise,
+}
+
+#[derive(Default, Clone, Copy)]
+pub struct Orientation {
+    chirality: Chirality,
+    winding: Winding,
 }
 
 #[derive(Default, Clone, Copy)]
