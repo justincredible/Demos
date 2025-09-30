@@ -213,13 +213,15 @@ impl<C: Float + FloatConst, I: Copy + NumCast + Unsigned> Shaper<C, I> for Plato
 mod tests {
     use super::{PlatonicSolids, Shape, Shaper};
 
-    const TOLERANCE: f32 = f32::EPSILON;
+    type Double = f64;
 
-    fn magnitude_squared(vertex: &[f32; 3]) -> f32 {
+    const TOLERANCE: Double = 2. * Double::EPSILON;
+
+    fn magnitude_squared(vertex: &[Double; 3]) -> Double {
         vertex[0] * vertex[0] + vertex[1] * vertex[1] + vertex[2] * vertex[2]
     }
 
-    fn magnitude_squared_diff(a: &[f32; 3], b: &[f32; 3]) -> f32 {
+    fn magnitude_squared_diff(a: &[Double; 3], b: &[Double; 3]) -> Double {
         let x = a[0] - b[0];
         let y = a[1] - b[1];
         let z = a[2] - b[2];
@@ -229,14 +231,14 @@ mod tests {
 
     macro_rules! uniform_distance {
         ($polyhedron:ident) => {
-            let Shape::Strips { vertices, .. } = Shaper::<f32, u8>::make(
+            let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
                 &PlatonicSolids::$polyhedron,
                 Default::default()) else { todo!() };
 
             let r_squared = magnitude_squared(&vertices[0]);
 
             for vertex in vertices {
-                assert!(f32::abs(r_squared - magnitude_squared(&vertex)) <= TOLERANCE);
+                assert!(Double::abs(r_squared - magnitude_squared(&vertex)) <= TOLERANCE);
             }
         };
     }
@@ -246,7 +248,7 @@ mod tests {
             let difference_length =
                 magnitude_squared_diff(&$vertices[$a], &$vertices[$b]);
 
-            assert!(f32::abs(1.0 - difference_length) <= TOLERANCE);
+            assert!(Double::abs(1.0 - difference_length) <= TOLERANCE);
         };
     }
 
@@ -257,7 +259,7 @@ mod tests {
 
     #[test]
     fn tetrahedron_edges() {
-        let Shape::Strips { vertices, .. } = Shaper::<f32, u8>::make(
+        let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
             &PlatonicSolids::Tetrahedron,
             Default::default()) else { todo!() };
 
@@ -276,7 +278,7 @@ mod tests {
 
     #[test]
     fn hexahedron_edges() {
-        let Shape::Strips { vertices, .. } = Shaper::<f32, u8>::make(
+        let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
             &PlatonicSolids::Hexahedron,
             Default::default()) else { todo!() };
 
@@ -301,7 +303,7 @@ mod tests {
 
     #[test]
     fn octahedron_edges() {
-        let Shape::Strips { vertices, .. } = Shaper::<f32, u8>::make(
+        let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
             &PlatonicSolids::Octahedron,
             Default::default()) else { todo!() };
 
@@ -326,7 +328,7 @@ mod tests {
 
     #[test]
     fn dodecahedron_edges() {
-        let Shape::Strips { vertices, .. } = Shaper::<f32, u8>::make(
+        let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
             &PlatonicSolids::Dodecahedron,
             Default::default()) else { todo!() };
 
@@ -369,7 +371,7 @@ mod tests {
 
     #[test]
     fn icosahedron_edges() {
-        let Shape::Strips { vertices, .. } = Shaper::<f32, u8>::make(
+        let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
             &PlatonicSolids::Icosahedron,
             Default::default()) else { todo!() };
 
