@@ -211,9 +211,7 @@ fn main() {
                         1 | 3 | 5 => shape = 2,
                         2 => shape = 4,
                         0 => {
-                            if sides < u16::MAX {
-                                sides += 1;
-                            }
+                            sides = sides.saturating_add(1);
                             shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
                         },
                         _ => (),
@@ -296,14 +294,14 @@ implement_vertex!(PosVertex, position);
 
 enum Indices {
     None(NoIndices),
-    One(IndexBuffer<u8>),
+    One(Box<IndexBuffer<u8>>),
 }
 
 impl Indices {
     pub fn source<'a>(&'a self) -> IndicesSource<'a> {
         match self {
             Indices::None(i) => i.into(),
-            Indices::One(i) => i.into(),
+            Indices::One(i) => (&(**i)).into(),
         }
     }
 }
@@ -325,10 +323,10 @@ impl Shape {
             let indices = if strips.is_empty() {
                 Indices::None(NoIndices(PrimitiveType::TriangleStrip))
             } else {
-                Indices::One(IndexBuffer::new(
+                Indices::One(Box::new(IndexBuffer::new(
                 display,
                 PrimitiveType::TriangleStrip,
-                &strips[0]).unwrap())
+                &strips[0]).unwrap()))
             };
 
             Self { vertices, indices }
