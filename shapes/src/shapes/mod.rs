@@ -16,31 +16,49 @@ pub enum Shape<C: Float, I: Unsigned> {
     },
 }
 
-#[derive(Default, Clone, Copy)]
+#[derive(Default, Clone, Copy, PartialEq, Eq)]
 pub enum Chirality {
     Left,
     #[default]
     Right,
 }
 
-#[derive(Default, Clone, Copy)]
+#[derive(Default, Clone, Copy, PartialEq, Eq)]
 pub enum Winding {
     Clockwise,
     #[default]
-    CounterClockwise,
+    Counterclockwise,
 }
 
 #[derive(Default, Clone, Copy)]
 pub struct Orientation {
-    chirality: Chirality,
-    winding: Winding,
+    pub chirality: Chirality,
+    pub winding: Winding,
+}
+
+impl Orientation {
+    pub fn is_left(&self) -> bool {
+        self.chirality == Chirality::Left
+    }
+
+    pub fn is_right(&self) -> bool {
+        self.chirality == Chirality::Right
+    }
+
+    pub fn is_cw(&self) -> bool {
+        self.winding == Winding::Clockwise
+    }
+
+    pub fn is_ccw(&self) -> bool {
+        self.winding == Winding::Counterclockwise
+    }
 }
 
 #[derive(Default, Clone, Copy)]
 pub struct Configuration {
-    orientation: Orientation,
-    generate_normals: bool,
-    prefer_strips: bool,
+    pub orientation: Orientation,
+    pub generate_normals: bool,
+    pub prefer_strips: bool,
 }
 
 pub trait Shaper<C: Float, I: Unsigned> {
