@@ -153,22 +153,23 @@ fn main() {
     let initial_rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
     let mut rotation = initial_rotation;
     let rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01);
+    let mut rotating = true;
 
     let mut shape = 5;
 
     println!(
         "Up and Down arrows modify vertices per face.\n\
         Left and Right arrows modify faces per vertex.\n\
-        G switches to and from polygons."
+        G switches to and from polygons.\n\
+        R toggles rotation.\n\
+        H returns object to initial orientation."
     );
     event_loop.run(move |event, window_target| {
         if let Event::WindowEvent { event, .. } = event {
             match event {
                 WindowEvent::CloseRequested => window_target.exit(),
                 WindowEvent::RedrawRequested => {
-                    if shape == 0 {
-                        rotation = initial_rotation;
-                    } else {
+                    if rotating {
                         rotation *= rotation_delta;
                     }
                     let scale = Vec3::ONE * if shape == 0 {
@@ -262,6 +263,16 @@ fn main() {
                         },
                         _ => shape = 0,
                     },
+                    KeyEvent {
+                        state: ElementState::Pressed,
+                        physical_key: Code(KeyCode::KeyR),
+                        ..
+                    } => rotating = !rotating,
+                    KeyEvent {
+                        state: ElementState::Pressed,
+                        physical_key: Code(KeyCode::KeyH),
+                        ..
+                    } => rotation = initial_rotation,
                     _ => (),
                 },
                 _ => (),
