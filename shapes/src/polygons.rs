@@ -1,4 +1,4 @@
-use num_traits::{cast, Float, FloatConst, Unsigned, zero};
+use num_traits::{cast, Float, FloatConst, one, Unsigned, zero};
 
 use crate::shapes::{Configuration, Shape, Shaper};
 
@@ -19,33 +19,37 @@ impl Polygon {
 }
 
 impl<C: Float + FloatConst, I: Unsigned> Shaper<C, I> for Polygon {
-    fn make(&self, _request: Configuration) -> Shape<C, I> {
+    fn make(&self, request: Configuration) -> Shape<C, I> {
         let zero = zero();
+        let one: C = one();
         let tau: C = FloatConst::TAU();
-        let exterior = tau / cast::<_, C>(self.sides).unwrap();
-        let offset = cast::<_, C>(0.5).unwrap() * exterior;
-        let radius = offset.cos() / exterior.sin();
+        let angle = tau / cast::<_, C>(self.sides).unwrap();
+        let half = cast::<_, C>(0.5).unwrap() * angle;
+        let radius = half.cos() / angle.sin();
 
-        let mut vertices = vec![];
-        if self.sides % 2 == 0 {
-            for step in 0..self.sides/2 {
-                let stepf = cast::<_, C>(step).unwrap();
-                let s_val = (offset + stepf * exterior).sin();
-                let c_val = (offset + stepf * exterior).cos();
-                vertices.push([radius * s_val, radius * c_val, zero]);
-                vertices.push([radius * -s_val, radius * c_val, zero]);
-            }
+        let odd = !self.sides.is_multiple_of(2);
+        let mut vertices = if odd {
+            vec!([zero, radius, zero])
         } else {
-            vertices.push([zero, radius, zero]);
-
-            for step in 1..=self.sides/2 {
-                let stepf = cast::<_, C>(step).unwrap();
-                let s_val = (stepf * exterior).sin();
-                let c_val = (stepf * exterior).cos();
-                vertices.push([radius * -s_val, radius * c_val, zero]);
-                vertices.push([radius * s_val, radius * c_val, zero]);
-            }
+            vec!()
         };
+        let first = if odd && request.orientation.is_ccw() || !odd && request.orientation.is_cw() {
+            -one
+        } else {
+            one
+        };
+
+        for step in 0..self.sides/2 {
+            let value = if odd {
+                angle * cast::<_, C>(step+1).unwrap()
+            } else {
+                half + angle * cast::<_, C>(step).unwrap()
+            };
+            let mut point = [radius * first * value.sin(), radius * value.cos(), zero];
+            vertices.push(point);
+            point[0] = -point[0];
+            vertices.push(point);
+        }
 
         Shape::Strips { vertices, strips: vec!() }
     }
