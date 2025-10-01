@@ -313,7 +313,20 @@ struct Shape {
 
 impl Shape {
     pub fn new(display: &impl Facade, shape: shapes::Shape<f32, u8>) -> Self {
-        if let shapes::Shape::Strips { vertices, strips } = shape {
+        if let shapes::Shape::Triangles { vertices, indices } = shape {
+            let vertices = VertexBuffer::new(
+                display,
+                &vertices
+                    .iter()
+                    .map(|&p| p.into())
+                    .collect::<Vec<_>>()).unwrap();
+            let indices = Indices::One(Box::new(IndexBuffer::new(
+                display,
+                PrimitiveType::TrianglesList,
+                &indices).unwrap()));
+
+            Self { vertices, indices }
+        } else if let shapes::Shape::Strips { vertices, strips } = shape {
             let vertices = VertexBuffer::new(
                 display,
                 &vertices

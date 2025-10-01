@@ -1,4 +1,6 @@
-use num_traits::{cast, Float, FloatConst, one, Unsigned, zero};
+use std::ops::AddAssign;
+
+use num_traits::{cast, Float, FloatConst, NumCast, one, Unsigned, zero};
 
 use crate::shapes::{Configuration, Shape, Shaper};
 
@@ -18,7 +20,11 @@ impl Polygon {
     }
 }
 
-impl<C: Float + FloatConst, I: Unsigned> Shaper<C, I> for Polygon {
+impl<C, I> Shaper<C, I> for Polygon
+where
+    C: Float + FloatConst,
+    I: AddAssign + Copy + NumCast + Unsigned,
+{
     fn make(&self, request: Configuration) -> Shape<C, I> {
         let zero = zero();
         let one: C = one();
@@ -51,6 +57,32 @@ impl<C: Float + FloatConst, I: Unsigned> Shaper<C, I> for Polygon {
             vertices.push(point);
         }
 
-        Shape::Strips { vertices, strips: vec!() }
+        if request.prefer_strips {
+            Shape::Strips { vertices, strips: vec!() }
+        } else {
+            let mut indices = vec!();
+
+            let mut a: I = num_traits::zero();
+            let mut b: I = num_traits::one();
+            let mut c = cast::<_, I>(2).unwrap();
+            let inc = b;
+            let mut even = false;
+
+            for _ in 0..self.sides-2 {
+                indices.push(a);
+                indices.push(b);
+                indices.push(c);
+
+                if even {
+                    b = c;
+                } else {
+                    a = c;
+                }
+                c += inc;
+                even = !even
+            }
+
+            Shape::Triangles { vertices, indices }
+        }
     }
 }
