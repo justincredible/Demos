@@ -3,7 +3,7 @@ use num_traits::{cast, Float, FloatConst, NumCast, one, Unsigned, zero};
 use crate::shapes::{Configuration, Shape, Shaper};
 
 /// All possible Platonic solids.
-pub enum PlatonicSolids {
+pub enum PlatonicSolid {
     Tetrahedron,
     Hexahedron,
     Octahedron,
@@ -11,7 +11,7 @@ pub enum PlatonicSolids {
     Icosahedron,
 }
 
-impl<C: Float + FloatConst, I: Copy + NumCast + Unsigned> Shaper<C, I> for PlatonicSolids {
+impl<C: Float + FloatConst, I: Copy + NumCast + Unsigned> Shaper<C, I> for PlatonicSolid {
     fn make(&self, _request: Configuration) -> Shape<C, I> {
         match self {
             Self::Tetrahedron => {
@@ -211,7 +211,7 @@ impl<C: Float + FloatConst, I: Copy + NumCast + Unsigned> Shaper<C, I> for Plato
 
 #[cfg(test)]
 mod tests {
-    use super::{PlatonicSolids, Shape, Shaper};
+    use super::{PlatonicSolid, Shape, Shaper};
 
     type Double = f64;
 
@@ -232,7 +232,7 @@ mod tests {
     macro_rules! uniform_distance {
         ($polyhedron:ident) => {
             let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
-                &PlatonicSolids::$polyhedron,
+                &PlatonicSolid::$polyhedron,
                 Default::default()) else { todo!() };
 
             let r_squared = magnitude_squared(&vertices[0]);
@@ -260,7 +260,7 @@ mod tests {
     #[test]
     fn tetrahedron_edges() {
         let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
-            &PlatonicSolids::Tetrahedron,
+            &PlatonicSolid::Tetrahedron,
             Default::default()) else { todo!() };
 
         unit_neighbour!(vertices, 0, 1);
@@ -279,7 +279,7 @@ mod tests {
     #[test]
     fn hexahedron_edges() {
         let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
-            &PlatonicSolids::Hexahedron,
+            &PlatonicSolid::Hexahedron,
             Default::default()) else { todo!() };
 
         unit_neighbour!(vertices, 0, 1);
@@ -304,7 +304,7 @@ mod tests {
     #[test]
     fn octahedron_edges() {
         let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
-            &PlatonicSolids::Octahedron,
+            &PlatonicSolid::Octahedron,
             Default::default()) else { todo!() };
 
         unit_neighbour!(vertices, 0, 1);
@@ -329,7 +329,7 @@ mod tests {
     #[test]
     fn dodecahedron_edges() {
         let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
-            &PlatonicSolids::Dodecahedron,
+            &PlatonicSolid::Dodecahedron,
             Default::default()) else { todo!() };
 
         unit_neighbour!(vertices, 0, 1);
@@ -372,7 +372,7 @@ mod tests {
     #[test]
     fn icosahedron_edges() {
         let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
-            &PlatonicSolids::Icosahedron,
+            &PlatonicSolid::Icosahedron,
             Default::default()) else { todo!() };
 
         unit_neighbour!(vertices, 0, 1);

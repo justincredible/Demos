@@ -22,7 +22,7 @@ use raw_window_handle::HasRawWindowHandle;
 use simple_targa::read_targa;
 
 use shapes::polygons::Polygon;
-use shapes::platonic_solids::PlatonicSolids;
+use shapes::platonic_solids::PlatonicSolid;
 use shapes::Shaper;
 
 fn main() {
@@ -132,11 +132,11 @@ fn main() {
     let config = Default::default();
     let mut shapes = vec![
         Shape::new(&display, Polygon::new(sides).make(config)),
-        Shape::new(&display, PlatonicSolids::Tetrahedron.make(config)),
-        Shape::new(&display, PlatonicSolids::Hexahedron.make(config)),
-        Shape::new(&display, PlatonicSolids::Octahedron.make(config)),
-        Shape::new(&display, PlatonicSolids::Dodecahedron.make(config)),
-        Shape::new(&display, PlatonicSolids::Icosahedron.make(config)),
+        Shape::new(&display, PlatonicSolid::Tetrahedron.make(config)),
+        Shape::new(&display, PlatonicSolid::Hexahedron.make(config)),
+        Shape::new(&display, PlatonicSolid::Octahedron.make(config)),
+        Shape::new(&display, PlatonicSolid::Dodecahedron.make(config)),
+        Shape::new(&display, PlatonicSolid::Icosahedron.make(config)),
     ];
 
     let params = glium::DrawParameters {
