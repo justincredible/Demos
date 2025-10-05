@@ -66,20 +66,18 @@ where
             let mut b: I = num_traits::one();
             let mut c = cast::<_, I>(2).unwrap();
             let inc = b;
-            let mut even = false;
 
-            for _ in 0..self.sides-2 {
+            for i in 0..self.sides-2 {
                 indices.push(a);
                 indices.push(b);
                 indices.push(c);
 
-                if even {
-                    b = c;
-                } else {
+                if i.is_multiple_of(2) {
                     a = c;
+                } else {
+                    b = c;
                 }
                 c += inc;
-                even = !even
             }
 
             Shape::Triangles { vertices, indices }
