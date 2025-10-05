@@ -80,7 +80,17 @@ where
                 c += inc;
             }
 
-            Shape::Triangles { vertices, indices }
+            if request.generate_normals {
+                let normals = if request.orientation.is_left() {
+                    vec!([zero, zero, -one])
+                } else {
+                    vec!([zero, zero, one])
+                };
+
+                Shape::NormalTriangles { vertices, normals, indices }
+            } else {
+                Shape::Triangles { vertices, indices }
+            }
         }
     }
 }
