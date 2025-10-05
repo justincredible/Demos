@@ -326,6 +326,19 @@ impl Shape {
                 &indices).unwrap()));
 
             Self { vertices, indices }
+        } else if let shapes::Shape::NormalTriangles { vertices, indices, .. } = shape {
+            let vertices = VertexBuffer::new(
+                display,
+                &vertices
+                    .iter()
+                    .map(|&p| p.into())
+                    .collect::<Vec<_>>()).unwrap();
+            let indices = Indices::One(Box::new(IndexBuffer::new(
+                display,
+                PrimitiveType::TrianglesList,
+                &indices).unwrap()));
+
+            Self { vertices, indices }
         } else if let shapes::Shape::Strips { vertices, strips } = shape {
             let vertices = VertexBuffer::new(
                 display,
@@ -343,7 +356,7 @@ impl Shape {
             };
 
             Self { vertices, indices }
-        } else { panic!() }
+        } else { unreachable!() }
     }
 }
 
