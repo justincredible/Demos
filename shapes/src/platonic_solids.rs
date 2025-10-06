@@ -11,7 +11,11 @@ pub enum PlatonicSolid {
     Icosahedron,
 }
 
-impl<C: Float + FloatConst, I: Copy + NumCast + Unsigned> Shaper<C, I> for PlatonicSolid {
+impl<C, I> Shaper<C, I> for PlatonicSolid
+where
+    C: Float + FloatConst,
+    I: Copy + NumCast + Unsigned,
+{
     fn make(&self, _request: Configuration) -> Shape<C, I> {
         match self {
             Self::Tetrahedron => {
