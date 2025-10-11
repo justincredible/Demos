@@ -244,14 +244,15 @@ mod tests {
 
     macro_rules! uniform_distance {
         ($polyhedron:ident) => {
-            let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
+            let shape = Shaper::<Double, u8>::make(
                 &PlatonicSolid::$polyhedron,
-                Default::default()) else { todo!() };
+                Default::default(),
+            );
 
-            let r_squared = magnitude_squared(&vertices[0]);
+            let r_squared = magnitude_squared(&shape.vertices()[0]);
 
-            for vertex in vertices {
-                assert!(Double::abs(r_squared - magnitude_squared(&vertex)) <= TOLERANCE);
+            for vertex in shape.vertices() {
+                assert!(Double::abs(r_squared - magnitude_squared(vertex)) <= TOLERANCE);
             }
         };
     }
@@ -272,9 +273,11 @@ mod tests {
 
     #[test]
     fn tetrahedron_edges() {
-        let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
+        let shape = Shaper::<Double, u8>::make(
             &PlatonicSolid::Tetrahedron,
-            Default::default()) else { todo!() };
+            Default::default(),
+        );
+        let vertices = shape.vertices();
 
         unit_neighbour!(vertices, 0, 1);
         unit_neighbour!(vertices, 0, 2);

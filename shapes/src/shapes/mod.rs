@@ -16,6 +16,16 @@ pub enum Shape<C: Float, I: Unsigned> {
     },
 }
 
+impl<C: Float, I: Unsigned> Shape<C, I> {
+    pub fn vertices(&self) -> &Vec<[C; 3]> {
+        match self {
+            Shape::NormalTriangles { vertices, .. } => vertices,
+            Shape::Triangles { vertices, .. } => vertices,
+            Shape::Strips { vertices, .. } => vertices,
+        }
+    }
+}
+
 /// The handedness of the coordinate system, with:
 /// <br>&emsp;+X rightward
 /// <br>&emsp;+Y upward
