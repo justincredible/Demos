@@ -24,6 +24,23 @@ impl<C: Float, I: Unsigned> Shape<C, I> {
             Shape::Strips { vertices, .. } => vertices,
         }
     }
+
+    pub fn normals(&self) -> Option<&Vec<[C; 3]>> {
+        match self {
+            Shape::NormalTriangles { normals, .. } => Some(normals),
+            _ => None,
+        }
+    }
+
+    pub fn indices(&self, strip: Option<usize>) -> &Vec<I> {
+        match self {
+            Shape::NormalTriangles { indices, .. } => indices,
+            Shape::Triangles { indices, .. } => indices,
+            Shape::Strips { strips, .. } => &strips[
+                std::cmp::min(strips.len()-1, strip.unwrap_or_default())
+            ],
+        }
+    }
 }
 
 /// The handedness of the coordinate system, with:
