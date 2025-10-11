@@ -28,8 +28,7 @@ where
     fn make(&self, request: Configuration) -> Shape<C, I> {
         let zero = zero();
         let one: C = one();
-        let tau: C = FloatConst::TAU();
-        let angle = tau / cast::<_, C>(self.sides).unwrap();
+        let angle = <C as FloatConst>::TAU() / cast::<_, C>(self.sides).unwrap();
         let half = cast::<_, C>(0.5).unwrap() * angle;
         let radius = half.cos() / angle.sin();
 
