@@ -69,12 +69,31 @@ where
                     .chain((2..8).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
-                let indices = vec![
-                    i[0], i[1], i[2], i[3], i[7], i[1], i[5],
-                    i[0], i[4], i[2], i[6], i[7], i[4], i[5],
-                ];
+                if request.prefer_strips {
+                    let strips = vec!(vec![
+                        i[0], i[1], i[2], i[3], i[7], i[1], i[5],
+                        i[0], i[4], i[2], i[6], i[7], i[4], i[5],
+                    ]);
 
-                Shape::Strips { vertices, strips: vec!(indices) }
+                    Shape::Strips { vertices, strips }
+                } else {
+                    let indices = vec![
+                        i[0], i[1], i[2],
+                        i[0], i[2], i[4],
+                        i[0], i[4], i[5],
+                        i[0], i[5], i[1],
+                        i[1], i[3], i[2],
+                        i[1], i[5], i[7],
+                        i[1], i[7], i[3],
+                        i[2], i[3], i[7],
+                        i[2], i[6], i[4],
+                        i[2], i[7], i[6],
+                        i[4], i[6], i[7],
+                        i[4], i[7], i[5],
+                    ];
+
+                    Shape::Triangles { vertices, indices }
+                }
             },
             Self::Octahedron => {
                 let f0 = zero();
@@ -294,9 +313,11 @@ mod tests {
 
     #[test]
     fn hexahedron_edges() {
-        let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
+        let shape = Shaper::<Double, u8>::make(
             &PlatonicSolid::Hexahedron,
-            Default::default()) else { todo!() };
+            Default::default()
+        );
+        let vertices = shape.vertices();
 
         unit_neighbour!(vertices, 0, 1);
         unit_neighbour!(vertices, 0, 2);
