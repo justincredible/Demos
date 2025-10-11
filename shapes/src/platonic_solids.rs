@@ -16,7 +16,7 @@ where
     C: Float + FloatConst,
     I: Copy + NumCast + Unsigned,
 {
-    fn make(&self, _request: Configuration) -> Shape<C, I> {
+    fn make(&self, request: Configuration) -> Shape<C, I> {
         match self {
             Self::Tetrahedron => {
                 let f0 = zero();
@@ -37,9 +37,18 @@ where
                     .chain((2..4).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
-                let indices = vec![i[0], i[1], i[2], i[3], i[0], i[1]];
+                if request.prefer_strips {
+                    let strips = vec!(vec![i[0], i[1], i[2], i[3], i[0], i[1]]);
 
-                Shape::Strips { vertices, strips: vec!(indices) }
+                    Shape::Strips { vertices, strips }
+                } else {
+                    let indices = vec![
+                        i[0], i[1], i[2], i[0], i[2], i[3],
+                        i[0], i[3], i[1], i[1], i[3], i[2],
+                    ];
+
+                    Shape::Triangles { vertices, indices }
+                }
             },
             Self::Hexahedron => {
                 let fh = cast::<_, C>(0.5).unwrap();
