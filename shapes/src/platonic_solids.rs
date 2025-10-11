@@ -114,12 +114,27 @@ where
                     .chain((2..6).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
-                let indices = vec![
-                    i[0], i[1], i[2], i[5], i[3], i[4], i[1],
-                    i[5], i[2], i[3], i[0], i[4], i[1],
-                ];
+                if request.prefer_strips {
+                    let strips = vec!(vec![
+                        i[0], i[1], i[2], i[5], i[3], i[4], i[1],
+                        i[5], i[2], i[3], i[0], i[4], i[1],
+                    ]);
 
-                Shape::Strips { vertices, strips: vec!(indices) }
+                    Shape::Strips { vertices, strips }
+                } else {
+                    let indices = vec![
+                        i[0], i[1], i[2],
+                        i[0], i[2], i[3],
+                        i[0], i[3], i[4],
+                        i[0], i[4], i[1],
+                        i[1], i[4], i[5],
+                        i[1], i[5], i[2],
+                        i[2], i[5], i[3],
+                        i[3], i[5], i[4],
+                    ];
+
+                    Shape::Triangles { vertices, indices }
+                }
             },
             Self::Dodecahedron => {
                 let f0 = zero();
@@ -340,9 +355,11 @@ mod tests {
 
     #[test]
     fn octahedron_edges() {
-        let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
+        let shape = Shaper::<Double, u8>::make(
             &PlatonicSolid::Octahedron,
-            Default::default()) else { todo!() };
+            Default::default(),
+        );
+        let vertices = shape.vertices();
 
         unit_neighbour!(vertices, 0, 1);
         unit_neighbour!(vertices, 0, 2);
