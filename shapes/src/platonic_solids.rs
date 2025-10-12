@@ -194,14 +194,33 @@ where
                     .chain((2..20).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
-                let indices = vec![
-                    i[1], i[3], i[0], i[4], i[2], i[7], i[0], i[11], i[5], i[10],
-                    i[0], i[6], i[1], i[12], i[3], i[8], i[4], i[9], i[7], i[13],
-                    i[11], i[16], i[10], i[15], i[6], i[17], i[12], i[19], i[8],
-                    i[14], i[9], i[19], i[13], i[18], i[16], i[19], i[15], i[17],
-                ];
+                if request.prefer_strips {
+                    let strips = vec!(vec![
+                        i[1], i[3], i[0], i[4], i[2], i[7], i[0], i[11], i[5], i[10],
+                        i[0], i[6], i[1], i[12], i[3], i[8], i[4], i[9], i[7], i[13],
+                        i[11], i[16], i[10], i[15], i[6], i[17], i[12], i[19], i[8],
+                        i[14], i[9], i[19], i[13], i[18], i[16], i[19], i[15], i[17],
+                    ]);
 
-                Shape::Strips { vertices, strips: vec!(indices) }
+                    Shape::Strips { vertices, strips }
+                } else {
+                    let indices = vec![
+                        i[0], i[1], i[3], i[0], i[2], i[7], i[0], i[3], i[4],
+                        i[0], i[4], i[2], i[0], i[5], i[10], i[0], i[6], i[1],
+                        i[0], i[7], i[11], i[0], i[10], i[6], i[0], i[11], i[5],
+                        i[1], i[6], i[12], i[1], i[12], i[3], i[2], i[4], i[7],
+                        i[3], i[12], i[8], i[3], i[8], i[4], i[4], i[8], i[9],
+                        i[4], i[9], i[7], i[5], i[11], i[10], i[6], i[10], i[15],
+                        i[6], i[15], i[17], i[6], i[17], i[12], i[7], i[9], i[13],
+                        i[7], i[13], i[11], i[8], i[12], i[19], i[8], i[19], i[14],
+                        i[8], i[14], i[9], i[9], i[14], i[19], i[9], i[19], i[13],
+                        i[10], i[11], i[16], i[10], i[16], i[15], i[11], i[13], i[16],
+                        i[12], i[17], i[19], i[13], i[19], i[18], i[13], i[18], i[16],
+                        i[15], i[16], i[19], i[15], i[19], i[17], i[16], i[18], i[19],
+                    ];
+
+                    Shape::Triangles { vertices, indices }
+                }
             },
             Self::Icosahedron => {
                 let f0 = zero();
@@ -382,9 +401,11 @@ mod tests {
 
     #[test]
     fn dodecahedron_edges() {
-        let Shape::Strips { vertices, .. } = Shaper::<Double, u8>::make(
+        let shape = Shaper::<Double, u8>::make(
             &PlatonicSolid::Dodecahedron,
-            Default::default()) else { todo!() };
+            Default::default(),
+        );
+        let vertices = shape.vertices();
 
         unit_neighbour!(vertices, 0, 1);
         unit_neighbour!(vertices, 0, 2);
