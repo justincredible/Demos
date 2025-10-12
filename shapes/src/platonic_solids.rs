@@ -282,7 +282,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{PlatonicSolid, Shape, Shaper};
+    use super::{PlatonicSolid, Shaper};
 
     type Double = f64;
 
