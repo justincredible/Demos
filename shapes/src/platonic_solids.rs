@@ -78,18 +78,10 @@ where
                     Shape::Strips { vertices, strips }
                 } else {
                     let indices = vec![
-                        i[0], i[1], i[2],
-                        i[0], i[2], i[4],
-                        i[0], i[4], i[5],
-                        i[0], i[5], i[1],
-                        i[1], i[3], i[2],
-                        i[1], i[5], i[7],
-                        i[1], i[7], i[3],
-                        i[2], i[3], i[7],
-                        i[2], i[6], i[4],
-                        i[2], i[7], i[6],
-                        i[4], i[6], i[7],
-                        i[4], i[7], i[5],
+                        i[0], i[1], i[2], i[0], i[2], i[4], i[0], i[4], i[5],
+                        i[0], i[5], i[1], i[1], i[3], i[2], i[1], i[5], i[7],
+                        i[1], i[7], i[3], i[2], i[3], i[7], i[2], i[6], i[4],
+                        i[2], i[7], i[6], i[4], i[6], i[7], i[4], i[7], i[5],
                     ];
 
                     Shape::Triangles { vertices, indices }
@@ -123,14 +115,10 @@ where
                     Shape::Strips { vertices, strips }
                 } else {
                     let indices = vec![
-                        i[0], i[1], i[2],
-                        i[0], i[2], i[3],
-                        i[0], i[3], i[4],
-                        i[0], i[4], i[1],
-                        i[1], i[4], i[5],
-                        i[1], i[5], i[2],
-                        i[2], i[5], i[3],
-                        i[3], i[5], i[4],
+                        i[0], i[1], i[2], i[0], i[2], i[3],
+                        i[0], i[3], i[4], i[0], i[4], i[1],
+                        i[1], i[4], i[5], i[1], i[5], i[2],
+                        i[2], i[5], i[3], i[3], i[5], i[4],
                     ];
 
                     Shape::Triangles { vertices, indices }
@@ -349,7 +337,7 @@ mod tests {
     fn hexahedron_edges() {
         let shape = Shaper::<Double, u8>::make(
             &PlatonicSolid::Hexahedron,
-            Default::default()
+            Default::default(),
         );
         let vertices = shape.vertices();
 
