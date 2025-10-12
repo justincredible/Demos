@@ -188,15 +188,17 @@ fn main() {
 
                     frame.clear_color_and_depth((0.0, 0.0, 0.0, 1.0), -1.0);
 
-                    frame
-                        .draw(
-                            &shapes[shape].vertices,
-                            shapes[shape].indices.source(),
-                            &program,
-                            &uniform! { transform: matrix.to_cols_array_2d() },
-                            &params,
-                        )
-                        .unwrap();
+                    for source in shapes[shape].indices.sources() {
+                        frame
+                            .draw(
+                                &shapes[shape].vertices,
+                                source,
+                                &program,
+                                &uniform! { transform: matrix.to_cols_array_2d() },
+                                &params,
+                            )
+                            .unwrap();
+                    }
 
                     frame.finish().unwrap();
 
@@ -295,13 +297,15 @@ implement_vertex!(PosVertex, position);
 enum Indices {
     None(NoIndices),
     One(Box<IndexBuffer<u8>>),
+    Some(Vec<IndexBuffer<u8>>),
 }
 
 impl Indices {
-    pub fn source<'a>(&'a self) -> IndicesSource<'a> {
+    pub fn sources<'a>(&'a self) -> Vec<IndicesSource<'a>> {
         match self {
-            Indices::None(i) => i.into(),
-            Indices::One(i) => (&(**i)).into(),
+            Indices::None(i) => vec!(i.into()),
+            Indices::One(i) => vec!((&(**i)).into()),
+            Indices::Some(vi) => vi.iter().map(|i| i.into()).collect(),
         }
     }
 }
@@ -349,10 +353,14 @@ impl Shape {
             let indices = if strips.is_empty() {
                 Indices::None(NoIndices(PrimitiveType::TriangleStrip))
             } else {
-                Indices::One(Box::new(IndexBuffer::new(
-                display,
-                PrimitiveType::TriangleStrip,
-                &strips[0]).unwrap()))
+                let buffers = strips.iter().map(|strip|
+                    IndexBuffer::new(
+                        display,
+                        PrimitiveType::TriangleStrip,
+                        strip,
+                    ).unwrap()
+                ).collect();
+                Indices::Some(buffers)
             };
 
             Self { vertices, indices }
