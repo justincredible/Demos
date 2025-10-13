@@ -152,7 +152,7 @@ fn main() {
 
     let initial_rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
     let mut rotation = initial_rotation;
-    let rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01);
+    let mut rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01);
     let mut rotating = true;
 
     let mut shape = 5;
@@ -268,6 +268,51 @@ fn main() {
                         physical_key: Code(KeyCode::KeyR),
                         ..
                     } => rotating = !rotating,
+                    KeyEvent {
+                        state: ElementState::Pressed,
+                        physical_key: Code(KeyCode::Digit0),
+                        ..
+                    } => rotation_delta = Quat::from_axis_angle(Vec3::ZERO, 0.01),
+                    KeyEvent {
+                        state: ElementState::Pressed,
+                        physical_key: Code(KeyCode::Digit1),
+                        ..
+                    } => rotation_delta = Quat::from_axis_angle(Vec3::new(0., 0., 1.), 0.01),
+                    KeyEvent {
+                        state: ElementState::Pressed,
+                        physical_key: Code(KeyCode::Digit2),
+                        ..
+                    } => rotation_delta = Quat::from_axis_angle(Vec3::new(0., 1., 0.), 0.01),
+                    KeyEvent {
+                        state: ElementState::Pressed,
+                        physical_key: Code(KeyCode::Digit3),
+                        ..
+                    } => rotation_delta = Quat::from_axis_angle(Vec3::new(0., 1., 1.), 0.01),
+                    KeyEvent {
+                        state: ElementState::Pressed,
+                        physical_key: Code(KeyCode::Digit4),
+                        ..
+                    } => rotation_delta = Quat::from_axis_angle(Vec3::new(1., 0., 0.), 0.01),
+                    KeyEvent {
+                        state: ElementState::Pressed,
+                        physical_key: Code(KeyCode::Digit5),
+                        ..
+                    } => rotation_delta = Quat::from_axis_angle(Vec3::new(1., 0., 1.), 0.01),
+                    KeyEvent {
+                        state: ElementState::Pressed,
+                        physical_key: Code(KeyCode::Digit6),
+                        ..
+                    } => rotation_delta = Quat::from_axis_angle(Vec3::new(1., 1., 0.), 0.01),
+                    KeyEvent {
+                        state: ElementState::Pressed,
+                        physical_key: Code(KeyCode::Digit7),
+                        ..
+                    } => rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01),
+                    KeyEvent {
+                        state: ElementState::Pressed,
+                        physical_key: Code(KeyCode::Minus),
+                        ..
+                    } => rotation_delta = rotation_delta.conjugate(),
                     KeyEvent {
                         state: ElementState::Pressed,
                         physical_key: Code(KeyCode::KeyH),
