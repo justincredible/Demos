@@ -252,11 +252,11 @@ where
                     .collect::<Vec<_>>();
 
                 if request.prefer_strips {
-                    let strips = vec!(vec![
-                        i[4], i[10], i[5], i[9], i[3], i[7], i[1], i[6], i[2], i[8],
-                        i[4], i[10], i[9], i[11], i[7], i[6], i[6], i[11], i[8],
-                        i[10], i[4], i[5], i[0], i[3], i[1], i[1], i[0], i[2], i[4],
-                    ]);
+                    let strips = vec![
+                        vec![i[1], i[2], i[0], i[4], i[5], i[10], i[9], i[11], i[7], i[6], i[1], i[2]],
+                        vec![i[7], i[1], i[3], i[0], i[5], i[4], i[10], i[8], i[11], i[6]],// i[7], i[1]],
+                        vec![i[6], i[8], i[2], i[4], i[0], i[5], i[3], i[9], i[7]],// i[11], i[6], i[8]],
+                    ];
 
                     Shape::Strips { vertices, strips }
                 } else {
