@@ -93,3 +93,46 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{Polygon, Shape, Shaper};
+
+    #[test]
+    #[should_panic]
+    fn zero_sides() {
+        let _: Shape<f32, u8> = Polygon::new(0).make(Default::default());
+    }
+
+    #[test]
+    #[should_panic]
+    fn two_sides() {
+        let _: Shape<f32, u8> = Polygon::new(2).make(Default::default());
+    }
+
+    #[test]
+    fn three_sides() {
+        let _: Shape<f32, u8> = Polygon::new(3).make(Default::default());
+    }
+
+    #[test]
+    fn u8_max_sides() {
+        let _: Shape<f32, u8> = Polygon::new(255).make(Default::default());
+    }
+
+    #[test]
+    #[should_panic]
+    fn u8_overflow() {
+        let _: Shape<f32, u8> = Polygon::new(256).make(Default::default());
+    }
+
+    #[test]
+    fn u16_min_sides() {
+        let _: Shape<f32, u16> = Polygon::new(256).make(Default::default());
+    }
+
+    #[test]
+    fn max_sides() {
+        let _: Shape<f32, u16> = Polygon::new(u16::MAX).make(Default::default());
+    }
+}
