@@ -98,6 +98,27 @@ where
 mod tests {
     use super::{Polygon, Shape, Shaper};
 
+    type Double = f64;
+
+    const TOLERANCE: Double = 50000. * Double::EPSILON;
+
+    fn magnitude_squared_diff(a: &[Double; 3], b: &[Double; 3]) -> Double {
+        let x = a[0] - b[0];
+        let y = a[1] - b[1];
+        let z = a[2] - b[2];
+
+        x * x + y * y + z * z
+    }
+
+    macro_rules! unit_neighbour {
+        ($vertices:expr, $a:expr, $b:expr) => {
+            let difference_length =
+                magnitude_squared_diff(&$vertices[$a], &$vertices[$b]);
+
+            assert!(Double::abs(1.0 - difference_length) <= TOLERANCE);
+        };
+    }
+
     #[test]
     #[should_panic]
     fn zero_sides() {
@@ -134,5 +155,29 @@ mod tests {
     #[test]
     fn max_sides() {
         let _: Shape<f32, u16> = Polygon::new(u16::MAX).make(Default::default());
+    }
+
+    #[test]
+    fn side_length_odd() {
+        let shape = Shaper::<Double, u16>::make(&Polygon::new(u16::MAX), Default::default());
+        let vertices = shape.vertices();
+
+        unit_neighbour!(vertices, 1, 0);
+        for i in 2..vertices.len() {
+            unit_neighbour!(vertices, i, i-2);
+        }
+        unit_neighbour!(vertices, vertices.len()-1, vertices.len()-2);
+    }
+
+    #[test]
+    fn side_length_even() {
+        let shape = Shaper::<Double, u16>::make(&Polygon::new(u16::MAX - 1), Default::default());
+        let vertices = shape.vertices();
+
+        unit_neighbour!(vertices, 1, 0);
+        for i in 2..vertices.len() {
+            unit_neighbour!(vertices, i, i-2);
+        }
+        unit_neighbour!(vertices, vertices.len()-1, vertices.len()-2);
     }
 }
