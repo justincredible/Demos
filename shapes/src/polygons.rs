@@ -100,7 +100,7 @@ mod tests {
 
     type Double = f64;
 
-    const TOLERANCE: Double = 50000. * Double::EPSILON;
+    const TOLERANCE: Double = 2. * Double::EPSILON;
 
     fn magnitude_squared_diff(a: &[Double; 3], b: &[Double; 3]) -> Double {
         let x = a[0] - b[0];
@@ -159,7 +159,7 @@ mod tests {
 
     #[test]
     fn side_length_odd() {
-        let shape = Shaper::<Double, u16>::make(&Polygon::new(u16::MAX), Default::default());
+        let shape = Shaper::<Double, u16>::make(&Polygon::new(5), Default::default());
         let vertices = shape.vertices();
 
         unit_neighbour!(vertices, 1, 0);
@@ -171,7 +171,7 @@ mod tests {
 
     #[test]
     fn side_length_even() {
-        let shape = Shaper::<Double, u16>::make(&Polygon::new(u16::MAX - 1), Default::default());
+        let shape = Shaper::<Double, u16>::make(&Polygon::new(4), Default::default());
         let vertices = shape.vertices();
 
         unit_neighbour!(vertices, 1, 0);
