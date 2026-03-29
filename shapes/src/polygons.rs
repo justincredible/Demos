@@ -102,18 +102,18 @@ mod tests {
 
     const TOLERANCE: Double = 2. * Double::EPSILON;
 
-    fn magnitude_squared_diff(a: &[Double; 3], b: &[Double; 3]) -> Double {
+    fn magnitude_diff(a: &[Double; 3], b: &[Double; 3]) -> Double {
         let x = a[0] - b[0];
         let y = a[1] - b[1];
         let z = a[2] - b[2];
 
-        x * x + y * y + z * z
+        (x * x + y * y + z * z).sqrt()
     }
 
     macro_rules! unit_neighbour {
         ($vertices:expr, $a:expr, $b:expr) => {
             let difference_length =
-                magnitude_squared_diff(&$vertices[$a], &$vertices[$b]);
+                magnitude_diff(&$vertices[$a], &$vertices[$b]);
 
             assert!(Double::abs(1.0 - difference_length) <= TOLERANCE);
         };
@@ -170,6 +170,22 @@ mod tests {
     }
 
     #[test]
+    fn error_total_odd() {
+        let shape = Shaper::<Double, u16>::make(&Polygon::new(7), Default::default());
+        let vertices = shape.vertices();
+
+        let mut error = 0.;
+        error += 1. - magnitude_diff(&vertices[1], &vertices[0]);
+        for i in 2..vertices.len() {
+            error += 1. - magnitude_diff(&vertices[i], &vertices[i-2]);
+        }
+        error += 1. - magnitude_diff(&vertices[vertices.len()-1], &vertices[vertices.len()-2]);
+
+        eprintln!("{:?} {:?}", error, TOLERANCE);
+        assert!(error < TOLERANCE);
+    }
+
+    #[test]
     fn side_length_even() {
         let shape = Shaper::<Double, u16>::make(&Polygon::new(4), Default::default());
         let vertices = shape.vertices();
@@ -179,5 +195,21 @@ mod tests {
             unit_neighbour!(vertices, i, i-2);
         }
         unit_neighbour!(vertices, vertices.len()-1, vertices.len()-2);
+    }
+
+    #[test]
+    fn error_total_even() {
+        let shape = Shaper::<Double, u16>::make(&Polygon::new(6), Default::default());
+        let vertices = shape.vertices();
+
+        let mut error = 0.;
+        error += 1. - magnitude_diff(&vertices[1], &vertices[0]);
+        for i in 2..vertices.len() {
+            error += 1. - magnitude_diff(&vertices[i], &vertices[i-2]);
+        }
+        error += 1. - magnitude_diff(&vertices[vertices.len()-1], &vertices[vertices.len()-2]);
+
+        eprintln!("{:?} {:?}", error, TOLERANCE);
+        assert!(error < TOLERANCE);
     }
 }
