@@ -1,4 +1,7 @@
 pub mod shapes;
 pub use shapes::{Shape, Shaper};
-pub mod platonic_solids;
-pub mod polygons;
+pub mod prefab;
+pub use prefab::{
+    polygons,
+    platonic_solids,
+};
