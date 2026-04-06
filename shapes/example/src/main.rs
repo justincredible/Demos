@@ -21,6 +21,7 @@ use raw_window_handle::HasRawWindowHandle;
 
 use simple_targa::read_targa;
 
+use shapes::kepler_poinsot::KpPolyhedron;
 use shapes::polygons::Polygon;
 use shapes::platonic_solids::PlatonicSolid;
 use shapes::Shaper;
@@ -137,6 +138,7 @@ fn main() {
         Shape::new(&display, PlatonicSolid::Octahedron.make(config)),
         Shape::new(&display, PlatonicSolid::Dodecahedron.make(config)),
         Shape::new(&display, PlatonicSolid::Icosahedron.make(config)),
+        Shape::new(&display, KpPolyhedron::StellatedDodecahedron.make(config)),
     ];
 
     let params = glium::DrawParameters {
@@ -178,6 +180,9 @@ fn main() {
                     } else if shape == 4 {
                         // the dodecahedron is rather large
                         0.5
+                    } else if shape == 6 {
+                        // the stellated dodecahedron is even larger
+                        0.4
                     } else {
                         1.0
                     };
@@ -261,6 +266,7 @@ fn main() {
                             shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
                             shape = 5;
                         },
+                        1 | 2 | 3 | 4 | 5 => shape = 6,
                         _ => shape = 0,
                     },
                     KeyEvent {
