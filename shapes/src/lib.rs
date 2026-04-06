@@ -4,4 +4,5 @@ pub mod prefab;
 pub use prefab::{
     polygons,
     platonic_solids,
+    kepler_poinsot,
 };
