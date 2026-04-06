@@ -131,7 +131,7 @@ fn main() {
 
     let mut sides = 3;
     let config = Default::default();
-    let mut shapes = vec![
+    let mut shapes = [
         Shape::new(&display, Polygon::new(sides).make(config)),
         Shape::new(&display, PlatonicSolid::Tetrahedron.make(config)),
         Shape::new(&display, PlatonicSolid::Hexahedron.make(config)),
@@ -266,7 +266,7 @@ fn main() {
                             shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
                             shape = 5;
                         },
-                        1 | 2 | 3 | 4 | 5 => shape = 6,
+                        1 ..= 5 => shape = 6,
                         _ => shape = 0,
                     },
                     KeyEvent {
