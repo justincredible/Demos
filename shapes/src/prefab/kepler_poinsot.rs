@@ -5,6 +5,7 @@ use crate::shapes::{Configuration, Shape, Shaper};
 /// All possible Platonic solids.
 pub enum KpPolyhedron {
     StellatedDodecahedron,
+    GreatDodecahedron,
 }
 
 impl<C, I> Shaper<C, I> for KpPolyhedron
@@ -102,6 +103,65 @@ where
                     i[24], i[14], i[18], i[24], i[18], i[28], i[24], i[28], i[30], i[24], i[30], i[20], i[24], i[20], i[14],
                     i[25], i[15], i[20], i[25], i[20], i[30], i[25], i[30], i[29], i[25], i[29], i[19], i[25], i[19], i[15],
                     i[31], i[26], i[27], i[31], i[27], i[29], i[31], i[29], i[30], i[31], i[30], i[28], i[31], i[28], i[26],
+                ];
+
+                Shape::Triangles { vertices, indices }
+            },
+            Self::GreatDodecahedron => {
+                // Icosahedron
+                let f0 = zero();
+                let f1 = one::<C>();
+                let f2 = cast::<_, C>(2.).unwrap();
+                let f3 = cast::<_, C>(3.).unwrap();
+                let f10 = cast::<_, C>(10.).unwrap();
+                let fh = cast::<_, C>(0.5).unwrap();
+                let fq = cast::<_, C>(0.25).unwrap();
+                let ft = cast::<_, C>(0.1).unwrap();
+                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
+
+                let mid = fq * (f10 + f2 * sr5).sqrt();
+                let top = fq * (f10 - f2 * sr5).sqrt();
+                let width = fq * (f1 + sr5); // phi/2
+                let depth = top + mid;
+                let center = fq * (f2 + sr5) / depth;
+                let radius = fq * (f3 + sr5) / depth;
+
+                let y_diff = (fh - ft * sr5).sqrt();
+                let half_middle = fh * (fh + ft * sr5).sqrt();
+
+                let vertices = vec![
+                    [f0, half_middle + y_diff, f0],
+                    [f0, half_middle, -radius],
+                    [-width, half_middle, -radius + top],
+                    [width, half_middle, -radius + top],
+                    [-fh, half_middle, center],
+                    [fh, half_middle, center],
+                    [-fh, -half_middle, -center],
+                    [fh, -half_middle, -center],
+                    [-width, -half_middle, radius - top],
+                    [width, -half_middle, radius - top],
+                    [f0, -half_middle, radius],
+                    [f0, -half_middle - y_diff, f0],
+                ];
+
+                let i = vec![zero(), one()]
+                    .into_iter()
+                    .chain((2..12).map(|i| cast::<_, I>(i).unwrap()))
+                    .collect::<Vec<_>>();
+
+                let indices = vec![
+                    i[1], i[2], i[3], i[3], i[2], i[4], i[3], i[4], i[5],
+                    i[0], i[3], i[2], i[2], i[3], i[7], i[2], i[7], i[6],
+                    i[0], i[1], i[4], i[4], i[1], i[6], i[4], i[6], i[8],
+                    i[0], i[5], i[1], i[1], i[5], i[9], i[1], i[9], i[7],
+                    i[0], i[2], i[5], i[5], i[2], i[8], i[5], i[8], i[10],
+                    i[0], i[4], i[3], i[3], i[4], i[10], i[3], i[10], i[9],
+                    i[1], i[7], i[2], i[2], i[7], i[11], i[2], i[11], i[8],
+                    i[1], i[3], i[6], i[6], i[3], i[9], i[6], i[9], i[11],
+                    i[2], i[6], i[4], i[4], i[6], i[11], i[4], i[11], i[10],
+                    i[3], i[5], i[7], i[7], i[5], i[10], i[7], i[10], i[11],
+                    i[4], i[8], i[5], i[5], i[8], i[11], i[5], i[11], i[9],
+                    i[6], i[7], i[8], i[8], i[7], i[9], i[8], i[9], i[10],
                 ];
 
                 Shape::Triangles { vertices, indices }
