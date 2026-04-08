@@ -140,6 +140,7 @@ fn main() {
         Shape::new(&display, PlatonicSolid::Icosahedron.make(config)),
         Shape::new(&display, KpPolyhedron::StellatedDodecahedron.make(config)),
         Shape::new(&display, KpPolyhedron::GreatDodecahedron.make(config)),
+        Shape::new(&display, KpPolyhedron::GreatStellatedDodecahedron.make(config)),
     ];
 
     let params = glium::DrawParameters {
@@ -181,8 +182,8 @@ fn main() {
                     } else if shape == 4 {
                         // the dodecahedron is rather large
                         0.5
-                    } else if shape == 6 {
-                        // the stellated dodecahedron is even larger
+                    } else if shape == 6 || shape == 8 {
+                        // the stellated dodecahedrons are even larger
                         0.4
                     } else {
                         1.0
@@ -244,6 +245,7 @@ fn main() {
                         physical_key: Code(KeyCode::ArrowLeft),
                         ..
                     } => match shape {
+                        8 => shape = 7,
                         7 => shape = 6,
                         5 => shape = 3,
                         3 => shape = 1,
@@ -257,6 +259,7 @@ fn main() {
                         1 => shape = 3,
                         3 => shape = 5,
                         6 => shape = 7,
+                        7 => shape = 8,
                         _ => (),
                     },
                     KeyEvent {
