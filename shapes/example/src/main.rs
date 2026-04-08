@@ -141,6 +141,7 @@ fn main() {
         Shape::new(&display, KpPolyhedron::StellatedDodecahedron.make(config)),
         Shape::new(&display, KpPolyhedron::GreatDodecahedron.make(config)),
         Shape::new(&display, KpPolyhedron::GreatStellatedDodecahedron.make(config)),
+        Shape::new(&display, KpPolyhedron::GreatIcosahedron.make(config)),
     ];
 
     let params = glium::DrawParameters {
@@ -245,6 +246,7 @@ fn main() {
                         physical_key: Code(KeyCode::ArrowLeft),
                         ..
                     } => match shape {
+                        9 => shape = 8,
                         8 => shape = 7,
                         7 => shape = 6,
                         5 => shape = 3,
@@ -260,6 +262,7 @@ fn main() {
                         3 => shape = 5,
                         6 => shape = 7,
                         7 => shape = 8,
+                        8 => shape = 9,
                         _ => (),
                     },
                     KeyEvent {
