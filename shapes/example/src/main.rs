@@ -165,7 +165,7 @@ fn main() {
     println!(
         "Up and Down arrows modify vertices per face.\n\
         Left and Right arrows modify faces per vertex.\n\
-        G switches to and from polygons.\n\
+        G switches between polyhedra and polygons.\n\
         R toggles rotation.\n\
         H returns object to initial orientation."
     );
