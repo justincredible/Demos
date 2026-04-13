@@ -1,9 +1,6 @@
 # Shapes
 
-Polygons and the Platonic Solids.
-
-The derivation of vertex positions requires only elementary trigonometry and algebra.
-All angles for the Platonic Solids have simple [exact trigonometric values](https://en.wikipedia.org/wiki/Exact_trigonometric_values).
+Polygons and the Regular Polyhedra.
 
 ## Polygons
 
@@ -25,6 +22,7 @@ A square has $90^\circ$ vertex angles, and the distance between non-adjacent ver
 
 A regular pentagon has $108^\circ$ vertex angles, leading to several facts:
 - the distance between non-adjacent vertices is $\phi = { 1 + \sqrt 5 \over 2 }$
+- the height of this polygon is $h = \sqrt { \phi + { 3 \over 4 } }$
 - the angles adjacent to lengths top and span are $54^\circ$ and $36^\circ$ respectively
 - the angle adjacent to length base is $18^\circ$
 - the height of this polygon is $h = \cos { \pi \over 10 } + \cos { 3\pi \over 10 }$
@@ -109,3 +107,19 @@ The distance betwen these vertices is $z_{inner} = \sqrt { 1 - 4(base - c)^2 }  
 
 The final two vertices are collinear with the center and orthogonal to the circle.
 The distance from the center is $z_{outer} = \sqrt { 1 - r^2 }$
+
+## Kepler-Poinsot Polyhedra
+
+The remaining regular polyhedra.
+
+### (Small) and Great Stellated Dodecahedra
+
+Stellation is accomplished by constructing pyramids from the faces of a dodecahedron or an icosahedron.
+The resulting faces are meant to be intersecting pentagrams, so the heights are fixed for a given edge length.
+Merely extending the edges by the golden ratio determines vertex locations; retaining the original vertices aides rendering.
+
+![quote stellation unquote](doc/pentagram.svg)
+
+### Greats Dodecahedron and Icosahedron
+
+Greatening is accomplished by replacing the faces or edges of an icosahedron. These are simple to render, but have much of their faces hidden.
