@@ -1,0 +1,22 @@
+<svg viewBox="0 0 190 180" width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100%" height="100%" fill="white" />
+    <polygon points="10,69 41,164 141,164 172,69 91,10" fill="none" stroke="black" />
+
+    <line x1="41" y1="164" x2="91" y2="10" stroke="black" />
+    <line x1="141" y1="164" x2="91" y2="10" stroke="black" />
+
+    <text x="91" y="170" font-size="5" >1</text>
+
+    <!-- phi -->
+    <path d="M 52.5 112 C 50 115 56 114 54.5 112.5 S 53 113 53 115.5" stroke="black" fill="none" stroke-width="0.4" />
+
+    <path d="M 51 164 A 10 10 0 0 0 44 154" stroke="black" fill="none" stroke-width="0.5" />
+
+    <!-- pi -->
+    <path d="M 54.5 153 C 56.5 152.5 56.5 153 56.5 153 S 57.5 153 57 152.5
+            M 56 152.8 C 55 152.5 55.8 154 54.5 155
+            M 56.3 152.8 C 56.5 153 55 156 57 154.5" stroke="black" fill="none" stroke-width="0.3" />
+    <text x="52" y="155" font-size="5" >2</text>
+    <text x="52" y="155" font-size="5" >__</text>
+    <text x="53" y="160" font-size="5" >5</text>
+</svg>
