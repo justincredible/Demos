@@ -1,26 +1,27 @@
-<svg viewBox="-60 -60 225 225" xmlns="http://www.w3.org/2000/svg">
-    <polygon points="0,87 100,87 50,0" fill="none" stroke="black" />
+<svg viewBox="0 0 120 115" width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100%" height="100%" fill="white" />
+    <polygon points="10,97 110,97 60,10" fill="none" stroke="black" />
 
-    <line x1="50" y1="87" x2="50" y2="0" stroke="black" stroke-dasharray="2" />
+    <line x1="60" y1="97" x2="60" y2="10" stroke="black" stroke-dasharray="2" />
 
     <!-- sqrt -->
-    <polyline points="53,49 53.5,48 54,50 55,46 57,46" fill="none" stroke="black" stroke-width="0.3" />
-    <text x="55" y="50" font-size="5" >3</text>
-    <text x="55" y="50" font-size="5" >_</text>
-    <text x="55" y="55" font-size="5" >2</text>
+    <polyline points="63,59 63.5,58 64,60 65,56 67,56" fill="none" stroke="black" stroke-width="0.3" />
+    <text x="65" y="60" font-size="5" >3</text>
+    <text x="65" y="60" font-size="5" >_</text>
+    <text x="65" y="65" font-size="5" >2</text>
 
-    <text x="20" y="43" font-size="5" >1</text>
+    <text x="30" y="53" font-size="5" >1</text>
 
-    <text x="25" y="93" font-size="5" >1</text>
-    <text x="25" y="93" font-size="5" >_</text>
-    <text x="25" y="98" font-size="5" >2</text>
+    <text x="35" y="103" font-size="5" >1</text>
+    <text x="35" y="103" font-size="5" >_</text>
+    <text x="35" y="108" font-size="5" >2</text>
 
-    <path d="M10 87 A10 10 0 0 0 5 78" stroke="black" fill="none" stroke-width="0.5" />
+    <path d="M20 97 A10 10 0 0 0 15 88" stroke="black" fill="none" stroke-width="0.5" />
 
     <!-- pi -->
-    <path d="M11 77 C12 76.5 13 77 13 77 S14 77 13.5 76.5
-            M12.5 76.8 C11.5 76.5 12.3 78 11 79
-            M12.8 76.8 C13 77 11.5 80 13.5 78.5" stroke="black" fill="none" stroke-width="0.3" />
-    <text x="11" y="79" font-size="5" >_</text>
-    <text x="11" y="84" font-size="5" >3</text>
+    <path d="M21 87 C22 86.5 23 87 23 87 S24 87 23.5 86.5
+            M22.5 86.8 C21.5 86.5 22.3 88 21 89
+            M22.8 86.8 C23 87 21.5 90 23.5 88.5" stroke="black" fill="none" stroke-width="0.3" />
+    <text x="21" y="89" font-size="5" >_</text>
+    <text x="21" y="94" font-size="5" >3</text>
 </svg>

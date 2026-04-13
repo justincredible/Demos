@@ -1,16 +1,17 @@
-<svg viewBox="-125 -125 400 400" xmlns="http://www.w3.org/2000/svg">
-    <polygon points="0,59 31,154 131,154 162,59 81,0" fill="none" stroke="black" />
+<svg viewBox="0 0 290 295" width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100%" height="100%" fill="white" />
+    <polygon points="63,122 94,217 194,217 225,122 144,63" fill="none" stroke="black" />
 
-    <polygon points="81,0 81,-53 0,-26 -50,42 0,59
-                    -50,42 -50,128 0,196 31,154
-                    0,196 81,223 162,196 131,154
-                    162,196 212,128 212,42 162,59
-                    212,42 162,-26 81,-53" fill="none" stroke="black" />
+    <polygon points="144,63 144,10 63,37 13,105 63,122
+                    13,105 13,191 63,259 94,217
+                    63,259 144,286 225,259 194,217
+                    225,259 275,191 275,105 225,122
+                    275,105 225,37 144,10" fill="none" stroke="black" />
 
-    <polygon points="81,-53 -50,42 0,196 162,196 212,42" stroke="black" fill="none" stroke-dasharray="2" />
+    <polygon points="144,10 13,105 63,259 225,259 275,105" stroke="black" fill="none" stroke-dasharray="2" />
 
     <!-- phi -->
-    <path d="M 150 -15 C 143 -9 157 -11 154 -14 S 151 -13 151 -8 " stroke="black" fill="none" stroke-width="0.8" />
+    <path d="M 213 48 C 206 54 220 52 217 49 S 214 50 214 55" stroke="black" fill="none" stroke-width="0.8" />
 
-    <text x="125" y="28" font-size="10" >1</text>
+    <text x="188" y="91" font-size="10" >1</text>
 </svg>

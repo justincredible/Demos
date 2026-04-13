@@ -13,13 +13,13 @@ Regular polygons with unit length. The faces of the polyhedra.
 
 An equilateral triangle has $60^\circ$ vertex angles, so the height is $h = { \sqrt 3 \over 2 }$
 
-<img src="https://github.com/justincredible/Demos/assets/3183562/d1da94a8-8314-47f0-81cb-6e5ae63ed4a2" height="200" width="200" >
+![equilateral triangle](doc/triangle.svg)
 
 ### Tetragon
 
 A square has $90^\circ$ vertex angles, and the distance between non-adjacent vertices is $\sqrt 2$
 
-<img src="https://github.com/justincredible/Demos/assets/3183562/375048da-4714-43d7-9a2f-d6b0cd5bacbe" height="200" width="200" >
+![square](doc/square.svg)
 
 ### Pentagon
 
@@ -29,7 +29,7 @@ A regular pentagon has $108^\circ$ vertex angles, leading to several facts:
 - the angle adjacent to length base is $18^\circ$
 - the height of this polygon is $h = \cos { \pi \over 10 } + \cos { 3\pi \over 10 }$
 
-<img src="https://github.com/justincredible/Demos/assets/3183562/85945636-84f9-492e-84a6-d25b501313a6" height="200" width="200" >
+![regular pentagon](doc/pentagon.svg)
 
 ### Circumscribing circle
 
@@ -45,7 +45,7 @@ radius $r = { h \over 2 } + { 1 \over 8h }$
 
 The vertices are centred by subtracting $c$
 
-<img src="https://github.com/justincredible/Demos/assets/3183562/1bed5bcd-f34e-4ece-84be-e254bfde83dd" height="200" width="200" >
+![circumscribed pentagons](doc/circle.svg)
 
 Also notice how a face can be reflected in the circumcircle.
 
@@ -85,7 +85,7 @@ and the two remaining vertices have a distance of $1 \over \sqrt 2$ from the squ
 The first five relative positions are known from the pentagon,
 and from the diagram below we see a conceptual pentagon with side length $\phi$
 
-<img src="https://github.com/justincredible/Demos/assets/3183562/0707ca75-8411-44eb-8480-94ffb8576a9b" height="200" width="200" >
+![dodecahedron](doc/dodecahedron.svg)
 
 Positioning this larger pentagon similarly shows the next five vertices have x- and y-coordinates $\phi$ times larger than the first five.
 The distance between the first two sets of vertices, $z_{outer}$,
