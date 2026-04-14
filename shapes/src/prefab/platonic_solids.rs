@@ -136,7 +136,6 @@ where
                 let fe = cast::<_, C>(0.125).unwrap();
                 let ft = cast::<_, C>(0.1).unwrap();
                 let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-                let phi = fh * (f1 + sr5);
 
                 let mid = fq * (f10 + f2 * sr5).sqrt();
                 let top = fq * (f10 - f2 * sr5).sqrt();
@@ -146,9 +145,7 @@ where
                 let circle_radius = fq * (f3 + sr5) / height;
                 let centred_mid = fe * (f1 + sr5) / height;
                 let phi_width = fq * (f3 + sr5);
-                // we use the less accurate (phi * circle_offset)
-                // to offset some accumulated error in the tests
-                let _phi_offset = fe * (f7 + f3 * sr5) / height;
+                let phi_offset = fe * (f7 + f3 * sr5) / height;
                 let phi_radius = fh * (f2 + sr5) / height; // 2 * circle_offset
                 let phi_mid = fe * (f3 + sr5) / height; // circle_radius / 2
 
@@ -163,10 +160,10 @@ where
                     [f0, phi_radius, half_iz],
                     [-phi_width, phi_mid, half_iz],
                     [phi_width, phi_mid, half_iz],
-                    [-width, -phi * circle_offset, half_iz],
-                    [width, -phi * circle_offset, half_iz],
-                    [-width, phi * circle_offset, -half_iz],
-                    [width, phi * circle_offset, -half_iz],
+                    [-width, -phi_offset, half_iz],
+                    [width, -phi_offset, half_iz],
+                    [-width, phi_offset, -half_iz],
+                    [width, phi_offset, -half_iz],
                     [-phi_width, -phi_mid, -half_iz],
                     [phi_width, -phi_mid, -half_iz],
                     [f0, -phi_radius, -half_iz],
