@@ -129,18 +129,16 @@ where
                 let f1 = one::<C>();
                 let f2 = cast::<_, C>(2.).unwrap();
                 let f3 = cast::<_, C>(3.).unwrap();
+                let f5 = cast::<_, C>(5.).unwrap();
                 let f7 = cast::<_, C>(7.).unwrap();
-                let f10 = cast::<_, C>(10.).unwrap();
                 let fh = cast::<_, C>(0.5).unwrap();
                 let fq = cast::<_, C>(0.25).unwrap();
                 let fe = cast::<_, C>(0.125).unwrap();
                 let ft = cast::<_, C>(0.1).unwrap();
                 let sr5 = cast::<_, C>(5.).unwrap().sqrt();
 
-                let mid = fq * (f10 + f2 * sr5).sqrt();
-                let top = fq * (f10 - f2 * sr5).sqrt();
                 let width = fq * (f1 + sr5); // phi/2
-                let height = top + mid;
+                let height = fh * (f5 + f2 * sr5).sqrt();
                 let circle_offset = fq * (f2 + sr5) / height;
                 let circle_radius = fq * (f3 + sr5) / height;
                 let centred_mid = fe * (f1 + sr5) / height;
