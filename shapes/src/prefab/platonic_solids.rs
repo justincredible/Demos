@@ -127,45 +127,31 @@ where
             Self::Dodecahedron => {
                 let f0 = zero();
                 let fh = cast::<_, C>(0.5).unwrap();
-                let f1 = one::<C>();
-                let f2 = cast::<_, C>(2.).unwrap();
-                let f3 = cast::<_, C>(3.).unwrap();
-                let f10 = cast::<_, C>(10.).unwrap();
-                let f22 = cast::<_, C>(22.).unwrap();
-                let fq = cast::<_, C>(0.25).unwrap();
-                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-
-                let width = fq * (f1 + sr5); // phi/2
-                let circle_offset = fh * (f1 + f2 / sr5).sqrt();
-                let circle_radius = fh * (f2 + f2 / sr5).sqrt();
-                let centred_mid = fq * (f2 - f2 / sr5).sqrt();
-                let phi_width = fq * (f3 + sr5);
-                let phi_offset = fq * (f10 + f22 / sr5).sqrt();
-                let phi_radius = (f1 + f2 / sr5).sqrt(); // 2 * circle_offset
-                let phi_mid = fq * (f2 + f2 / sr5).sqrt(); // circle_radius / 2
-                let half_iz = fh * (fh - sr5 / f10).sqrt();
+                let pent = Pentagonal::new(Edge::Unit);
+                let agon = Pentagonal::new(Edge::Phi);
+                let half_iz = fh * pent.axis.0;
 
                 let vertices = vec![
-                    [f0, circle_radius, circle_radius + half_iz],
-                    [-width, centred_mid, circle_radius + half_iz],
-                    [width, centred_mid, circle_radius + half_iz],
-                    [-fh, -circle_offset, circle_radius + half_iz],
-                    [fh, -circle_offset, circle_radius + half_iz],
-                    [f0, phi_radius, half_iz],
-                    [-phi_width, phi_mid, half_iz],
-                    [phi_width, phi_mid, half_iz],
-                    [-width, -phi_offset, half_iz],
-                    [width, -phi_offset, half_iz],
-                    [-width, phi_offset, -half_iz],
-                    [width, phi_offset, -half_iz],
-                    [-phi_width, -phi_mid, -half_iz],
-                    [phi_width, -phi_mid, -half_iz],
-                    [f0, -phi_radius, -half_iz],
-                    [-fh, circle_offset, -circle_radius - half_iz],
-                    [fh, circle_offset, -circle_radius - half_iz],
-                    [-width, -centred_mid, -circle_radius - half_iz],
-                    [width, -centred_mid, -circle_radius - half_iz],
-                    [f0, -circle_radius, -circle_radius - half_iz],
+                    [f0, pent.radius, pent.radius + half_iz],
+                    [-pent.width, pent.middle, pent.radius + half_iz],
+                    [pent.width, pent.middle, pent.radius + half_iz],
+                    [-fh, -pent.center, pent.radius + half_iz],
+                    [fh, -pent.center, pent.radius + half_iz],
+                    [f0, agon.radius, half_iz],
+                    [-agon.width, agon.middle, half_iz],
+                    [agon.width, agon.middle, half_iz],
+                    [-pent.width, -agon.center, half_iz],
+                    [pent.width, -agon.center, half_iz],
+                    [-pent.width, agon.center, -half_iz],
+                    [pent.width, agon.center, -half_iz],
+                    [-agon.width, -agon.middle, -half_iz],
+                    [agon.width, -agon.middle, -half_iz],
+                    [f0, -agon.radius, -half_iz],
+                    [-fh, pent.center, -pent.radius - half_iz],
+                    [fh, pent.center, -pent.radius - half_iz],
+                    [-pent.width, -pent.middle, -pent.radius - half_iz],
+                    [pent.width, -pent.middle, -pent.radius - half_iz],
+                    [f0, -pent.radius, -pent.radius - half_iz],
                 ];
 
                 let i = vec![zero(), one()]
@@ -203,32 +189,23 @@ where
             },
             Self::Icosahedron => {
                 let f0 = zero();
-                let f1 = one::<C>();
-                let f2 = cast::<_, C>(2.).unwrap();
-                let f10 = cast::<_, C>(10.).unwrap();
                 let fh = cast::<_, C>(0.5).unwrap();
-                let fq = cast::<_, C>(0.25).unwrap();
-                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-
-                let width = fq * (f1 + sr5); // phi/2
-                let center = fh * (f1 + f2 / sr5).sqrt();
-                let radius = fh * (f2 + f2 / sr5).sqrt();
-                let mid = fq * (f2 - f2 / sr5).sqrt();
-                let y_diff = (fh - sr5 / f10).sqrt();
-                let half_middle = fh * (fh + sr5 / f10).sqrt();
+                let pent = Pentagonal::new(Edge::Unit);
+                let y_diff = pent.axis.0;
+                let half_middle = fh * pent.axis.1;
 
                 let vertices = vec![
                     [f0, half_middle + y_diff, f0],
-                    [f0, half_middle, -radius],
-                    [-width, half_middle, -mid],
-                    [width, half_middle, -mid],
-                    [-fh, half_middle, center],
-                    [fh, half_middle, center],
-                    [-fh, -half_middle, -center],
-                    [fh, -half_middle, -center],
-                    [-width, -half_middle, mid],
-                    [width, -half_middle, mid],
-                    [f0, -half_middle, radius],
+                    [f0, half_middle, -pent.radius],
+                    [-pent.width, half_middle, -pent.middle],
+                    [pent.width, half_middle, -pent.middle],
+                    [-fh, half_middle, pent.center],
+                    [fh, half_middle, pent.center],
+                    [-fh, -half_middle, -pent.center],
+                    [fh, -half_middle, -pent.center],
+                    [-pent.width, -half_middle, pent.middle],
+                    [pent.width, -half_middle, pent.middle],
+                    [f0, -half_middle, pent.radius],
                     [f0, -half_middle - y_diff, f0],
                 ];
 
@@ -263,6 +240,62 @@ where
                 }
             },
         }
+    }
+}
+
+use num_traits;
+enum Edge {
+    Unit,
+    Phi,
+}
+
+struct Pentagonal<C>
+where
+    C: Float + FloatConst,
+{
+    width: C,
+    center: C,
+    radius: C,
+    middle: C,
+    axis: (C, C)
+}
+
+impl<C> Pentagonal<C>
+where
+    C: Float + FloatConst,
+{
+    fn new(edge: Edge) -> Self {
+        let fh = cast::<_, C>(0.5).unwrap();
+        let f1 = one::<C>();
+        let f2 = cast::<_, C>(2.).unwrap();
+        let f10 = cast::<_, C>(10.).unwrap();
+        let fq = cast::<_, C>(0.25).unwrap();
+        let sr5 = cast::<_, C>(5.).unwrap().sqrt();
+
+        let (width, center, radius, middle) = match edge {
+            Edge::Unit => (
+                fq * (f1 + sr5), // phi/2
+                fh * (f1 + f2 / sr5).sqrt(),
+                fh * (f2 + f2 / sr5).sqrt(),
+                fq * (f2 - f2 / sr5).sqrt(),
+            ),
+            Edge::Phi => {
+                let f3 = cast::<_, C>(3.).unwrap();
+                let f10 = cast::<_, C>(10.).unwrap();
+                let f22 = cast::<_, C>(22.).unwrap();
+                let fq = cast::<_, C>(0.25).unwrap();
+
+                (
+                    fq * (f3 + sr5),
+                    fq * (f10 + f22 / sr5).sqrt(),
+                    (f1 + f2 / sr5).sqrt(), // 2 * unit.center
+                    fq * (f2 + f2 / sr5).sqrt(), // unit.radius / 2
+                )
+            },
+        };
+        let axis = ((fh - sr5 / f10).sqrt(), (fh + sr5 / f10).sqrt());
+
+        Pentagonal { width, center, radius, middle, axis }
     }
 }
 
