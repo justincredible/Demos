@@ -126,26 +126,24 @@ where
             },
             Self::Dodecahedron => {
                 let f0 = zero();
+                let fh = cast::<_, C>(0.5).unwrap();
                 let f1 = one::<C>();
                 let f2 = cast::<_, C>(2.).unwrap();
                 let f3 = cast::<_, C>(3.).unwrap();
-                let f7 = cast::<_, C>(7.).unwrap();
-                let fh = cast::<_, C>(0.5).unwrap();
+                let f10 = cast::<_, C>(10.).unwrap();
+                let f22 = cast::<_, C>(22.).unwrap();
                 let fq = cast::<_, C>(0.25).unwrap();
-                let ft = cast::<_, C>(0.1).unwrap();
                 let sr5 = cast::<_, C>(5.).unwrap().sqrt();
 
                 let width = fq * (f1 + sr5); // phi/2
-                let srh = (f1 - f2/sr5).sqrt(); // semi reciprocal height
-                let circle_offset = fh * (f2 + sr5) * srh;
-                let circle_radius = fh * (f3 + sr5) * srh;
-                let centred_mid = fq * (f1 + sr5) * srh;
+                let circle_offset = fh * (f1 + f2 / sr5).sqrt();
+                let circle_radius = fh * (f2 + f2 / sr5).sqrt();
+                let centred_mid = fq * (f2 - f2 / sr5).sqrt();
                 let phi_width = fq * (f3 + sr5);
-                let phi_offset = fq * (f7 + f3 * sr5) * srh;
-                let phi_radius = (f2 + sr5) * srh; // 2 * circle_offset
-                let phi_mid = fq * (f3 + sr5) * srh; // circle_radius / 2
-
-                let half_iz = fh * (fh - ft * sr5).sqrt();
+                let phi_offset = fq * (f10 + f22 / sr5).sqrt();
+                let phi_radius = (f1 + f2 / sr5).sqrt(); // 2 * circle_offset
+                let phi_mid = fq * (f2 + f2 / sr5).sqrt(); // circle_radius / 2
+                let half_iz = fh * (fh - sr5 / f10).sqrt();
 
                 let vertices = vec![
                     [f0, circle_radius, circle_radius + half_iz],
