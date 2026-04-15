@@ -110,7 +110,7 @@ The distance from the center is $z_{outer} = \sqrt { 1 - r^2 }$
 
 ## Kepler-Poinsot Polyhedra
 
-The remaining regular polyhedra.
+Finite regular nonconvex polyhedra.
 
 ### (Small) and Great Stellated Dodecahedra
 
