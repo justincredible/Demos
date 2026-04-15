@@ -17,6 +17,6 @@
             M 56 152.8 C 55 152.5 55.8 154 54.5 155
             M 56.3 152.8 C 56.5 153 55 156 57 154.5" stroke="black" fill="none" stroke-width="0.3" />
     <text x="52" y="155" font-size="5" >2</text>
-    <text x="52" y="155" font-size="5" >__</text>
+    <text x="52" y="154.5" font-size="5" >__</text>
     <text x="53" y="160" font-size="5" >5</text>
 </svg>

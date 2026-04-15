@@ -22,10 +22,8 @@ A square has $90^\circ$ vertex angles, and the distance between non-adjacent ver
 
 A regular pentagon has $108^\circ$ vertex angles, leading to several facts:
 - the distance between non-adjacent vertices is $\phi = { 1 + \sqrt 5 \over 2 }$
+- lines connecting non-adjacent vertices trisect the angle
 - the height of this polygon is $h = \sqrt { \phi + { 3 \over 4 } }$
-- the angles adjacent to lengths top and span are $54^\circ$ and $36^\circ$ respectively
-- the angle adjacent to length base is $18^\circ$
-- the height of this polygon is $h = \cos { \pi \over 10 } + \cos { 3\pi \over 10 }$
 
 ![regular pentagon](doc/pentagon.svg)
 
