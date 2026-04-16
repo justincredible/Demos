@@ -155,7 +155,7 @@ mod tests {
 
     #[test]
     fn side_length_odd() {
-        let shape = Shaper::<Double, u16>::make(&Polygon::new(5), Default::default());
+        let shape = Shaper::<Double, u16>::make(&Polygon::new(11), Default::default());
         let vertices = shape.vertices();
 
         unit_neighbour(vertices, 1, 0);
@@ -167,7 +167,7 @@ mod tests {
 
     #[test]
     fn error_total_odd() {
-        let shape = Shaper::<Double, u16>::make(&Polygon::new(7), Default::default());
+        let shape = Shaper::<Double, u16>::make(&Polygon::new(32773), Default::default());
         let vertices = shape.vertices();
 
         let mut error = 0.;
@@ -177,13 +177,12 @@ mod tests {
         }
         error += 1. - magnitude_diff(vertices[vertices.len()-1], vertices[vertices.len()-2]);
 
-        eprintln!("{:?} {:?}", error, TOLERANCE);
-        assert!(error < TOLERANCE);
+        assert!(error <= TOLERANCE);
     }
 
     #[test]
     fn side_length_even() {
-        let shape = Shaper::<Double, u16>::make(&Polygon::new(4), Default::default());
+        let shape = Shaper::<Double, u16>::make(&Polygon::new(14), Default::default());
         let vertices = shape.vertices();
 
         unit_neighbour(vertices, 1, 0);
@@ -195,7 +194,7 @@ mod tests {
 
     #[test]
     fn error_total_even() {
-        let shape = Shaper::<Double, u16>::make(&Polygon::new(6), Default::default());
+        let shape = Shaper::<Double, u16>::make(&Polygon::new(32768), Default::default());
         let vertices = shape.vertices();
 
         let mut error = 0.;
@@ -205,7 +204,6 @@ mod tests {
         }
         error += 1. - magnitude_diff(vertices[vertices.len()-1], vertices[vertices.len()-2]);
 
-        eprintln!("{:?} {:?}", error, TOLERANCE);
-        assert!(error < TOLERANCE);
+        assert!(error <= TOLERANCE);
     }
 }
