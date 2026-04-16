@@ -102,7 +102,7 @@ mod tests {
 
     const TOLERANCE: Double = 2. * Double::EPSILON;
 
-    fn magnitude_diff(a: &[Double; 3], b: &[Double; 3]) -> Double {
+    fn magnitude_diff(a: [Double; 3], b: [Double; 3]) -> Double {
         let x = a[0] - b[0];
         let y = a[1] - b[1];
         let z = a[2] - b[2];
@@ -110,13 +110,9 @@ mod tests {
         (x * x + y * y + z * z).sqrt()
     }
 
-    macro_rules! unit_neighbour {
-        ($vertices:expr, $a:expr, $b:expr) => {
-            let difference_length =
-                magnitude_diff(&$vertices[$a], &$vertices[$b]);
-
-            assert!(Double::abs(1.0 - difference_length) <= TOLERANCE);
-        };
+    #[inline]
+    fn unit_neighbour(vertices: &Vec<[Double; 3]>, i: usize, j: usize) {
+        assert!(Double::abs(1.0 - magnitude_diff(vertices[i], vertices[j])) <= TOLERANCE);
     }
 
     #[test]
@@ -162,11 +158,11 @@ mod tests {
         let shape = Shaper::<Double, u16>::make(&Polygon::new(5), Default::default());
         let vertices = shape.vertices();
 
-        unit_neighbour!(vertices, 1, 0);
+        unit_neighbour(vertices, 1, 0);
         for i in 2..vertices.len() {
-            unit_neighbour!(vertices, i, i-2);
+            unit_neighbour(vertices, i, i-2);
         }
-        unit_neighbour!(vertices, vertices.len()-1, vertices.len()-2);
+        unit_neighbour(vertices, vertices.len()-1, vertices.len()-2);
     }
 
     #[test]
@@ -175,11 +171,11 @@ mod tests {
         let vertices = shape.vertices();
 
         let mut error = 0.;
-        error += 1. - magnitude_diff(&vertices[1], &vertices[0]);
+        error += 1. - magnitude_diff(vertices[1], vertices[0]);
         for i in 2..vertices.len() {
-            error += 1. - magnitude_diff(&vertices[i], &vertices[i-2]);
+            error += 1. - magnitude_diff(vertices[i], vertices[i-2]);
         }
-        error += 1. - magnitude_diff(&vertices[vertices.len()-1], &vertices[vertices.len()-2]);
+        error += 1. - magnitude_diff(vertices[vertices.len()-1], vertices[vertices.len()-2]);
 
         eprintln!("{:?} {:?}", error, TOLERANCE);
         assert!(error < TOLERANCE);
@@ -190,11 +186,11 @@ mod tests {
         let shape = Shaper::<Double, u16>::make(&Polygon::new(4), Default::default());
         let vertices = shape.vertices();
 
-        unit_neighbour!(vertices, 1, 0);
+        unit_neighbour(vertices, 1, 0);
         for i in 2..vertices.len() {
-            unit_neighbour!(vertices, i, i-2);
+            unit_neighbour(vertices, i, i-2);
         }
-        unit_neighbour!(vertices, vertices.len()-1, vertices.len()-2);
+        unit_neighbour(vertices, vertices.len()-1, vertices.len()-2);
     }
 
     #[test]
@@ -203,11 +199,11 @@ mod tests {
         let vertices = shape.vertices();
 
         let mut error = 0.;
-        error += 1. - magnitude_diff(&vertices[1], &vertices[0]);
+        error += 1. - magnitude_diff(vertices[1], vertices[0]);
         for i in 2..vertices.len() {
-            error += 1. - magnitude_diff(&vertices[i], &vertices[i-2]);
+            error += 1. - magnitude_diff(vertices[i], vertices[i-2]);
         }
-        error += 1. - magnitude_diff(&vertices[vertices.len()-1], &vertices[vertices.len()-2]);
+        error += 1. - magnitude_diff(vertices[vertices.len()-1], vertices[vertices.len()-2]);
 
         eprintln!("{:?} {:?}", error, TOLERANCE);
         assert!(error < TOLERANCE);

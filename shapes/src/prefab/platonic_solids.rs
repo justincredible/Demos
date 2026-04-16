@@ -301,210 +301,200 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{PlatonicSolid, Shaper};
+    use super::{PlatonicSolid, Shape, Shaper};
 
     type Double = f64;
 
     const TOLERANCE: Double = 2. * Double::EPSILON;
 
-    fn magnitude_squared(vertex: &[Double; 3]) -> Double {
+    fn magnitude_squared(vertex: [Double; 3]) -> Double {
         vertex[0] * vertex[0] + vertex[1] * vertex[1] + vertex[2] * vertex[2]
     }
 
-    fn magnitude_squared_diff(a: &[Double; 3], b: &[Double; 3]) -> Double {
+    fn magnitude_diff(a: [Double; 3], b: [Double; 3]) -> Double {
         let x = a[0] - b[0];
         let y = a[1] - b[1];
         let z = a[2] - b[2];
 
-        x * x + y * y + z * z
+        (x * x + y * y + z * z).sqrt()
     }
 
-    macro_rules! uniform_distance {
-        ($polyhedron:ident) => {
-            let shape = Shaper::<Double, u8>::make(
-                &PlatonicSolid::$polyhedron,
-                Default::default(),
-            );
-
-            let r_squared = magnitude_squared(&shape.vertices()[0]);
-
-            for vertex in shape.vertices() {
-                assert!(Double::abs(r_squared - magnitude_squared(vertex)) <= TOLERANCE);
-            }
-        };
+    fn make_shape(solid: PlatonicSolid) -> Shape<Double, u8> {
+        solid.make(Default::default())
     }
 
-    macro_rules! unit_neighbour {
-        ($vertices:expr, $a:expr, $b:expr) => {
-            let difference_length =
-                magnitude_squared_diff(&$vertices[$a], &$vertices[$b]);
-
-            assert!(Double::abs(1.0 - difference_length) <= TOLERANCE);
-        };
+    #[inline]
+    fn unit_neighbour(vertices: &Vec<[Double; 3]>, i: usize, j: usize) {
+        assert!(Double::abs(1.0 - magnitude_diff(vertices[i], vertices[j])) <= TOLERANCE);
     }
 
     #[test]
     fn tetrahedron_centered() {
-        uniform_distance!(Tetrahedron);
+        let shape = make_shape(PlatonicSolid::Tetrahedron);
+
+        for vertex in shape.vertices() {
+            assert!(Double::abs(magnitude_squared(shape.vertices()[0]) - magnitude_squared(*vertex)) <= TOLERANCE);
+        }
     }
 
     #[test]
     fn tetrahedron_edges() {
-        let shape = Shaper::<Double, u8>::make(
-            &PlatonicSolid::Tetrahedron,
-            Default::default(),
-        );
+        let shape = make_shape(PlatonicSolid::Tetrahedron);
         let vertices = shape.vertices();
 
-        unit_neighbour!(vertices, 0, 1);
-        unit_neighbour!(vertices, 0, 2);
-        unit_neighbour!(vertices, 0, 3);
-        unit_neighbour!(vertices, 1, 2);
-        unit_neighbour!(vertices, 1, 3);
-        unit_neighbour!(vertices, 2, 3);
+        unit_neighbour(vertices, 0, 1);
+        unit_neighbour(vertices, 0, 2);
+        unit_neighbour(vertices, 0, 3);
+        unit_neighbour(vertices, 1, 2);
+        unit_neighbour(vertices, 1, 3);
+        unit_neighbour(vertices, 2, 3);
     }
 
     #[test]
     fn hexahedron_centered() {
-        uniform_distance!(Hexahedron);
+        let shape = make_shape(PlatonicSolid::Hexahedron);
+
+        for vertex in shape.vertices() {
+            assert!(Double::abs(magnitude_squared(shape.vertices()[0]) - magnitude_squared(*vertex)) <= TOLERANCE);
+        }
     }
 
     #[test]
     fn hexahedron_edges() {
-        let shape = Shaper::<Double, u8>::make(
-            &PlatonicSolid::Hexahedron,
-            Default::default(),
-        );
+        let shape = make_shape(PlatonicSolid::Hexahedron);
         let vertices = shape.vertices();
 
-        unit_neighbour!(vertices, 0, 1);
-        unit_neighbour!(vertices, 0, 2);
-        unit_neighbour!(vertices, 0, 4);
-        unit_neighbour!(vertices, 1, 3);
-        unit_neighbour!(vertices, 1, 5);
-        unit_neighbour!(vertices, 2, 3);
-        unit_neighbour!(vertices, 2, 6);
-        unit_neighbour!(vertices, 3, 7);
-        unit_neighbour!(vertices, 4, 5);
-        unit_neighbour!(vertices, 4, 6);
-        unit_neighbour!(vertices, 5, 7);
-        unit_neighbour!(vertices, 6, 7);
+        unit_neighbour(vertices, 0, 1);
+        unit_neighbour(vertices, 0, 2);
+        unit_neighbour(vertices, 0, 4);
+        unit_neighbour(vertices, 1, 3);
+        unit_neighbour(vertices, 1, 5);
+        unit_neighbour(vertices, 2, 3);
+        unit_neighbour(vertices, 2, 6);
+        unit_neighbour(vertices, 3, 7);
+        unit_neighbour(vertices, 4, 5);
+        unit_neighbour(vertices, 4, 6);
+        unit_neighbour(vertices, 5, 7);
+        unit_neighbour(vertices, 6, 7);
     }
 
     #[test]
     fn octahedron_centered() {
-        uniform_distance!(Octahedron);
+        let shape = make_shape(PlatonicSolid::Octahedron);
+
+        for vertex in shape.vertices() {
+            assert!(Double::abs(magnitude_squared(shape.vertices()[0]) - magnitude_squared(*vertex)) <= TOLERANCE);
+        }
     }
 
     #[test]
     fn octahedron_edges() {
-        let shape = Shaper::<Double, u8>::make(
-            &PlatonicSolid::Octahedron,
-            Default::default(),
-        );
+        let shape = make_shape(PlatonicSolid::Octahedron);
         let vertices = shape.vertices();
 
-        unit_neighbour!(vertices, 0, 1);
-        unit_neighbour!(vertices, 0, 2);
-        unit_neighbour!(vertices, 0, 3);
-        unit_neighbour!(vertices, 0, 4);
-        unit_neighbour!(vertices, 1, 2);
-        unit_neighbour!(vertices, 1, 4);
-        unit_neighbour!(vertices, 1, 5);
-        unit_neighbour!(vertices, 2, 3);
-        unit_neighbour!(vertices, 2, 5);
-        unit_neighbour!(vertices, 3, 4);
-        unit_neighbour!(vertices, 3, 5);
-        unit_neighbour!(vertices, 4, 5);
+        unit_neighbour(vertices, 0, 1);
+        unit_neighbour(vertices, 0, 2);
+        unit_neighbour(vertices, 0, 3);
+        unit_neighbour(vertices, 0, 4);
+        unit_neighbour(vertices, 1, 2);
+        unit_neighbour(vertices, 1, 4);
+        unit_neighbour(vertices, 1, 5);
+        unit_neighbour(vertices, 2, 3);
+        unit_neighbour(vertices, 2, 5);
+        unit_neighbour(vertices, 3, 4);
+        unit_neighbour(vertices, 3, 5);
+        unit_neighbour(vertices, 4, 5);
     }
 
     #[test]
     fn dodecahedron_centered() {
-        uniform_distance!(Dodecahedron);
+        let shape = make_shape(PlatonicSolid::Dodecahedron);
+
+        for vertex in shape.vertices() {
+            assert!(Double::abs(magnitude_squared(shape.vertices()[0]) - magnitude_squared(*vertex)) <= TOLERANCE);
+        }
     }
 
     #[test]
     fn dodecahedron_edges() {
-        let shape = Shaper::<Double, u8>::make(
-            &PlatonicSolid::Dodecahedron,
-            Default::default(),
-        );
+        let shape = make_shape(PlatonicSolid::Dodecahedron);
         let vertices = shape.vertices();
 
-        unit_neighbour!(vertices, 0, 1);
-        unit_neighbour!(vertices, 0, 2);
-        unit_neighbour!(vertices, 0, 5);
-        unit_neighbour!(vertices, 1, 3);
-        unit_neighbour!(vertices, 1, 6);
-        unit_neighbour!(vertices, 2, 4);
-        unit_neighbour!(vertices, 2, 7);
-        unit_neighbour!(vertices, 3, 4);
-        unit_neighbour!(vertices, 3, 8);
-        unit_neighbour!(vertices, 4, 9);
-        unit_neighbour!(vertices, 5, 10);
-        unit_neighbour!(vertices, 5, 11);
-        unit_neighbour!(vertices, 6, 10);
-        unit_neighbour!(vertices, 6, 12);
-        unit_neighbour!(vertices, 7, 11);
-        unit_neighbour!(vertices, 7, 13);
-        unit_neighbour!(vertices, 8, 12);
-        unit_neighbour!(vertices, 8, 14);
-        unit_neighbour!(vertices, 9, 13);
-        unit_neighbour!(vertices, 9, 14);
-        unit_neighbour!(vertices, 10, 15);
-        unit_neighbour!(vertices, 11, 16);
-        unit_neighbour!(vertices, 12, 17);
-        unit_neighbour!(vertices, 13, 18);
-        unit_neighbour!(vertices, 14, 19);
-        unit_neighbour!(vertices, 15, 16);
-        unit_neighbour!(vertices, 15, 17);
-        unit_neighbour!(vertices, 16, 18);
-        unit_neighbour!(vertices, 17, 19);
-        unit_neighbour!(vertices, 18, 19);
+        unit_neighbour(vertices, 0, 1);
+        unit_neighbour(vertices, 0, 2);
+        unit_neighbour(vertices, 0, 5);
+        unit_neighbour(vertices, 1, 3);
+        unit_neighbour(vertices, 1, 6);
+        unit_neighbour(vertices, 2, 4);
+        unit_neighbour(vertices, 2, 7);
+        unit_neighbour(vertices, 3, 4);
+        unit_neighbour(vertices, 3, 8);
+        unit_neighbour(vertices, 4, 9);
+        unit_neighbour(vertices, 5, 10);
+        unit_neighbour(vertices, 5, 11);
+        unit_neighbour(vertices, 6, 10);
+        unit_neighbour(vertices, 6, 12);
+        unit_neighbour(vertices, 7, 11);
+        unit_neighbour(vertices, 7, 13);
+        unit_neighbour(vertices, 8, 12);
+        unit_neighbour(vertices, 8, 14);
+        unit_neighbour(vertices, 9, 13);
+        unit_neighbour(vertices, 9, 14);
+        unit_neighbour(vertices, 10, 15);
+        unit_neighbour(vertices, 11, 16);
+        unit_neighbour(vertices, 12, 17);
+        unit_neighbour(vertices, 13, 18);
+        unit_neighbour(vertices, 14, 19);
+        unit_neighbour(vertices, 15, 16);
+        unit_neighbour(vertices, 15, 17);
+        unit_neighbour(vertices, 16, 18);
+        unit_neighbour(vertices, 17, 19);
+        unit_neighbour(vertices, 18, 19);
     }
 
     #[test]
     fn icosahedron_centered() {
-        uniform_distance!(Icosahedron);
+        let shape = make_shape(PlatonicSolid::Icosahedron);
+
+        for vertex in shape.vertices() {
+            assert!(Double::abs(magnitude_squared(shape.vertices()[0]) - magnitude_squared(*vertex)) <= TOLERANCE);
+        }
     }
 
     #[test]
     fn icosahedron_edges() {
-        let shape = Shaper::<Double, u8>::make(
-            &PlatonicSolid::Icosahedron,
-            Default::default(),
-        );
+        let shape = make_shape(PlatonicSolid::Icosahedron);
         let vertices = shape.vertices();
 
-        unit_neighbour!(vertices, 0, 1);
-        unit_neighbour!(vertices, 0, 2);
-        unit_neighbour!(vertices, 0, 3);
-        unit_neighbour!(vertices, 0, 4);
-        unit_neighbour!(vertices, 0, 5);
-        unit_neighbour!(vertices, 1, 2);
-        unit_neighbour!(vertices, 1, 3);
-        unit_neighbour!(vertices, 1, 6);
-        unit_neighbour!(vertices, 1, 7);
-        unit_neighbour!(vertices, 2, 4);
-        unit_neighbour!(vertices, 2, 6);
-        unit_neighbour!(vertices, 2, 8);
-        unit_neighbour!(vertices, 3, 5);
-        unit_neighbour!(vertices, 3, 7);
-        unit_neighbour!(vertices, 3, 9);
-        unit_neighbour!(vertices, 4, 5);
-        unit_neighbour!(vertices, 4, 8);
-        unit_neighbour!(vertices, 4, 10);
-        unit_neighbour!(vertices, 5, 9);
-        unit_neighbour!(vertices, 5, 10);
-        unit_neighbour!(vertices, 6, 7);
-        unit_neighbour!(vertices, 6, 8);
-        unit_neighbour!(vertices, 6, 11);
-        unit_neighbour!(vertices, 7, 9);
-        unit_neighbour!(vertices, 7, 11);
-        unit_neighbour!(vertices, 8, 10);
-        unit_neighbour!(vertices, 8, 11);
-        unit_neighbour!(vertices, 9, 10);
-        unit_neighbour!(vertices, 9, 11);
-        unit_neighbour!(vertices, 10, 11);
+        unit_neighbour(vertices, 0, 1);
+        unit_neighbour(vertices, 0, 2);
+        unit_neighbour(vertices, 0, 3);
+        unit_neighbour(vertices, 0, 4);
+        unit_neighbour(vertices, 0, 5);
+        unit_neighbour(vertices, 1, 2);
+        unit_neighbour(vertices, 1, 3);
+        unit_neighbour(vertices, 1, 6);
+        unit_neighbour(vertices, 1, 7);
+        unit_neighbour(vertices, 2, 4);
+        unit_neighbour(vertices, 2, 6);
+        unit_neighbour(vertices, 2, 8);
+        unit_neighbour(vertices, 3, 5);
+        unit_neighbour(vertices, 3, 7);
+        unit_neighbour(vertices, 3, 9);
+        unit_neighbour(vertices, 4, 5);
+        unit_neighbour(vertices, 4, 8);
+        unit_neighbour(vertices, 4, 10);
+        unit_neighbour(vertices, 5, 9);
+        unit_neighbour(vertices, 5, 10);
+        unit_neighbour(vertices, 6, 7);
+        unit_neighbour(vertices, 6, 8);
+        unit_neighbour(vertices, 6, 11);
+        unit_neighbour(vertices, 7, 9);
+        unit_neighbour(vertices, 7, 11);
+        unit_neighbour(vertices, 8, 10);
+        unit_neighbour(vertices, 8, 11);
+        unit_neighbour(vertices, 9, 10);
+        unit_neighbour(vertices, 9, 11);
+        unit_neighbour(vertices, 10, 11);
     }
 }
