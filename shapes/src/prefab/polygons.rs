@@ -98,27 +98,27 @@ where
 mod tests {
     use super::{Polygon, Shape, Shaper};
 
-    use crate::prefab::unit_test::{unit_neighbour, magnitude_diff};
+    use crate::prefab::unit_test::{epsilon_error, magnitude_diff, unit_neighbour};
 
-    type Double = f64;
-
-    const TOLERANCE: Double = 2. * Double::EPSILON;
+    fn make_shape(size: u16) -> Shape<f64, u16> {
+        Polygon::new(size).make(Default::default())
+    }
 
     #[test]
     #[should_panic]
     fn zero_sides() {
-        let _: Shape<f32, u8> = Polygon::new(0).make(Default::default());
+        make_shape(0);
     }
 
     #[test]
     #[should_panic]
     fn two_sides() {
-        let _: Shape<f32, u8> = Polygon::new(2).make(Default::default());
+        make_shape(2);
     }
 
     #[test]
     fn three_sides() {
-        let _: Shape<f32, u8> = Polygon::new(3).make(Default::default());
+        make_shape(3);
     }
 
     #[test]
@@ -139,12 +139,12 @@ mod tests {
 
     #[test]
     fn max_sides() {
-        let _: Shape<f32, u16> = Polygon::new(u16::MAX).make(Default::default());
+        make_shape(u16::MAX);
     }
 
     #[test]
     fn side_length_odd() {
-        let shape = Shaper::<Double, u16>::make(&Polygon::new(11), Default::default());
+        let shape = make_shape(11);
         let vertices = shape.vertices();
 
         unit_neighbour(vertices, 1, 0);
@@ -156,7 +156,7 @@ mod tests {
 
     #[test]
     fn error_total_odd() {
-        let shape = Shaper::<Double, u16>::make(&Polygon::new(32773), Default::default());
+        let shape = make_shape(32773);
         let vertices = shape.vertices();
 
         let mut error = 0.;
@@ -166,12 +166,12 @@ mod tests {
         }
         error += 1. - magnitude_diff(vertices[vertices.len()-1], vertices[vertices.len()-2]);
 
-        assert!(error <= TOLERANCE);
+        epsilon_error(error);
     }
 
     #[test]
     fn side_length_even() {
-        let shape = Shaper::<Double, u16>::make(&Polygon::new(10), Default::default());
+        let shape = make_shape(10);
         let vertices = shape.vertices();
 
         unit_neighbour(vertices, 1, 0);
@@ -183,7 +183,7 @@ mod tests {
 
     #[test]
     fn error_total_even() {
-        let shape = Shaper::<Double, u16>::make(&Polygon::new(32768), Default::default());
+        let shape = make_shape(32768);
         let vertices = shape.vertices();
 
         let mut error = 0.;
@@ -193,6 +193,6 @@ mod tests {
         }
         error += 1. - magnitude_diff(vertices[vertices.len()-1], vertices[vertices.len()-2]);
 
-        assert!(error <= TOLERANCE);
+        epsilon_error(error);
     }
 }

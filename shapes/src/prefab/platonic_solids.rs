@@ -303,27 +303,15 @@ where
 mod tests {
     use super::{PlatonicSolid, Shape, Shaper};
 
-    use crate::prefab::unit_test::unit_neighbour;
+    use crate::prefab::unit_test::{equidistant, unit_neighbour};
 
-    type Double = f64;
-
-    const TOLERANCE: Double = 2. * Double::EPSILON;
-
-    fn magnitude_squared(vertex: [Double; 3]) -> Double {
-        vertex[0] * vertex[0] + vertex[1] * vertex[1] + vertex[2] * vertex[2]
-    }
-
-    fn make_shape(solid: PlatonicSolid) -> Shape<Double, u8> {
+    fn make_shape(solid: PlatonicSolid) -> Shape<f64, u8> {
         solid.make(Default::default())
     }
 
     #[test]
     fn tetrahedron_centered() {
-        let shape = make_shape(PlatonicSolid::Tetrahedron);
-
-        for vertex in shape.vertices() {
-            assert!(Double::abs(magnitude_squared(shape.vertices()[0]) - magnitude_squared(*vertex)) <= TOLERANCE);
-        }
+        equidistant(make_shape(PlatonicSolid::Tetrahedron).vertices());
     }
 
     #[test]
@@ -341,11 +329,7 @@ mod tests {
 
     #[test]
     fn hexahedron_centered() {
-        let shape = make_shape(PlatonicSolid::Hexahedron);
-
-        for vertex in shape.vertices() {
-            assert!(Double::abs(magnitude_squared(shape.vertices()[0]) - magnitude_squared(*vertex)) <= TOLERANCE);
-        }
+        equidistant(make_shape(PlatonicSolid::Hexahedron).vertices());
     }
 
     #[test]
@@ -369,11 +353,7 @@ mod tests {
 
     #[test]
     fn octahedron_centered() {
-        let shape = make_shape(PlatonicSolid::Octahedron);
-
-        for vertex in shape.vertices() {
-            assert!(Double::abs(magnitude_squared(shape.vertices()[0]) - magnitude_squared(*vertex)) <= TOLERANCE);
-        }
+        equidistant(make_shape(PlatonicSolid::Octahedron).vertices());
     }
 
     #[test]
@@ -397,11 +377,7 @@ mod tests {
 
     #[test]
     fn dodecahedron_centered() {
-        let shape = make_shape(PlatonicSolid::Dodecahedron);
-
-        for vertex in shape.vertices() {
-            assert!(Double::abs(magnitude_squared(shape.vertices()[0]) - magnitude_squared(*vertex)) <= TOLERANCE);
-        }
+        equidistant(make_shape(PlatonicSolid::Dodecahedron).vertices());
     }
 
     #[test]
@@ -443,11 +419,7 @@ mod tests {
 
     #[test]
     fn icosahedron_centered() {
-        let shape = make_shape(PlatonicSolid::Icosahedron);
-
-        for vertex in shape.vertices() {
-            assert!(Double::abs(magnitude_squared(shape.vertices()[0]) - magnitude_squared(*vertex)) <= TOLERANCE);
-        }
+        equidistant(make_shape(PlatonicSolid::Icosahedron).vertices());
     }
 
     #[test]
