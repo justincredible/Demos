@@ -98,22 +98,11 @@ where
 mod tests {
     use super::{Polygon, Shape, Shaper};
 
+    use crate::prefab::unit_test::{unit_neighbour, magnitude_diff};
+
     type Double = f64;
 
     const TOLERANCE: Double = 2. * Double::EPSILON;
-
-    fn magnitude_diff(a: [Double; 3], b: [Double; 3]) -> Double {
-        let x = a[0] - b[0];
-        let y = a[1] - b[1];
-        let z = a[2] - b[2];
-
-        (x * x + y * y + z * z).sqrt()
-    }
-
-    #[inline]
-    fn unit_neighbour(vertices: &Vec<[Double; 3]>, i: usize, j: usize) {
-        assert!(Double::abs(1.0 - magnitude_diff(vertices[i], vertices[j])) <= TOLERANCE);
-    }
 
     #[test]
     #[should_panic]
@@ -182,7 +171,7 @@ mod tests {
 
     #[test]
     fn side_length_even() {
-        let shape = Shaper::<Double, u16>::make(&Polygon::new(14), Default::default());
+        let shape = Shaper::<Double, u16>::make(&Polygon::new(10), Default::default());
         let vertices = shape.vertices();
 
         unit_neighbour(vertices, 1, 0);

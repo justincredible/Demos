@@ -303,6 +303,8 @@ where
 mod tests {
     use super::{PlatonicSolid, Shape, Shaper};
 
+    use crate::prefab::unit_test::unit_neighbour;
+
     type Double = f64;
 
     const TOLERANCE: Double = 2. * Double::EPSILON;
@@ -311,21 +313,8 @@ mod tests {
         vertex[0] * vertex[0] + vertex[1] * vertex[1] + vertex[2] * vertex[2]
     }
 
-    fn magnitude_diff(a: [Double; 3], b: [Double; 3]) -> Double {
-        let x = a[0] - b[0];
-        let y = a[1] - b[1];
-        let z = a[2] - b[2];
-
-        (x * x + y * y + z * z).sqrt()
-    }
-
     fn make_shape(solid: PlatonicSolid) -> Shape<Double, u8> {
         solid.make(Default::default())
-    }
-
-    #[inline]
-    fn unit_neighbour(vertices: &Vec<[Double; 3]>, i: usize, j: usize) {
-        assert!(Double::abs(1.0 - magnitude_diff(vertices[i], vertices[j])) <= TOLERANCE);
     }
 
     #[test]
