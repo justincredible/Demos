@@ -1,11 +1,11 @@
 use num_traits::{cast, Float, FloatConst, one};
 
-pub enum Edge {
+pub(super) enum Edge {
     Unit,
     Phi,
 }
 
-pub struct Pentagonal<C>
+pub(super) struct Pentagonal<C>
 where
     C: Float + FloatConst,
 {
