@@ -22,8 +22,8 @@ use raw_window_handle::HasRawWindowHandle;
 use simple_targa::read_targa;
 
 use shapes::kepler_poinsot::KpPolyhedron;
-use shapes::polygons::Polygon;
-use shapes::platonic_solids::PlatonicSolid;
+use shapes::polygon::Polygon;
+use shapes::platonic_solid::PlatonicSolid;
 use shapes::Shaper;
 
 fn main() {
