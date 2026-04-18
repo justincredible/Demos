@@ -2,7 +2,7 @@ use num_traits::{cast, Float, FloatConst, NumCast, one, Unsigned, zero};
 
 use crate::shapes::{Configuration, Shape, Shaper};
 
-/// All possible Platonic solids.
+/// All possible Kepler-Poinsot polyhedra.
 pub enum KpPolyhedron {
     StellatedDodecahedron,
     GreatDodecahedron,
