@@ -33,6 +33,7 @@ where
                 let fq = cast::<_, C>(0.25).unwrap();
                 let sr5 = cast::<_, C>(5.).unwrap().sqrt();
                 let point_top = fq * (f26 + f58 / sr5).sqrt();
+                let point_bot = f2 * agon.center + C::epsilon();
                 let phi2_width = fh * (f2 + sr5);
 
                 let vertices = vec![
@@ -41,8 +42,8 @@ where
                     [agon.width, point_top, pent.radius + half_iz],
                     [-phi2_width, -pent.center, pent.radius + half_iz],
                     [phi2_width, -pent.center, pent.radius + half_iz],
-                    [f0, -f2 * agon.center, pent.radius + half_iz],
-                    [f0, f2 * agon.center, -pent.radius - half_iz],
+                    [f0, -point_bot, pent.radius + half_iz],
+                    [f0, point_bot, -pent.radius - half_iz],
                     [-phi2_width, pent.center, -pent.radius - half_iz],
                     [phi2_width, pent.center, -pent.radius - half_iz],
                     [-agon.width, -point_top, -pent.radius - half_iz],
@@ -153,9 +154,9 @@ where
                 let sr5 = cast::<_, C>(5.).unwrap().sqrt();
                 let phi2h = fq * (f3 + sr5);
                 let phi3h = fh * (f2 + sr5);
-                let phi2r_phim = agon.radius + pent.radius - agon.middle;
-                let phir_phi2m = agon.radius - agon.middle - pent.middle;
-                let phi2c_phim = agon.center + pent.center + agon.middle;
+                let phi2r_phim = agon.radius + pent.radius - agon.middle - f2 * C::epsilon();
+                let phir_phi2m = agon.radius - agon.middle - pent.middle - f2 * C::epsilon();
+                let phi2c_phim = agon.center + pent.center + agon.middle - f2 * C::epsilon();
                 let phi2y = pent.axis.0 + pent.axis.1;
 
                 let vertices = vec![
