@@ -331,3 +331,189 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{KpPolyhedron, Shape, Shaper};
+
+    use crate::prefab::unit_test::{equidistant, distance_neighbour};
+
+    type Real = f64;
+
+    const PHI: Real = 1.6180339887498948482;
+    const STAR_EDGE: Real = 4.2360679774997896964; // 2*phi + 1
+
+    fn make_shape(solid: KpPolyhedron) -> Shape<Real, u8> {
+        solid.make(Default::default())
+    }
+
+    #[test]
+    fn stellated_dodecahedron_centered() {
+        // only test the polyhedral vertices
+        equidistant(&make_shape(KpPolyhedron::StellatedDodecahedron).vertices()[0..12]);
+    }
+
+    #[test]
+    fn stellated_dodecahedron_edges() {
+        let shape = make_shape(KpPolyhedron::StellatedDodecahedron);
+        let vertices = shape.vertices();
+
+        distance_neighbour(STAR_EDGE, vertices, 0, 6);
+        distance_neighbour(STAR_EDGE, vertices, 0, 7);
+        distance_neighbour(STAR_EDGE, vertices, 0, 8);
+        distance_neighbour(STAR_EDGE, vertices, 0, 9);
+        distance_neighbour(STAR_EDGE, vertices, 0, 10);
+        distance_neighbour(STAR_EDGE, vertices, 1, 4);
+        distance_neighbour(STAR_EDGE, vertices, 1, 5);
+        distance_neighbour(STAR_EDGE, vertices, 1, 8);
+        distance_neighbour(STAR_EDGE, vertices, 1, 9);
+        distance_neighbour(STAR_EDGE, vertices, 1, 11);
+        distance_neighbour(STAR_EDGE, vertices, 2, 3);
+        distance_neighbour(STAR_EDGE, vertices, 2, 5);
+        distance_neighbour(STAR_EDGE, vertices, 2, 7);
+        distance_neighbour(STAR_EDGE, vertices, 2, 10);
+        distance_neighbour(STAR_EDGE, vertices, 2, 11);
+        distance_neighbour(STAR_EDGE, vertices, 3, 4);
+        distance_neighbour(STAR_EDGE, vertices, 3, 6);
+        distance_neighbour(STAR_EDGE, vertices, 3, 10);
+        distance_neighbour(STAR_EDGE, vertices, 3, 11);
+        distance_neighbour(STAR_EDGE, vertices, 4, 6);
+        distance_neighbour(STAR_EDGE, vertices, 4, 9);
+        distance_neighbour(STAR_EDGE, vertices, 4, 11);
+        distance_neighbour(STAR_EDGE, vertices, 5, 7);
+        distance_neighbour(STAR_EDGE, vertices, 5, 8);
+        distance_neighbour(STAR_EDGE, vertices, 5, 11);
+        distance_neighbour(STAR_EDGE, vertices, 6, 9);
+        distance_neighbour(STAR_EDGE, vertices, 6, 10);
+        distance_neighbour(STAR_EDGE, vertices, 7, 8);
+        distance_neighbour(STAR_EDGE, vertices, 7, 10);
+        distance_neighbour(STAR_EDGE, vertices, 8, 9);
+    }
+
+    #[test]
+    fn great_dodecahedron_centered() {
+        equidistant(make_shape(KpPolyhedron::GreatDodecahedron).vertices());
+    }
+
+    #[test]
+    fn great_dodecahedron_edges() {
+        let shape = make_shape(KpPolyhedron::GreatDodecahedron);
+        let vertices = shape.vertices();
+
+        distance_neighbour(1., vertices, 0, 1);
+        distance_neighbour(1., vertices, 0, 2);
+        distance_neighbour(1., vertices, 0, 3);
+        distance_neighbour(1., vertices, 0, 4);
+        distance_neighbour(1., vertices, 0, 5);
+        distance_neighbour(1., vertices, 1, 2);
+        distance_neighbour(1., vertices, 1, 3);
+        distance_neighbour(1., vertices, 1, 6);
+        distance_neighbour(1., vertices, 1, 7);
+        distance_neighbour(1., vertices, 2, 4);
+        distance_neighbour(1., vertices, 2, 6);
+        distance_neighbour(1., vertices, 2, 8);
+        distance_neighbour(1., vertices, 3, 5);
+        distance_neighbour(1., vertices, 3, 7);
+        distance_neighbour(1., vertices, 3, 9);
+        distance_neighbour(1., vertices, 4, 5);
+        distance_neighbour(1., vertices, 4, 8);
+        distance_neighbour(1., vertices, 4, 10);
+        distance_neighbour(1., vertices, 5, 9);
+        distance_neighbour(1., vertices, 5, 10);
+        distance_neighbour(1., vertices, 6, 7);
+        distance_neighbour(1., vertices, 6, 8);
+        distance_neighbour(1., vertices, 6, 11);
+        distance_neighbour(1., vertices, 7, 9);
+        distance_neighbour(1., vertices, 7, 11);
+        distance_neighbour(1., vertices, 8, 10);
+        distance_neighbour(1., vertices, 8, 11);
+        distance_neighbour(1., vertices, 9, 10);
+        distance_neighbour(1., vertices, 9, 11);
+        distance_neighbour(1., vertices, 10, 11);
+    }
+
+    #[test]
+    fn great_stellated_dodecahedron_centered() {
+        // only test the polyhedral vertices
+        equidistant(&make_shape(KpPolyhedron::GreatStellatedDodecahedron).vertices()[0..20]);
+    }
+
+    #[test]
+    fn great_stellated_dodecahedron_edges() {
+        let shape = make_shape(KpPolyhedron::GreatStellatedDodecahedron);
+        let vertices = shape.vertices();
+
+        distance_neighbour(STAR_EDGE, vertices, 0, 14);
+        distance_neighbour(STAR_EDGE, vertices, 0, 17);
+        distance_neighbour(STAR_EDGE, vertices, 0, 18);
+        distance_neighbour(STAR_EDGE, vertices, 1, 13);
+        distance_neighbour(STAR_EDGE, vertices, 1, 16);
+        distance_neighbour(STAR_EDGE, vertices, 1, 19);
+        distance_neighbour(STAR_EDGE, vertices, 2, 12);
+        distance_neighbour(STAR_EDGE, vertices, 2, 15);
+        distance_neighbour(STAR_EDGE, vertices, 2, 19);
+        distance_neighbour(STAR_EDGE, vertices, 3, 11);
+        distance_neighbour(STAR_EDGE, vertices, 3, 15);
+        distance_neighbour(STAR_EDGE, vertices, 3, 18);
+        distance_neighbour(STAR_EDGE, vertices, 4, 10);
+        distance_neighbour(STAR_EDGE, vertices, 4, 16);
+        distance_neighbour(STAR_EDGE, vertices, 4, 17);
+        distance_neighbour(STAR_EDGE, vertices, 5, 8);
+        distance_neighbour(STAR_EDGE, vertices, 5, 9);
+        distance_neighbour(STAR_EDGE, vertices, 5, 19);
+        distance_neighbour(STAR_EDGE, vertices, 6, 7);
+        distance_neighbour(STAR_EDGE, vertices, 6, 9);
+        distance_neighbour(STAR_EDGE, vertices, 6, 18);
+        distance_neighbour(STAR_EDGE, vertices, 7, 8);
+        distance_neighbour(STAR_EDGE, vertices, 7, 17);
+        distance_neighbour(STAR_EDGE, vertices, 8, 16);
+        distance_neighbour(STAR_EDGE, vertices, 9, 15);
+        distance_neighbour(STAR_EDGE, vertices, 10, 13);
+        distance_neighbour(STAR_EDGE, vertices, 10, 14);
+        distance_neighbour(STAR_EDGE, vertices, 11, 12);
+        distance_neighbour(STAR_EDGE, vertices, 11, 14);
+        distance_neighbour(STAR_EDGE, vertices, 12, 13);
+    }
+
+    #[test]
+    fn great_icosahedron_centered() {
+        equidistant(make_shape(KpPolyhedron::GreatIcosahedron).vertices());
+    }
+
+    #[test]
+    fn great_icosahedron_edges() {
+        let shape = make_shape(KpPolyhedron::GreatIcosahedron);
+        let vertices = shape.vertices();
+
+        distance_neighbour(PHI, vertices, 0, 6);
+        distance_neighbour(PHI, vertices, 0, 7);
+        distance_neighbour(PHI, vertices, 0, 8);
+        distance_neighbour(PHI, vertices, 0, 9);
+        distance_neighbour(PHI, vertices, 0, 10);
+        distance_neighbour(PHI, vertices, 1, 4);
+        distance_neighbour(PHI, vertices, 1, 5);
+        distance_neighbour(PHI, vertices, 1, 8);
+        distance_neighbour(PHI, vertices, 1, 9);
+        distance_neighbour(PHI, vertices, 1, 11);
+        distance_neighbour(PHI, vertices, 2, 3);
+        distance_neighbour(PHI, vertices, 2, 5);
+        distance_neighbour(PHI, vertices, 2, 7);
+        distance_neighbour(PHI, vertices, 2, 10);
+        distance_neighbour(PHI, vertices, 2, 11);
+        distance_neighbour(PHI, vertices, 3, 4);
+        distance_neighbour(PHI, vertices, 3, 6);
+        distance_neighbour(PHI, vertices, 3, 10);
+        distance_neighbour(PHI, vertices, 3, 11);
+        distance_neighbour(PHI, vertices, 4, 6);
+        distance_neighbour(PHI, vertices, 4, 9);
+        distance_neighbour(PHI, vertices, 4, 11);
+        distance_neighbour(PHI, vertices, 5, 7);
+        distance_neighbour(PHI, vertices, 5, 8);
+        distance_neighbour(PHI, vertices, 5, 11);
+        distance_neighbour(PHI, vertices, 6, 9);
+        distance_neighbour(PHI, vertices, 6, 10);
+        distance_neighbour(PHI, vertices, 7, 8);
+        distance_neighbour(PHI, vertices, 7, 10);
+        distance_neighbour(PHI, vertices, 8, 9);
+    }
+}
