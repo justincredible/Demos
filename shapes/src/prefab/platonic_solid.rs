@@ -130,7 +130,7 @@ where
                 let fh = cast::<_, C>(0.5).unwrap();
                 let pent = Pentagonal::new(Edge::Unit);
                 let agon = Pentagonal::new(Edge::Phi);
-                let half_iz = fh * pent.axis.0;
+                let half_iz = fh * pent.axis;
 
                 let vertices = vec![
                     [f0, pent.radius, pent.radius + half_iz],
@@ -190,10 +190,13 @@ where
             },
             Self::Icosahedron => {
                 let f0 = zero();
+                let f1 = one::<C>();
                 let fh = cast::<_, C>(0.5).unwrap();
+                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
                 let pent = Pentagonal::new(Edge::Unit);
-                let y_diff = pent.axis.0;
-                let half_middle = fh * pent.axis.1;
+                let y_diff = pent.axis;
+                let phi = fh * (f1 + sr5);
+                let half_middle = fh * phi * pent.axis;
 
                 let vertices = vec![
                     [f0, half_middle + y_diff, f0],

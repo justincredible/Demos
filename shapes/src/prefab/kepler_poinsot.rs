@@ -24,7 +24,7 @@ where
                 let fh = cast::<_, C>(0.5).unwrap();
                 let pent = Pentagonal::new(Edge::Unit);
                 let agon: Pentagonal<C> = Pentagonal::new(Edge::Phi);
-                let half_iz = fh * pent.axis.0;
+                let half_iz = fh * pent.axis;
 
                 // Stellation
                 let f2 = cast::<_, C>(2.).unwrap();
@@ -96,10 +96,13 @@ where
             Self::GreatDodecahedron => {
                 // Icosahedron
                 let f0 = zero();
+                let f1 = one::<C>();
                 let fh = cast::<_, C>(0.5).unwrap();
+                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
                 let pent = Pentagonal::new(Edge::Unit);
-                let y_diff = pent.axis.0;
-                let half_middle = fh * pent.axis.1;
+                let y_diff = pent.axis;
+                let phi = fh * (f1 + sr5);
+                let half_middle = fh * phi * pent.axis;
 
                 let vertices = vec![
                     [f0, half_middle + y_diff, f0],
@@ -143,11 +146,11 @@ where
                 let f0 = zero();
                 let fh = cast::<_, C>(0.5).unwrap();
                 let pent = Pentagonal::new(Edge::Unit);
-                let y_diff = pent.axis.0;
-                let half_middle = fh * pent.axis.1;
+                let y_diff = pent.axis;
 
                 // GSD
                 let agon: Pentagonal<C> = Pentagonal::new(Edge::Phi);
+                let half_middle = fh * agon.axis;
                 let f2 = cast::<_, C>(2.).unwrap();
                 let f3 = cast::<_, C>(3.).unwrap();
                 let fq = cast::<_, C>(0.25).unwrap();
@@ -157,7 +160,7 @@ where
                 let phi2r_phim = agon.radius + pent.radius - agon.middle - f2 * C::epsilon();
                 let phir_phi2m = agon.radius - agon.middle - pent.middle - f2 * C::epsilon();
                 let phi2c_phim = agon.center + pent.center + agon.middle - f2 * C::epsilon();
-                let phi2y = pent.axis.0 + pent.axis.1;
+                let phi2y = pent.axis + agon.axis;
 
                 let vertices = vec![
                     [-pent.width, phi2y + half_middle, -agon.center],
@@ -227,10 +230,13 @@ where
             Self::GreatIcosahedron => {
                 // Icosahedron
                 let f0 = zero();
+                let f1 = one::<C>();
                 let fh = cast::<_, C>(0.5).unwrap();
+                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
                 let pent = Pentagonal::new(Edge::Unit);
-                let y_diff = pent.axis.0;
-                let half_middle = fh * pent.axis.1;
+                let y_diff = pent.axis;
+                let phi = fh * (f1 + sr5);
+                let half_middle = fh * phi * pent.axis;
 
                 let vertices = vec![
                     [f0, half_middle + y_diff, f0],
