@@ -28,34 +28,26 @@ where
 
                 // Stellation
                 let f2 = cast::<_, C>(2.).unwrap();
-                let f3 = cast::<_, C>(3.).unwrap();
-                let f5 = cast::<_, C>(5.).unwrap();
-                let f7 = cast::<_, C>(7.).unwrap();
-                let f11 = cast::<_, C>(11.).unwrap();
+                let f26 = cast::<_, C>(26.).unwrap();
+                let f58 = cast::<_, C>(58.).unwrap();
                 let fq = cast::<_, C>(0.25).unwrap();
-                let fe = cast::<_, C>(0.125).unwrap();
                 let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-
-                let height = fh * (f5 + f2 * sr5).sqrt();
-                let phi2_radius = fq * (f7 + f3 * sr5) / height;
-                let point_top = fe * (f11 + f5 * sr5) / height;
+                let point_top = fq * (f26 + f58 / sr5).sqrt();
                 let phi2_width = fh * (f2 + sr5);
-                let point_mid = fq * (f2 + sr5) / height;
-                let point_bot = fq * (f7 + f3 * sr5) / height; // circle_offset + height
 
                 let vertices = vec![
-                    [f0, f0, phi2_radius + half_iz],
+                    [f0, f0, f2 * agon.center + half_iz],
                     [-agon.width, point_top, pent.radius + half_iz],
                     [agon.width, point_top, pent.radius + half_iz],
-                    [-phi2_width, -point_mid, pent.radius + half_iz],
-                    [phi2_width, -point_mid, pent.radius + half_iz],
-                    [f0, -point_bot, pent.radius + half_iz],
-                    [f0, point_bot, -pent.radius - half_iz],
-                    [-phi2_width, point_mid, -pent.radius - half_iz],
-                    [phi2_width, point_mid, -pent.radius - half_iz],
+                    [-phi2_width, -pent.center, pent.radius + half_iz],
+                    [phi2_width, -pent.center, pent.radius + half_iz],
+                    [f0, -f2 * agon.center, pent.radius + half_iz],
+                    [f0, f2 * agon.center, -pent.radius - half_iz],
+                    [-phi2_width, pent.center, -pent.radius - half_iz],
+                    [phi2_width, pent.center, -pent.radius - half_iz],
                     [-agon.width, -point_top, -pent.radius - half_iz],
                     [agon.width, -point_top, -pent.radius - half_iz],
-                    [f0, f0, -phi2_radius - half_iz],
+                    [f0, f0, -f2 * agon.center - half_iz],
                     [f0, pent.radius, pent.radius + half_iz],
                     [-pent.width, pent.middle, pent.radius + half_iz],
                     [pent.width, pent.middle, pent.radius + half_iz],
