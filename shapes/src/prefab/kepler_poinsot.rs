@@ -151,31 +151,34 @@ where
                 let f3 = cast::<_, C>(3.).unwrap();
                 let fq = cast::<_, C>(0.25).unwrap();
                 let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-                let phi2 = fh * (f3 + sr5);
                 let phi2h = fq * (f3 + sr5);
                 let phi3h = fh * (f2 + sr5);
+                let phi2r_phim = agon.radius + pent.radius - agon.middle;
+                let phir_phi2m = agon.radius - agon.middle - pent.middle;
+                let phi2c_phim = agon.center + pent.center + agon.middle;
+                let phi2y = pent.axis.0 + pent.axis.1;
 
                 let vertices = vec![
-                    [-pent.width, phi2 * y_diff + half_middle, -agon.center],
-                    [pent.width, phi2 * y_diff + half_middle, -agon.center],
-                    [-phi2h, phi2 * y_diff + half_middle, agon.middle],
-                    [phi2h, phi2 * y_diff + half_middle, agon.middle],
-                    [f0, phi2 * y_diff + half_middle, agon.radius],
-                    [-phi2h, half_middle, -(agon.radius - agon.middle + pent.radius)],
-                    [phi2h, half_middle, -(agon.radius - agon.middle + pent.radius)],
-                    [-phi3h, half_middle, phi2 * (pent.radius - pent.middle) - pent.radius],
-                    [phi3h, half_middle, phi2 * (pent.radius - pent.middle) - pent.radius],
-                    [f0, half_middle, phi2 * pent.center + agon.middle],
-                    [f0, -half_middle, -phi2 * pent.center - agon.middle],
-                    [-phi3h, -half_middle, -phi2 * (pent.radius - pent.middle) + pent.radius],
-                    [phi3h, -half_middle, -phi2 * (pent.radius - pent.middle) + pent.radius],
-                    [-phi2h, -half_middle, agon.radius - agon.middle + pent.radius],
-                    [phi2h, -half_middle, agon.radius - agon.middle + pent.radius],
-                    [f0, -phi2 * y_diff - half_middle, -agon.radius],
-                    [-phi2h, -phi2 * y_diff - half_middle, -agon.middle],
-                    [phi2h, -phi2 * y_diff - half_middle, -agon.middle],
-                    [-pent.width, -phi2 * y_diff - half_middle, agon.center],
-                    [pent.width, -phi2 * y_diff - half_middle, agon.center],
+                    [-pent.width, phi2y + half_middle, -agon.center],
+                    [pent.width, phi2y + half_middle, -agon.center],
+                    [-phi2h, phi2y + half_middle, agon.middle],
+                    [phi2h, phi2y + half_middle, agon.middle],
+                    [f0, phi2y + half_middle, agon.radius],
+                    [-phi2h, half_middle, -phi2r_phim],
+                    [phi2h, half_middle, -phi2r_phim],
+                    [-phi3h, half_middle, phir_phi2m],
+                    [phi3h, half_middle, phir_phi2m],
+                    [f0, half_middle, phi2c_phim],
+                    [f0, -half_middle, -phi2c_phim],
+                    [-phi3h, -half_middle, -phir_phi2m],
+                    [phi3h, -half_middle, -phir_phi2m],
+                    [-phi2h, -half_middle, phi2r_phim],
+                    [phi2h, -half_middle, phi2r_phim],
+                    [f0, -phi2y - half_middle, -agon.radius],
+                    [-phi2h, -phi2y - half_middle, -agon.middle],
+                    [phi2h, -phi2y - half_middle, -agon.middle],
+                    [-pent.width, -phi2y - half_middle, agon.center],
+                    [pent.width, -phi2y - half_middle, agon.center],
                     [f0, half_middle + y_diff, f0],
                     [f0, half_middle, -pent.radius],
                     [-pent.width, half_middle, -pent.middle],
