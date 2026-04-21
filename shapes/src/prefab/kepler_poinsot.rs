@@ -149,38 +149,38 @@ where
                 // GSD
                 let agon: Pentagonal<C> = Pentagonal::new(Edge::Phi);
                 let half_middle = fh * agon.axis;
-                let f2 = cast::<_, C>(2.).unwrap();
+                let f1 = one::<C>();
                 let f3 = cast::<_, C>(3.).unwrap();
-                let fq = cast::<_, C>(0.25).unwrap();
                 let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-                let phi2h = fq * (f3 + sr5);
-                let phi3h = fh * (f2 + sr5);
-                let phi2r_phim = agon.radius + pent.radius - agon.middle - f2 * C::epsilon();
-                let phir_phi2m = agon.radius - agon.middle - pent.middle - f2 * C::epsilon();
-                let phi2c_phim = agon.center + pent.center + agon.middle - f2 * C::epsilon();
-                let phi2y = pent.axis + agon.axis;
+                let phi = fh * (f1 + sr5);
+                let phi2 = fh * (f3 + sr5);
+                let phi2he = f1 / (f3 - sr5) + C::epsilon();
+                let point_bot = phi2 * pent.radius - agon.middle;
+                let point_top = phi2 * pent.center + agon.middle;
+                let pinnacle = (phi2 + pent.width) * pent.axis;
 
                 let vertices = vec![
-                    [-pent.width, phi2y + half_middle, -agon.center],
-                    [pent.width, phi2y + half_middle, -agon.center],
-                    [-phi2h, phi2y + half_middle, agon.middle],
-                    [phi2h, phi2y + half_middle, agon.middle],
-                    [f0, phi2y + half_middle, agon.radius],
-                    [-phi2h, half_middle, -phi2r_phim],
-                    [phi2h, half_middle, -phi2r_phim],
-                    [-phi3h, half_middle, phir_phi2m],
-                    [phi3h, half_middle, phir_phi2m],
-                    [f0, half_middle, phi2c_phim],
-                    [f0, -half_middle, -phi2c_phim],
-                    [-phi3h, -half_middle, -phir_phi2m],
-                    [phi3h, -half_middle, -phir_phi2m],
-                    [-phi2h, -half_middle, phi2r_phim],
-                    [phi2h, -half_middle, phi2r_phim],
-                    [f0, -phi2y - half_middle, -agon.radius],
-                    [-phi2h, -phi2y - half_middle, -agon.middle],
-                    [phi2h, -phi2y - half_middle, -agon.middle],
-                    [-pent.width, -phi2y - half_middle, agon.center],
-                    [pent.width, -phi2y - half_middle, agon.center],
+                    [-pent.width, pinnacle, -phi * pent.center],
+                    [pent.width, pinnacle, -phi * pent.center],
+                    [-agon.width, pinnacle, half_middle],
+                    [agon.width, pinnacle, half_middle],
+                    [f0, pinnacle, agon.radius],
+                    [-phi2he, half_middle, -point_bot],
+                    [phi2he, half_middle, -point_bot],
+                    [-phi * agon.width, half_middle, pent.center],
+                    [phi * agon.width, half_middle, pent.center],
+                    [f0, half_middle, point_top],
+                    [f0, -half_middle, -point_top],
+                    [-phi * agon.width, -half_middle, -pent.center],
+                    [phi * agon.width, -half_middle, -pent.center],
+                    [-phi2he, -half_middle, point_bot],
+                    [phi2he, -half_middle, point_bot],
+                    [f0, -pinnacle, -agon.radius],
+                    [-agon.width, -pinnacle, -half_middle],
+                    [agon.width, -pinnacle, -half_middle],
+                    [-pent.width, -pinnacle, phi * pent.center],
+                    [pent.width, -pinnacle, phi * pent.center],
+
                     [f0, half_middle + y_diff, f0],
                     [f0, half_middle, -pent.radius],
                     [-pent.width, half_middle, -pent.middle],
