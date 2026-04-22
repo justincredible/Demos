@@ -130,29 +130,28 @@ where
                 let fh = cast::<_, C>(0.5).unwrap();
                 let pent = Pentagonal::new(Edge::Unit);
                 let agon = Pentagonal::new(Edge::Phi);
-                let half_iz = fh * pent.axis;
 
                 let vertices = vec![
-                    [f0, pent.radius, pent.radius + half_iz],
-                    [-pent.width, pent.middle, pent.radius + half_iz],
-                    [pent.width, pent.middle, pent.radius + half_iz],
-                    [-fh, -pent.center, pent.radius + half_iz],
-                    [fh, -pent.center, pent.radius + half_iz],
-                    [f0, agon.radius, half_iz],
-                    [-agon.width, agon.middle, half_iz],
-                    [agon.width, agon.middle, half_iz],
-                    [-pent.width, -agon.center, half_iz],
-                    [pent.width, -agon.center, half_iz],
-                    [-pent.width, agon.center, -half_iz],
-                    [pent.width, agon.center, -half_iz],
-                    [-agon.width, -agon.middle, -half_iz],
-                    [agon.width, -agon.middle, -half_iz],
-                    [f0, -agon.radius, -half_iz],
-                    [-fh, pent.center, -pent.radius - half_iz],
-                    [fh, pent.center, -pent.radius - half_iz],
-                    [-pent.width, -pent.middle, -pent.radius - half_iz],
-                    [pent.width, -pent.middle, -pent.radius - half_iz],
-                    [f0, -pent.radius, -pent.radius - half_iz],
+                    [f0, pent.radius, pent.radius + fh * pent.axis],
+                    [-pent.width, pent.middle, pent.radius + fh * pent.axis],
+                    [pent.width, pent.middle, pent.radius + fh * pent.axis],
+                    [-fh, -pent.center, pent.radius + fh * pent.axis],
+                    [fh, -pent.center, pent.radius + fh * pent.axis],
+                    [f0, agon.radius, fh * pent.axis],
+                    [-agon.width, agon.middle, fh * pent.axis],
+                    [agon.width, agon.middle, fh * pent.axis],
+                    [-pent.width, -agon.center, fh * pent.axis],
+                    [pent.width, -agon.center, fh * pent.axis],
+                    [-pent.width, agon.center, -fh * pent.axis],
+                    [pent.width, agon.center, -fh * pent.axis],
+                    [-agon.width, -agon.middle, -fh * pent.axis],
+                    [agon.width, -agon.middle, -fh * pent.axis],
+                    [f0, -agon.radius, -fh * pent.axis],
+                    [-fh, pent.center, -pent.radius - fh * pent.axis],
+                    [fh, pent.center, -pent.radius - fh * pent.axis],
+                    [-pent.width, -pent.middle, -pent.radius - fh * pent.axis],
+                    [pent.width, -pent.middle, -pent.radius - fh * pent.axis],
+                    [f0, -pent.radius, -pent.radius - fh * pent.axis],
                 ];
 
                 let i = vec![zero(), one()]
@@ -190,16 +189,12 @@ where
             },
             Self::Icosahedron => {
                 let f0 = zero();
-                let f1 = one::<C>();
                 let fh = cast::<_, C>(0.5).unwrap();
-                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-                let pent = Pentagonal::new(Edge::Unit);
-                let y_diff = pent.axis;
-                let phi = fh * (f1 + sr5);
-                let half_middle = fh * phi * pent.axis;
+                let pent = Pentagonal::<C>::new(Edge::Unit);
+                let half_middle = pent.width * pent.axis;
 
                 let vertices = vec![
-                    [f0, half_middle + y_diff, f0],
+                    [f0, half_middle + pent.axis, f0],
                     [f0, half_middle, -pent.radius],
                     [-pent.width, half_middle, -pent.middle],
                     [pent.width, half_middle, -pent.middle],
@@ -210,7 +205,7 @@ where
                     [-pent.width, -half_middle, pent.middle],
                     [pent.width, -half_middle, pent.middle],
                     [f0, -half_middle, pent.radius],
-                    [f0, -half_middle - y_diff, f0],
+                    [f0, -half_middle - pent.axis, f0],
                 ];
 
                 let i = vec![zero(), one()]

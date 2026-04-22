@@ -23,50 +23,48 @@ where
                 let f0 = zero();
                 let fh = cast::<_, C>(0.5).unwrap();
                 let pent = Pentagonal::new(Edge::Unit);
-                let agon: Pentagonal<C> = Pentagonal::new(Edge::Phi);
-                let half_iz = fh * pent.axis;
+                let agon = Pentagonal::<C>::new(Edge::Phi);
 
                 // Stellation
-                let f1 = one::<C>();
-                let f2 = cast::<_, C>(2.).unwrap();
-                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-                let phi = fh * (f1 + sr5);
-                let phi3 = f2 + sr5;
+                let legs = agon.middle + pent.middle + agon.center;
+                let arms = agon.width + pent.width;
+                let head = agon.center + agon.center;
+                let ring = arms * pent.axis;
 
                 let vertices = vec![
-                    [f0, f0, f2 * agon.center + half_iz],
-                    [-agon.width, phi * agon.middle + agon.center, phi3 * half_iz],
-                    [agon.width, phi * agon.middle + agon.center, phi3 * half_iz],
-                    [-phi * agon.width, -pent.center, phi3 * half_iz],
-                    [phi * agon.width, -pent.center, phi3 * half_iz],
-                    [f0, -f2 * agon.center, agon.radius - half_iz],
-                    [f0, f2 * agon.center, -agon.radius + half_iz],
-                    [-phi * agon.width, pent.center, -phi3 * half_iz],
-                    [phi * agon.width, pent.center, -phi3 * half_iz],
-                    [-agon.width, -phi * agon.middle - agon.center, -phi3 * half_iz],
-                    [agon.width, -phi * agon.middle - agon.center, -phi3 * half_iz],
-                    [f0, f0, -f2 * agon.center - half_iz],
+                    [f0, f0, head + fh * pent.axis],
+                    [-agon.width, legs, ring],
+                    [agon.width, legs, ring],
+                    [-arms, -pent.center, ring],
+                    [arms, -pent.center, ring],
+                    [f0, -head, agon.radius - fh * pent.axis],
+                    [f0, head, -agon.radius + fh * pent.axis],
+                    [-arms, pent.center, -ring],
+                    [arms, pent.center, -ring],
+                    [-agon.width, -legs, -ring],
+                    [agon.width, -legs, -ring],
+                    [f0, f0, -head - fh * pent.axis],
 
-                    [f0, pent.radius, pent.radius + half_iz],
-                    [-pent.width, pent.middle, pent.radius + half_iz],
-                    [pent.width, pent.middle, pent.radius + half_iz],
-                    [-fh, -pent.center, pent.radius + half_iz],
-                    [fh, -pent.center, pent.radius + half_iz],
-                    [f0, agon.radius, half_iz],
-                    [-agon.width, agon.middle, half_iz],
-                    [agon.width, agon.middle, half_iz],
-                    [-pent.width, -agon.center, half_iz],
-                    [pent.width, -agon.center, half_iz],
-                    [-pent.width, agon.center, -half_iz],
-                    [pent.width, agon.center, -half_iz],
-                    [-agon.width, -agon.middle, -half_iz],
-                    [agon.width, -agon.middle, -half_iz],
-                    [f0, -agon.radius, -half_iz],
-                    [-fh, pent.center, -pent.radius - half_iz],
-                    [fh, pent.center, -pent.radius - half_iz],
-                    [-pent.width, -pent.middle, -pent.radius - half_iz],
-                    [pent.width, -pent.middle, -pent.radius - half_iz],
-                    [f0, -pent.radius, -pent.radius - half_iz],
+                    [f0, pent.radius, pent.radius + fh * pent.axis],
+                    [-pent.width, pent.middle, pent.radius + fh * pent.axis],
+                    [pent.width, pent.middle, pent.radius + fh * pent.axis],
+                    [-fh, -pent.center, pent.radius + fh * pent.axis],
+                    [fh, -pent.center, pent.radius + fh * pent.axis],
+                    [f0, agon.radius, fh * pent.axis],
+                    [-agon.width, agon.middle, fh * pent.axis],
+                    [agon.width, agon.middle, fh * pent.axis],
+                    [-pent.width, -agon.center, fh * pent.axis],
+                    [pent.width, -agon.center, fh * pent.axis],
+                    [-pent.width, agon.center, -fh * pent.axis],
+                    [pent.width, agon.center, -fh * pent.axis],
+                    [-agon.width, -agon.middle, -fh * pent.axis],
+                    [agon.width, -agon.middle, -fh * pent.axis],
+                    [f0, -agon.radius, -fh * pent.axis],
+                    [-fh, pent.center, -pent.radius - fh * pent.axis],
+                    [fh, pent.center, -pent.radius - fh * pent.axis],
+                    [-pent.width, -pent.middle, -pent.radius - fh * pent.axis],
+                    [pent.width, -pent.middle, -pent.radius - fh * pent.axis],
+                    [f0, -pent.radius, -pent.radius - fh * pent.axis],
                 ];
 
                 let i = vec![zero(), one()]
@@ -94,16 +92,12 @@ where
             Self::GreatDodecahedron => {
                 // Icosahedron
                 let f0 = zero();
-                let f1 = one::<C>();
                 let fh = cast::<_, C>(0.5).unwrap();
-                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-                let pent = Pentagonal::new(Edge::Unit);
-                let y_diff = pent.axis;
-                let phi = fh * (f1 + sr5);
-                let half_middle = fh * phi * pent.axis;
+                let pent = Pentagonal::<C>::new(Edge::Unit);
+                let half_middle = pent.width * pent.axis;
 
                 let vertices = vec![
-                    [f0, half_middle + y_diff, f0],
+                    [f0, half_middle + pent.axis, f0],
                     [f0, half_middle, -pent.radius],
                     [-pent.width, half_middle, -pent.middle],
                     [pent.width, half_middle, -pent.middle],
@@ -114,7 +108,7 @@ where
                     [-pent.width, -half_middle, pent.middle],
                     [pent.width, -half_middle, pent.middle],
                     [f0, -half_middle, pent.radius],
-                    [f0, -half_middle - y_diff, f0],
+                    [f0, -half_middle - pent.axis, f0],
                 ];
 
                 let i = vec![zero(), one()]
@@ -144,11 +138,10 @@ where
                 let f0 = zero();
                 let fh = cast::<_, C>(0.5).unwrap();
                 let pent = Pentagonal::new(Edge::Unit);
-                let y_diff = pent.axis;
+                let half_middle = pent.width * pent.axis;
 
                 // GSD
-                let agon: Pentagonal<C> = Pentagonal::new(Edge::Phi);
-                let half_middle = fh * agon.axis;
+                let agon = Pentagonal::<C>::new(Edge::Phi);
                 let f1 = one::<C>();
                 let f3 = cast::<_, C>(3.).unwrap();
                 let sr5 = cast::<_, C>(5.).unwrap().sqrt();
@@ -181,7 +174,7 @@ where
                     [-pent.width, -pinnacle, phi * pent.center],
                     [pent.width, -pinnacle, phi * pent.center],
 
-                    [f0, half_middle + y_diff, f0],
+                    [f0, half_middle + pent.axis, f0],
                     [f0, half_middle, -pent.radius],
                     [-pent.width, half_middle, -pent.middle],
                     [pent.width, half_middle, -pent.middle],
@@ -192,7 +185,7 @@ where
                     [-pent.width, -half_middle, pent.middle],
                     [pent.width, -half_middle, pent.middle],
                     [f0, -half_middle, pent.radius],
-                    [f0, -half_middle - y_diff, f0],
+                    [f0, -half_middle - pent.axis, f0],
                 ];
 
                 let i = vec![zero(), one()]
@@ -228,16 +221,12 @@ where
             Self::GreatIcosahedron => {
                 // Icosahedron
                 let f0 = zero();
-                let f1 = one::<C>();
                 let fh = cast::<_, C>(0.5).unwrap();
-                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-                let pent = Pentagonal::new(Edge::Unit);
-                let y_diff = pent.axis;
-                let phi = fh * (f1 + sr5);
-                let half_middle = fh * phi * pent.axis;
+                let pent = Pentagonal::<C>::new(Edge::Unit);
+                let half_middle = pent.width * pent.axis;
 
                 let vertices = vec![
-                    [f0, half_middle + y_diff, f0],
+                    [f0, half_middle + pent.axis, f0],
                     [f0, half_middle, -pent.radius],
                     [-pent.width, half_middle, -pent.middle],
                     [pent.width, half_middle, -pent.middle],
@@ -248,7 +237,7 @@ where
                     [-pent.width, -half_middle, pent.middle],
                     [pent.width, -half_middle, pent.middle],
                     [f0, -half_middle, pent.radius],
-                    [f0, -half_middle - y_diff, f0],
+                    [f0, -half_middle - pent.axis, f0],
                 ];
 
                 let i = vec![zero(), one()]
