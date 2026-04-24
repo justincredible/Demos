@@ -19,52 +19,55 @@ where
     fn make(&self, _request: Configuration) -> Shape<C, I> {
         match self {
             Self::StellatedDodecahedron => {
-                // Dodecahedron
+                // Icosahedron
                 let f0 = zero();
                 let fh = cast::<_, C>(0.5).unwrap();
-                let pent = Pentagonal::new(Edge::Unit);
-                let agon = Pentagonal::<C>::new(Edge::Phi);
+                let pent = Pentagonal::<C>::new(Edge::Unit);
 
                 // Stellation
-                let legs = agon.middle + pent.middle + agon.center;
-                let arms = agon.width + pent.width;
-                let head = agon.center + agon.center;
-                let ring = arms * pent.axis;
+                let f1 = one::<C>();
+                let f3 = cast::<_, C>(3.).unwrap();
+                let f5 = cast::<_, C>(5.).unwrap();
+                let fq = cast::<_, C>(0.25).unwrap();
+                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
+                let phi2p1h = fq * (f5 + sr5);
+                let npsi = fh * (sr5 - f1); // 1/phi
+                let psi2 = fh * (f3 - sr5); // 1/phi^2
 
                 let vertices = vec![
-                    [f0, f0, head + fh * pent.axis],
-                    [-agon.width, legs, ring],
-                    [agon.width, legs, ring],
-                    [-arms, -pent.center, ring],
-                    [arms, -pent.center, ring],
-                    [f0, -head, agon.radius - fh * pent.axis],
-                    [f0, head, -agon.radius + fh * pent.axis],
-                    [-arms, pent.center, -ring],
-                    [arms, pent.center, -ring],
-                    [-agon.width, -legs, -ring],
-                    [agon.width, -legs, -ring],
-                    [f0, f0, -head - fh * pent.axis],
+                    [f0, phi2p1h * pent.axis, f0],
+                    [f0, pent.width * pent.axis, -pent.radius],
+                    [-pent.width, pent.width * pent.axis, -pent.middle],
+                    [pent.width, pent.width * pent.axis, -pent.middle],
+                    [-fh, pent.width * pent.axis, pent.center],
+                    [fh, pent.width * pent.axis, pent.center],
+                    [-fh, -pent.width * pent.axis, -pent.center],
+                    [fh, -pent.width * pent.axis, -pent.center],
+                    [-pent.width, -pent.width * pent.axis, pent.middle],
+                    [pent.width, -pent.width * pent.axis, pent.middle],
+                    [f0, -pent.width * pent.axis, pent.radius],
+                    [f0, -phi2p1h * pent.axis, f0],
 
-                    [f0, pent.radius, pent.radius + fh * pent.axis],
-                    [-pent.width, pent.middle, pent.radius + fh * pent.axis],
-                    [pent.width, pent.middle, pent.radius + fh * pent.axis],
-                    [-fh, -pent.center, pent.radius + fh * pent.axis],
-                    [fh, -pent.center, pent.radius + fh * pent.axis],
-                    [f0, agon.radius, fh * pent.axis],
-                    [-agon.width, agon.middle, fh * pent.axis],
-                    [agon.width, agon.middle, fh * pent.axis],
-                    [-pent.width, -agon.center, fh * pent.axis],
-                    [pent.width, -agon.center, fh * pent.axis],
-                    [-pent.width, agon.center, -fh * pent.axis],
-                    [pent.width, agon.center, -fh * pent.axis],
-                    [-agon.width, -agon.middle, -fh * pent.axis],
-                    [agon.width, -agon.middle, -fh * pent.axis],
-                    [f0, -agon.radius, -fh * pent.axis],
-                    [-fh, pent.center, -pent.radius - fh * pent.axis],
-                    [fh, pent.center, -pent.radius - fh * pent.axis],
-                    [-pent.width, -pent.middle, -pent.radius - fh * pent.axis],
-                    [pent.width, -pent.middle, -pent.radius - fh * pent.axis],
-                    [f0, -pent.radius, -pent.radius - fh * pent.axis],
+                    [-fh * psi2, pent.width * pent.axis, -psi2 * pent.center],
+                    [fh * psi2, pent.width * pent.axis, -psi2 * pent.center],
+                    [-fh * npsi, pent.width * pent.axis, psi2 * pent.middle],
+                    [fh * npsi, pent.width * pent.axis, psi2 * pent.middle],
+                    [f0, pent.width * pent.axis, psi2 * pent.radius],
+                    [-fh * npsi, fh * psi2 * pent.axis, -npsi * pent.center],
+                    [fh * npsi, fh * psi2 * pent.axis, -npsi * pent.center],
+                    [-fh, fh * psi2 * pent.axis, npsi * pent.middle],
+                    [fh, fh * psi2 * pent.axis, npsi * pent.middle],
+                    [f0, fh * psi2 * pent.axis, npsi * pent.radius],
+                    [f0, -fh * psi2 * pent.axis, -npsi * pent.radius],
+                    [-fh, -fh * psi2 * pent.axis, -npsi * pent.middle],
+                    [fh, -fh * psi2 * pent.axis, -npsi * pent.middle],
+                    [-fh * npsi, -fh * psi2 * pent.axis, npsi * pent.center],
+                    [fh * npsi, -fh * psi2 * pent.axis, npsi * pent.center],
+                    [f0, -pent.width * pent.axis, -psi2 * pent.radius],
+                    [-fh * npsi, -pent.width * pent.axis, -psi2 * pent.middle],
+                    [fh * npsi, -pent.width * pent.axis, -psi2 * pent.middle],
+                    [-fh * psi2, -pent.width * pent.axis, psi2 * pent.center],
+                    [fh * psi2, -pent.width * pent.axis, psi2 * pent.center],
                 ];
 
                 let i = vec![zero(), one()]
@@ -73,18 +76,18 @@ where
                     .collect::<Vec<_>>();
 
                 let indices = vec![
-                    i[0], i[12], i[13], i[0], i[14], i[12], i[0], i[13], i[15], i[0], i[16], i[14], i[0], i[15], i[16],
-                    i[1], i[13], i[12], i[1], i[12], i[17], i[1], i[18], i[13], i[1], i[17], i[22], i[1], i[22], i[18],
-                    i[2], i[12], i[14], i[2], i[17], i[12], i[2], i[14], i[19], i[2], i[23], i[17], i[2], i[19], i[23],
-                    i[3], i[15], i[13], i[3], i[13], i[18], i[3], i[20], i[15], i[3], i[18], i[24], i[3], i[24], i[20],
-                    i[4], i[14], i[16], i[4], i[19], i[14], i[4], i[16], i[21], i[4], i[25], i[19], i[4], i[21], i[25],
-                    i[5], i[16], i[15], i[5], i[15], i[20], i[5], i[21], i[16], i[5], i[20], i[26], i[5], i[26], i[21],
-                    i[6], i[22], i[17], i[6], i[17], i[23], i[6], i[27], i[22], i[6], i[23], i[28], i[6], i[28], i[27],
-                    i[7], i[18], i[22], i[7], i[24], i[18], i[7], i[22], i[27], i[7], i[29], i[24], i[7], i[27], i[29],
-                    i[8], i[23], i[19], i[8], i[19], i[25], i[8], i[28], i[23], i[8], i[25], i[30], i[8], i[30], i[28],
-                    i[9], i[20], i[24], i[9], i[26], i[20], i[9], i[24], i[29], i[9], i[31], i[26], i[9], i[29], i[31],
-                    i[10], i[25], i[21], i[10], i[21], i[26], i[10], i[30], i[25], i[10], i[26], i[31], i[10], i[31], i[30],
-                    i[11], i[27], i[28], i[11], i[29], i[27], i[11], i[28], i[30], i[11], i[31], i[29], i[11], i[30], i[31],
+                    i[0], i[13], i[12], i[0], i[12], i[14], i[0], i[15], i[13], i[0], i[14], i[16], i[0], i[16], i[15],
+                    i[1], i[12], i[13], i[1], i[17], i[12], i[1], i[13], i[18], i[1], i[22], i[17], i[1], i[18], i[22],
+                    i[2], i[14], i[12], i[2], i[12], i[17], i[2], i[19], i[14], i[2], i[17], i[23], i[2], i[23], i[19],
+                    i[3], i[13], i[15], i[3], i[18], i[13], i[3], i[15], i[20], i[3], i[24], i[18], i[3], i[20], i[24],
+                    i[4], i[16], i[14], i[4], i[14], i[19], i[4], i[21], i[16], i[4], i[19], i[25], i[4], i[25], i[21],
+                    i[5], i[15], i[16], i[5], i[20], i[15], i[5], i[16], i[21], i[5], i[26], i[20], i[5], i[21], i[26],
+                    i[6], i[17], i[22], i[6], i[23], i[17], i[6], i[22], i[27], i[6], i[28], i[23], i[6], i[27], i[28],
+                    i[7], i[22], i[18], i[7], i[18], i[24], i[7], i[27], i[22], i[7], i[24], i[29], i[7], i[29], i[27],
+                    i[8], i[19], i[23], i[8], i[25], i[19], i[8], i[23], i[28], i[8], i[30], i[25], i[8], i[28], i[30],
+                    i[9], i[24], i[20], i[9], i[20], i[26], i[9], i[29], i[24], i[9], i[26], i[31], i[9], i[31], i[29],
+                    i[10], i[21], i[25], i[10], i[26], i[21], i[10], i[25], i[30], i[10], i[31], i[26], i[10], i[30], i[31],
+                    i[11], i[28], i[27], i[11], i[27], i[29], i[11], i[30], i[28], i[11], i[29], i[31], i[11], i[31], i[30],
                 ];
 
                 Shape::Triangles { vertices, indices }
@@ -300,36 +303,36 @@ mod tests {
         let shape = make_shape(KpPolyhedron::StellatedDodecahedron);
         let vertices = shape.vertices();
 
-        distance_neighbour(STAR_EDGE, vertices, 0, 6);
-        distance_neighbour(STAR_EDGE, vertices, 0, 7);
-        distance_neighbour(STAR_EDGE, vertices, 0, 8);
-        distance_neighbour(STAR_EDGE, vertices, 0, 9);
-        distance_neighbour(STAR_EDGE, vertices, 0, 10);
-        distance_neighbour(STAR_EDGE, vertices, 1, 4);
-        distance_neighbour(STAR_EDGE, vertices, 1, 5);
-        distance_neighbour(STAR_EDGE, vertices, 1, 8);
-        distance_neighbour(STAR_EDGE, vertices, 1, 9);
-        distance_neighbour(STAR_EDGE, vertices, 1, 11);
-        distance_neighbour(STAR_EDGE, vertices, 2, 3);
-        distance_neighbour(STAR_EDGE, vertices, 2, 5);
-        distance_neighbour(STAR_EDGE, vertices, 2, 7);
-        distance_neighbour(STAR_EDGE, vertices, 2, 10);
-        distance_neighbour(STAR_EDGE, vertices, 2, 11);
-        distance_neighbour(STAR_EDGE, vertices, 3, 4);
-        distance_neighbour(STAR_EDGE, vertices, 3, 6);
-        distance_neighbour(STAR_EDGE, vertices, 3, 10);
-        distance_neighbour(STAR_EDGE, vertices, 3, 11);
-        distance_neighbour(STAR_EDGE, vertices, 4, 6);
-        distance_neighbour(STAR_EDGE, vertices, 4, 9);
-        distance_neighbour(STAR_EDGE, vertices, 4, 11);
-        distance_neighbour(STAR_EDGE, vertices, 5, 7);
-        distance_neighbour(STAR_EDGE, vertices, 5, 8);
-        distance_neighbour(STAR_EDGE, vertices, 5, 11);
-        distance_neighbour(STAR_EDGE, vertices, 6, 9);
-        distance_neighbour(STAR_EDGE, vertices, 6, 10);
-        distance_neighbour(STAR_EDGE, vertices, 7, 8);
-        distance_neighbour(STAR_EDGE, vertices, 7, 10);
-        distance_neighbour(STAR_EDGE, vertices, 8, 9);
+        distance_neighbour(PHI, vertices, 0, 6);
+        distance_neighbour(PHI, vertices, 0, 7);
+        distance_neighbour(PHI, vertices, 0, 8);
+        distance_neighbour(PHI, vertices, 0, 9);
+        distance_neighbour(PHI, vertices, 0, 10);
+        distance_neighbour(PHI, vertices, 1, 4);
+        distance_neighbour(PHI, vertices, 1, 5);
+        distance_neighbour(PHI, vertices, 1, 8);
+        distance_neighbour(PHI, vertices, 1, 9);
+        distance_neighbour(PHI, vertices, 1, 11);
+        distance_neighbour(PHI, vertices, 2, 3);
+        distance_neighbour(PHI, vertices, 2, 5);
+        distance_neighbour(PHI, vertices, 2, 7);
+        distance_neighbour(PHI, vertices, 2, 10);
+        distance_neighbour(PHI, vertices, 2, 11);
+        distance_neighbour(PHI, vertices, 3, 4);
+        distance_neighbour(PHI, vertices, 3, 6);
+        distance_neighbour(PHI, vertices, 3, 10);
+        distance_neighbour(PHI, vertices, 3, 11);
+        distance_neighbour(PHI, vertices, 4, 6);
+        distance_neighbour(PHI, vertices, 4, 9);
+        distance_neighbour(PHI, vertices, 4, 11);
+        distance_neighbour(PHI, vertices, 5, 7);
+        distance_neighbour(PHI, vertices, 5, 8);
+        distance_neighbour(PHI, vertices, 5, 11);
+        distance_neighbour(PHI, vertices, 6, 9);
+        distance_neighbour(PHI, vertices, 6, 10);
+        distance_neighbour(PHI, vertices, 7, 8);
+        distance_neighbour(PHI, vertices, 7, 10);
+        distance_neighbour(PHI, vertices, 8, 9);
     }
 
     #[test]
