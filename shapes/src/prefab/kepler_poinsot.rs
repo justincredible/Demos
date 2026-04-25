@@ -23,51 +23,51 @@ where
                 let f0 = zero();
                 let fh = cast::<_, C>(0.5).unwrap();
                 let pent = Pentagonal::<C>::new(Edge::Unit);
+                let apex = (pent.width / fh - fh) * pent.radius;
 
                 // Stellation
                 let f1 = one::<C>();
+                let f2 = cast::<_, C>(2.).unwrap();
                 let f3 = cast::<_, C>(3.).unwrap();
-                let f5 = cast::<_, C>(5.).unwrap();
-                let fq = cast::<_, C>(0.25).unwrap();
                 let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-                let phi2p1h = fq * (f5 + sr5);
                 let npsi = fh * (sr5 - f1); // 1/phi
                 let psi2 = fh * (f3 - sr5); // 1/phi^2
+                let npsi3h = fh * (sr5 - f2); // 1/phi^3
 
                 let vertices = vec![
-                    [f0, phi2p1h * pent.axis, f0],
-                    [f0, pent.width * pent.axis, -pent.radius],
-                    [-pent.width, pent.width * pent.axis, -pent.middle],
-                    [pent.width, pent.width * pent.axis, -pent.middle],
-                    [-fh, pent.width * pent.axis, pent.center],
-                    [fh, pent.width * pent.axis, pent.center],
-                    [-fh, -pent.width * pent.axis, -pent.center],
-                    [fh, -pent.width * pent.axis, -pent.center],
-                    [-pent.width, -pent.width * pent.axis, pent.middle],
-                    [pent.width, -pent.width * pent.axis, pent.middle],
-                    [f0, -pent.width * pent.axis, pent.radius],
-                    [f0, -phi2p1h * pent.axis, f0],
+                    [f0, apex, f0],
+                    [f0, fh * pent.radius, -pent.radius],
+                    [-pent.width, fh * pent.radius, -pent.middle],
+                    [pent.width, fh * pent.radius, -pent.middle],
+                    [-fh, fh * pent.radius, pent.center],
+                    [fh, fh * pent.radius, pent.center],
+                    [-fh, -fh * pent.radius, -pent.center],
+                    [fh, -fh * pent.radius, -pent.center],
+                    [-pent.width, -fh * pent.radius, pent.middle],
+                    [pent.width, -fh * pent.radius, pent.middle],
+                    [f0, -fh * pent.radius, pent.radius],
+                    [f0, -apex, f0],
 
-                    [-fh * psi2, pent.width * pent.axis, -psi2 * pent.center],
-                    [fh * psi2, pent.width * pent.axis, -psi2 * pent.center],
-                    [-fh * npsi, pent.width * pent.axis, psi2 * pent.middle],
-                    [fh * npsi, pent.width * pent.axis, psi2 * pent.middle],
-                    [f0, pent.width * pent.axis, psi2 * pent.radius],
-                    [-fh * npsi, fh * psi2 * pent.axis, -npsi * pent.center],
-                    [fh * npsi, fh * psi2 * pent.axis, -npsi * pent.center],
-                    [-fh, fh * psi2 * pent.axis, npsi * pent.middle],
-                    [fh, fh * psi2 * pent.axis, npsi * pent.middle],
-                    [f0, fh * psi2 * pent.axis, npsi * pent.radius],
-                    [f0, -fh * psi2 * pent.axis, -npsi * pent.radius],
-                    [-fh, -fh * psi2 * pent.axis, -npsi * pent.middle],
-                    [fh, -fh * psi2 * pent.axis, -npsi * pent.middle],
-                    [-fh * npsi, -fh * psi2 * pent.axis, npsi * pent.center],
-                    [fh * npsi, -fh * psi2 * pent.axis, npsi * pent.center],
-                    [f0, -pent.width * pent.axis, -psi2 * pent.radius],
-                    [-fh * npsi, -pent.width * pent.axis, -psi2 * pent.middle],
-                    [fh * npsi, -pent.width * pent.axis, -psi2 * pent.middle],
-                    [-fh * psi2, -pent.width * pent.axis, psi2 * pent.center],
-                    [fh * psi2, -pent.width * pent.axis, psi2 * pent.center],
+                    [-fh * psi2, fh * pent.radius, -psi2 * pent.center],
+                    [fh * psi2, fh * pent.radius, -psi2 * pent.center],
+                    [-fh * npsi, fh * pent.radius, psi2 * pent.middle],
+                    [fh * npsi, fh * pent.radius, psi2 * pent.middle],
+                    [f0, fh * pent.radius, psi2 * pent.radius],
+                    [-fh * npsi, npsi3h * pent.radius, -npsi * pent.center],
+                    [fh * npsi, npsi3h * pent.radius, -npsi * pent.center],
+                    [-fh, npsi3h * pent.radius, npsi * pent.middle],
+                    [fh, npsi3h * pent.radius, npsi * pent.middle],
+                    [f0, npsi3h * pent.radius, npsi * pent.radius],
+                    [f0, -npsi3h * pent.radius, -npsi * pent.radius],
+                    [-fh, -npsi3h * pent.radius, -npsi * pent.middle],
+                    [fh, -npsi3h * pent.radius, -npsi * pent.middle],
+                    [-fh * npsi, -npsi3h * pent.radius, npsi * pent.center],
+                    [fh * npsi, -npsi3h * pent.radius, npsi * pent.center],
+                    [f0, -fh * pent.radius, -psi2 * pent.radius],
+                    [-fh * npsi, -fh * pent.radius, -psi2 * pent.middle],
+                    [fh * npsi, -fh * pent.radius, -psi2 * pent.middle],
+                    [-fh * psi2, -fh * pent.radius, psi2 * pent.center],
+                    [fh * psi2, -fh * pent.radius, psi2 * pent.center],
                 ];
 
                 let i = vec![zero(), one()]
@@ -97,21 +97,21 @@ where
                 let f0 = zero();
                 let fh = cast::<_, C>(0.5).unwrap();
                 let pent = Pentagonal::<C>::new(Edge::Unit);
-                let half_middle = pent.width * pent.axis;
+                let apex = (pent.width / fh - fh) * pent.radius;
 
                 let vertices = vec![
-                    [f0, half_middle + pent.axis, f0],
-                    [f0, half_middle, -pent.radius],
-                    [-pent.width, half_middle, -pent.middle],
-                    [pent.width, half_middle, -pent.middle],
-                    [-fh, half_middle, pent.center],
-                    [fh, half_middle, pent.center],
-                    [-fh, -half_middle, -pent.center],
-                    [fh, -half_middle, -pent.center],
-                    [-pent.width, -half_middle, pent.middle],
-                    [pent.width, -half_middle, pent.middle],
-                    [f0, -half_middle, pent.radius],
-                    [f0, -half_middle - pent.axis, f0],
+                    [f0, apex, f0],
+                    [f0, fh * pent.radius, -pent.radius],
+                    [-pent.width, fh * pent.radius, -pent.middle],
+                    [pent.width, fh * pent.radius, -pent.middle],
+                    [-fh, fh * pent.radius, pent.center],
+                    [fh, fh * pent.radius, pent.center],
+                    [-fh, -fh * pent.radius, -pent.center],
+                    [fh, -fh * pent.radius, -pent.center],
+                    [-pent.width, -fh * pent.radius, pent.middle],
+                    [pent.width, -fh * pent.radius, pent.middle],
+                    [f0, -fh * pent.radius, pent.radius],
+                    [f0, -apex, f0],
                 ];
 
                 let i = vec![zero(), one()]
@@ -140,55 +140,54 @@ where
                 // Icosahedron
                 let f0 = zero();
                 let fh = cast::<_, C>(0.5).unwrap();
-                let pent = Pentagonal::new(Edge::Unit);
-                let half_middle = pent.width * pent.axis;
+                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
+                let pent = Pentagonal::<C>::new(Edge::Unit);
 
                 // GSD
                 let agon = Pentagonal::<C>::new(Edge::Phi);
                 let f1 = one::<C>();
                 let f3 = cast::<_, C>(3.).unwrap();
-                let sr5 = cast::<_, C>(5.).unwrap().sqrt();
                 let phi = fh * (f1 + sr5);
                 let phi2 = fh * (f3 + sr5);
                 let phi2he = f1 / (f3 - sr5) + C::epsilon();
                 let point_bot = phi2 * pent.radius - agon.middle;
                 let point_top = phi2 * pent.center + agon.middle;
-                let pinnacle = (phi2 + pent.width) * pent.axis;
+                let pinnacle = (phi + fh) * pent.radius;
 
                 let vertices = vec![
                     [-pent.width, pinnacle, -phi * pent.center],
                     [pent.width, pinnacle, -phi * pent.center],
-                    [-agon.width, pinnacle, half_middle],
-                    [agon.width, pinnacle, half_middle],
+                    [-agon.width, pinnacle, fh * pent.radius],
+                    [agon.width, pinnacle, fh * pent.radius],
                     [f0, pinnacle, agon.radius],
-                    [-phi2he, half_middle, -point_bot],
-                    [phi2he, half_middle, -point_bot],
-                    [-phi * agon.width, half_middle, pent.center],
-                    [phi * agon.width, half_middle, pent.center],
-                    [f0, half_middle, point_top],
-                    [f0, -half_middle, -point_top],
-                    [-phi * agon.width, -half_middle, -pent.center],
-                    [phi * agon.width, -half_middle, -pent.center],
-                    [-phi2he, -half_middle, point_bot],
-                    [phi2he, -half_middle, point_bot],
+                    [-phi2he, fh * pent.radius, -point_bot],
+                    [phi2he, fh * pent.radius, -point_bot],
+                    [-phi * agon.width, fh * pent.radius, pent.center],
+                    [phi * agon.width, fh * pent.radius, pent.center],
+                    [f0, fh * pent.radius, point_top],
+                    [f0, -fh * pent.radius, -point_top],
+                    [-phi * agon.width, -fh * pent.radius, -pent.center],
+                    [phi * agon.width, -fh * pent.radius, -pent.center],
+                    [-phi2he, -fh * pent.radius, point_bot],
+                    [phi2he, -fh * pent.radius, point_bot],
                     [f0, -pinnacle, -agon.radius],
-                    [-agon.width, -pinnacle, -half_middle],
-                    [agon.width, -pinnacle, -half_middle],
+                    [-agon.width, -pinnacle, -fh * pent.radius],
+                    [agon.width, -pinnacle, -fh * pent.radius],
                     [-pent.width, -pinnacle, phi * pent.center],
                     [pent.width, -pinnacle, phi * pent.center],
 
-                    [f0, half_middle + pent.axis, f0],
-                    [f0, half_middle, -pent.radius],
-                    [-pent.width, half_middle, -pent.middle],
-                    [pent.width, half_middle, -pent.middle],
-                    [-fh, half_middle, pent.center],
-                    [fh, half_middle, pent.center],
-                    [-fh, -half_middle, -pent.center],
-                    [fh, -half_middle, -pent.center],
-                    [-pent.width, -half_middle, pent.middle],
-                    [pent.width, -half_middle, pent.middle],
-                    [f0, -half_middle, pent.radius],
-                    [f0, -half_middle - pent.axis, f0],
+                    [f0, fh  * sr5 * pent.radius, f0],
+                    [f0, fh * pent.radius, -pent.radius],
+                    [-pent.width, fh * pent.radius, -pent.middle],
+                    [pent.width, fh * pent.radius, -pent.middle],
+                    [-fh, fh * pent.radius, pent.center],
+                    [fh, fh * pent.radius, pent.center],
+                    [-fh, -fh * pent.radius, -pent.center],
+                    [fh, -fh * pent.radius, -pent.center],
+                    [-pent.width, -fh * pent.radius, pent.middle],
+                    [pent.width, -fh * pent.radius, pent.middle],
+                    [f0, -fh * pent.radius, pent.radius],
+                    [f0, -fh * sr5 * pent.radius, f0],
                 ];
 
                 let i = vec![zero(), one()]
@@ -226,21 +225,21 @@ where
                 let f0 = zero();
                 let fh = cast::<_, C>(0.5).unwrap();
                 let pent = Pentagonal::<C>::new(Edge::Unit);
-                let half_middle = pent.width * pent.axis;
+                let apex = (pent.width / fh - fh) * pent.radius;
 
                 let vertices = vec![
-                    [f0, half_middle + pent.axis, f0],
-                    [f0, half_middle, -pent.radius],
-                    [-pent.width, half_middle, -pent.middle],
-                    [pent.width, half_middle, -pent.middle],
-                    [-fh, half_middle, pent.center],
-                    [fh, half_middle, pent.center],
-                    [-fh, -half_middle, -pent.center],
-                    [fh, -half_middle, -pent.center],
-                    [-pent.width, -half_middle, pent.middle],
-                    [pent.width, -half_middle, pent.middle],
-                    [f0, -half_middle, pent.radius],
-                    [f0, -half_middle - pent.axis, f0],
+                    [f0, apex, f0],
+                    [f0, fh * pent.radius, -pent.radius],
+                    [-pent.width, fh * pent.radius, -pent.middle],
+                    [pent.width, fh * pent.radius, -pent.middle],
+                    [-fh, fh * pent.radius, pent.center],
+                    [fh, fh * pent.radius, pent.center],
+                    [-fh, -fh * pent.radius, -pent.center],
+                    [fh, -fh * pent.radius, -pent.center],
+                    [-pent.width, -fh * pent.radius, pent.middle],
+                    [pent.width, -fh * pent.radius, pent.middle],
+                    [f0, -fh * pent.radius, pent.radius],
+                    [f0, -apex, f0],
                 ];
 
                 let i = vec![zero(), one()]

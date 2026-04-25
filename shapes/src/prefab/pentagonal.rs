@@ -13,7 +13,10 @@ where
     pub center: C,
     pub radius: C,
     pub middle: C,
-    pub axis: C,
+    //pub axis: C = radius / phi,
+    //pub base: C = center + middle,
+    //pub top: C = radius - middle,
+    //pub height: C = center + radius,
 }
 
 impl<C> Pentagonal<C>
@@ -21,23 +24,22 @@ where
     C: Float + FloatConst,
 {
     pub fn new(edge: Edge) -> Self {
-        let fh = cast::<_, C>(0.5).unwrap();
         let f1 = one::<C>();
         let f2 = cast::<_, C>(2.).unwrap();
-        let f10 = cast::<_, C>(10.).unwrap();
+        let fh = cast::<_, C>(0.5).unwrap();
         let fq = cast::<_, C>(0.25).unwrap();
         let sr5 = cast::<_, C>(5.).unwrap().sqrt();
 
-        let (width, center, radius, middle, axis) = match edge {
+        let (width, center, radius, middle) = match edge {
             Edge::Unit => (
                 fq * (f1 + sr5), // phi/2
                 fh * (f1 + f2 / sr5).sqrt(),
-                fh * (f2 + f2 / sr5).sqrt(),
+                (fh + fh / sr5).sqrt(),
                 fq * (f2 - f2 / sr5).sqrt(),
-                (fh - sr5 / f10).sqrt(),
             ),
             Edge::Phi => {
                 let f3 = cast::<_, C>(3.).unwrap();
+                let f10 = cast::<_, C>(10.).unwrap();
                 let f22 = cast::<_, C>(22.).unwrap();
 
                 (
@@ -45,12 +47,11 @@ where
                     fq * (f10 + f22 / sr5).sqrt(),
                     (f1 + f2 / sr5).sqrt(), // 2 * unit.center
                     fq * (f2 + f2 / sr5).sqrt(), // unit.radius / 2
-                    (fh + sr5 / f10).sqrt(),
                 )
             },
         };
 
-        Pentagonal { width, center, radius, middle, axis }
+        Pentagonal { width, center, radius, middle }
     }
 }
 
