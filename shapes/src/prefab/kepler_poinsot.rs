@@ -282,7 +282,7 @@ where
 mod tests {
     use super::{KpPolyhedron, Shape, Shaper};
 
-    use crate::prefab::unit_test::{equidistant, distance_neighbour};
+    use crate::prefab::unit_test::{distance_neighbour, equidistant};
 
     type Real = f64;
 
