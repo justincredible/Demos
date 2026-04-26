@@ -180,12 +180,9 @@ fn main() {
                     let scale = Vec3::ONE * if shape == 0 {
                         let angle = consts::TAU / sides as f32;
                         f32::sin(angle) / f32::cos(0.5 * angle)
-                    } else if shape == 4 {
+                    } else if shape == 4 || shape == 8 {
                         // the dodecahedron is rather large
-                        0.5
-                    } else if shape == 6 || shape == 8 {
-                        // the stellated dodecahedrons are even larger
-                        0.4
+                        0.7
                     } else {
                         1.0
                     };
