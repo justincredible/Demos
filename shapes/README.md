@@ -71,10 +71,9 @@ Better known as the cube, the vertices are immediately known for specific orient
 
 ### Octahedron
 
-The bottom edges of the triangles form a square perimeter.
-Two unit length edges connect non-adjacent vertices on this square over a distance of $\sqrt 2$,
-so the angle between those two edges is $90^\circ$
-and the two remaining vertices have a distance of $1 \over \sqrt 2$ from the square's center.
+The edges of the triangles form a square perimeter from two pairs of non-adjacent vertices.
+The remaining two vertices outline a square with either pair, so the diameter is $\sqrt 2$.
+A non-coplanar vertex has a distance of $1 \over \sqrt 2$ from a square's center.
 
 ### Dodecahedron
 
@@ -92,7 +91,7 @@ and from the exact values this simplifies to $z_{outer} = r$
 The next five vertices are the previous five reflected about the x-axis.
 The distance between these two sets, $z_{inner}$,
 must also satisfy ${\Delta x}^2 + {\Delta y}^2 + z_{inner}^2 = 1$ for neighbouring vertices.
-Using the middle vertices on one side we see $z_{inner} = \sqrt { 1 - 4(\phi + 1)(base - c)^2 }  = \sqrt { 1 - 4(\phi + 1)(r - top)^2 }$
+Using the middle vertices on one side we see $z_{inner} = \sqrt { 1 - 4(\phi + 1)(base - c)^2 }  = \sqrt { 1 - 4\phi^2(r - top)^2 } = \sqrt { 1 - 4\phi^2middle^2 }$
 
 The final five vertices are the first five reflected about the x-axis,
 and the distance between this and the previous set is again $z_{outer} = r$
@@ -114,7 +113,7 @@ The remaining regular polyhedra.
 
 Stellation is accomplished by constructing pyramids from the faces of a dodecahedron or an icosahedron.
 The resulting faces are meant to be intersecting pentagrams, so the heights are fixed for a given edge length.
-Merely extending the edges by the golden ratio determines vertex locations; retaining the original vertices aides rendering.
+Merely extending the edges by the golden ratio determines vertex locations; retaining the original vertices aides rendering. This process can also be inverted with the opposite Platonic solid by noting that the ratio of a pentagram's side lenth to its inner pentagon's side length is $2\phi + 1 = \phi^3$.
 
 ![quote stellation unquote](doc/pentagram.svg)
 
