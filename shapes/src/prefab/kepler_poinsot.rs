@@ -294,8 +294,9 @@ mod tests {
 
     #[test]
     fn stellated_dodecahedron_centered() {
-        // only test the polyhedral vertices
+        // test the polyhedral and render vertices separately
         equidistant(&make_shape(KpPolyhedron::StellatedDodecahedron).vertices()[0..12]);
+        equidistant(&make_shape(KpPolyhedron::StellatedDodecahedron).vertices()[12..]);
     }
 
     #[test]
@@ -379,8 +380,9 @@ mod tests {
 
     #[test]
     fn great_stellated_dodecahedron_centered() {
-        // only test the polyhedral vertices
+        // test the polyhedral and render vertices separately
         equidistant(&make_shape(KpPolyhedron::GreatStellatedDodecahedron).vertices()[0..20]);
+        equidistant(&make_shape(KpPolyhedron::GreatStellatedDodecahedron).vertices()[20..]);
     }
 
     #[test]
