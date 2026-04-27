@@ -248,9 +248,15 @@ where
 mod tests {
     use super::{PlatonicSolid, Shape, Shaper};
 
-    use crate::prefab::unit_test::{equidistant, unit_neighbour};
+    use crate::prefab::unit_test::{distance_neighbour, equidistant, unit_neighbour};
 
-    fn make_shape(solid: PlatonicSolid) -> Shape<f64, u8> {
+    type Real = f64;
+
+    const SQRT_2: Real = 1.41421356237309504880;
+    const SQRT_3: Real = 1.73205080756887729352;
+    const SQRT_5: Real = 2.23606797749978969640;
+
+    fn make_shape(solid: PlatonicSolid) -> Shape<Real, u8> {
         solid.make(Default::default())
     }
 
@@ -270,6 +276,11 @@ mod tests {
         unit_neighbour(vertices, 1, 2);
         unit_neighbour(vertices, 1, 3);
         unit_neighbour(vertices, 2, 3);
+    }
+
+    #[test]
+    fn tetrahedron_diameters() {
+        tetrahedron_edges();
     }
 
     #[test]
@@ -297,6 +308,17 @@ mod tests {
     }
 
     #[test]
+    fn hexahedron_diameters() {
+        let shape = make_shape(PlatonicSolid::Hexahedron);
+        let vertices = shape.vertices();
+
+        distance_neighbour(SQRT_3, vertices, 0, 7);
+        distance_neighbour(SQRT_3, vertices, 1, 6);
+        distance_neighbour(SQRT_3, vertices, 2, 5);
+        distance_neighbour(SQRT_3, vertices, 3, 4);
+    }
+
+    #[test]
     fn octahedron_centered() {
         equidistant(make_shape(PlatonicSolid::Octahedron).vertices());
     }
@@ -318,6 +340,16 @@ mod tests {
         unit_neighbour(vertices, 3, 4);
         unit_neighbour(vertices, 3, 5);
         unit_neighbour(vertices, 4, 5);
+    }
+
+    #[test]
+    fn octahedron_diameters() {
+        let shape = make_shape(PlatonicSolid::Octahedron);
+        let vertices = shape.vertices();
+
+        distance_neighbour(SQRT_2, vertices, 0, 5);
+        distance_neighbour(SQRT_2, vertices, 1, 3);
+        distance_neighbour(SQRT_2, vertices, 2, 4);
     }
 
     #[test]
@@ -363,6 +395,24 @@ mod tests {
     }
 
     #[test]
+    fn dodecahedron_diameters() {
+        let shape = make_shape(PlatonicSolid::Dodecahedron);
+        let vertices = shape.vertices();
+
+        let diameter = Real::sqrt(0.5*(9. + 3.*SQRT_5)); // sqrt(3phi^2)
+        distance_neighbour(diameter, vertices, 0, 19);
+        distance_neighbour(diameter, vertices, 1, 18);
+        distance_neighbour(diameter, vertices, 2, 17);
+        distance_neighbour(diameter, vertices, 3, 16);
+        distance_neighbour(diameter, vertices, 4, 15);
+        distance_neighbour(diameter, vertices, 5, 14);
+        distance_neighbour(diameter, vertices, 6, 13);
+        distance_neighbour(diameter, vertices, 7, 12);
+        distance_neighbour(diameter, vertices, 8, 11);
+        distance_neighbour(diameter, vertices, 9, 10);
+    }
+
+    #[test]
     fn icosahedron_centered() {
         equidistant(make_shape(PlatonicSolid::Icosahedron).vertices());
     }
@@ -402,5 +452,19 @@ mod tests {
         unit_neighbour(vertices, 9, 10);
         unit_neighbour(vertices, 9, 11);
         unit_neighbour(vertices, 10, 11);
+    }
+
+    #[test]
+    fn icosahedron_diameters() {
+        let shape = make_shape(PlatonicSolid::Icosahedron);
+        let vertices = shape.vertices();
+
+        let diameter = Real::sqrt(0.5*(5. + SQRT_5)); // sqrt(phi + 2)
+        distance_neighbour(diameter, vertices, 0, 11);
+        distance_neighbour(diameter, vertices, 1, 10);
+        distance_neighbour(diameter, vertices, 2, 9);
+        distance_neighbour(diameter, vertices, 3, 8);
+        distance_neighbour(diameter, vertices, 4, 7);
+        distance_neighbour(diameter, vertices, 5, 6);
     }
 }
