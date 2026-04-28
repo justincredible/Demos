@@ -21,16 +21,18 @@ where
         match self {
             Self::Tetrahedron => {
                 let f0 = zero();
+                let f1 = one::<C>();
                 let fh = cast::<_, C>(0.5).unwrap();
                 let sr2 = FloatConst::SQRT_2();
                 let sr3 = cast::<_, C>(3.).unwrap().sqrt();
                 let base = -fh / sr2 / sr3;
+                let apex = fh * sr3 / sr2;
 
                 let vertices = vec![
                     [-fh, base, fh / sr3],
                     [fh, base, fh / sr3],
-                    [f0, base + sr2 / sr3, f0],
-                    [f0, base, -one::<C>() / sr3],
+                    [f0, apex, f0],
+                    [f0, base, -f1 / sr3],
                 ];
 
                 let i = vec![zero(), one()]
