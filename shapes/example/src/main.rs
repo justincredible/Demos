@@ -215,8 +215,8 @@ fn main() {
                         physical_key: Code(KeyCode::ArrowUp),
                         ..
                     } => match shape {
-                        1 | 3 | 5 => shape = 2,
-                        2 => shape = 4,
+                        1 | 3 => shape = 2,
+                        2 | 5 => shape = 4,
                         0 => {
                             sides = sides.saturating_add(1);
                             shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
@@ -255,8 +255,8 @@ fn main() {
                         physical_key: Code(KeyCode::ArrowRight),
                         ..
                     } => match shape {
-                        1 => shape = 3,
-                        3 => shape = 5,
+                        1 | 2 => shape = 3,
+                        3 | 4 => shape = 5,
                         6 => shape = 7,
                         7 => shape = 8,
                         8 => shape = 9,
