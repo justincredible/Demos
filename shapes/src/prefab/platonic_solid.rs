@@ -91,17 +91,16 @@ where
                 }
             },
             Self::Octahedron => {
-                let f0 = zero();
-                let fh = cast::<_, C>(0.5).unwrap();
-                let half_height = FloatConst::FRAC_1_SQRT_2();
+                let f0 = zero::<C>();
+                let half_h = FloatConst::FRAC_1_SQRT_2();
 
                 let vertices = vec![
-                    [f0, half_height, f0],
-                    [-fh, f0, -fh],
-                    [-fh, f0, fh],
-                    [fh, f0, fh],
-                    [fh, f0, -fh],
-                    [f0, -half_height, f0],
+                    [f0, half_h, f0],
+                    [f0, f0, -half_h],
+                    [-half_h, f0, f0],
+                    [f0, f0, half_h],
+                    [half_h, f0, f0],
+                    [f0, -half_h, f0],
                 ];
 
                 let i = vec![zero(), one()]
