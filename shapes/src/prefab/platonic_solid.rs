@@ -252,6 +252,7 @@ mod tests {
 
     type Real = f64;
 
+    const PHI: Real = 1.61803398874989484820;
     const SQRT_2: Real = 1.41421356237309504880;
     const SQRT_3: Real = 1.73205080756887729352;
     const SQRT_5: Real = 2.23606797749978969640;
@@ -316,6 +317,25 @@ mod tests {
         distance_neighbour(SQRT_3, vertices, 1, 6);
         distance_neighbour(SQRT_3, vertices, 2, 5);
         distance_neighbour(SQRT_3, vertices, 3, 4);
+    }
+
+    #[test]
+    fn hexahedron_nonadjacents() {
+        let shape = make_shape(PlatonicSolid::Hexahedron);
+        let vertices = shape.vertices();
+
+        distance_neighbour(SQRT_2, vertices, 0, 3);
+        distance_neighbour(SQRT_2, vertices, 0, 5);
+        distance_neighbour(SQRT_2, vertices, 0, 6);
+        distance_neighbour(SQRT_2, vertices, 1, 2);
+        distance_neighbour(SQRT_2, vertices, 1, 4);
+        distance_neighbour(SQRT_2, vertices, 1, 7);
+        distance_neighbour(SQRT_2, vertices, 2, 4);
+        distance_neighbour(SQRT_2, vertices, 2, 7);
+        distance_neighbour(SQRT_2, vertices, 3, 5);
+        distance_neighbour(SQRT_2, vertices, 3, 6);
+        distance_neighbour(SQRT_2, vertices, 4, 7);
+        distance_neighbour(SQRT_2, vertices, 5, 6);
     }
 
     #[test]
@@ -413,6 +433,178 @@ mod tests {
     }
 
     #[test]
+    fn dodecahedron_nonadjacents_first() {
+        let shape = make_shape(PlatonicSolid::Dodecahedron);
+        let vertices = shape.vertices();
+
+        distance_neighbour(PHI, vertices, 0, 3);
+        distance_neighbour(PHI, vertices, 0, 4);
+        distance_neighbour(PHI, vertices, 0, 6);
+        distance_neighbour(PHI, vertices, 0, 7);
+        distance_neighbour(PHI, vertices, 0, 10);
+        distance_neighbour(PHI, vertices, 0, 11);
+        distance_neighbour(PHI, vertices, 1, 2);
+        distance_neighbour(PHI, vertices, 1, 4);
+        distance_neighbour(PHI, vertices, 1, 5);
+        distance_neighbour(PHI, vertices, 1, 8);
+        distance_neighbour(PHI, vertices, 1, 10);
+        distance_neighbour(PHI, vertices, 1, 12);
+        distance_neighbour(PHI, vertices, 2, 3);
+        distance_neighbour(PHI, vertices, 2, 5);
+        distance_neighbour(PHI, vertices, 2, 9);
+        distance_neighbour(PHI, vertices, 2, 11);
+        distance_neighbour(PHI, vertices, 2, 13);
+        distance_neighbour(PHI, vertices, 3, 6);
+        distance_neighbour(PHI, vertices, 3, 9);
+        distance_neighbour(PHI, vertices, 3, 12);
+        distance_neighbour(PHI, vertices, 3, 14);
+        distance_neighbour(PHI, vertices, 4, 7);
+        distance_neighbour(PHI, vertices, 4, 8);
+        distance_neighbour(PHI, vertices, 4, 13);
+        distance_neighbour(PHI, vertices, 4, 14);
+        distance_neighbour(PHI, vertices, 5, 6);
+        distance_neighbour(PHI, vertices, 5, 7);
+        distance_neighbour(PHI, vertices, 5, 15);
+        distance_neighbour(PHI, vertices, 5, 16);
+        distance_neighbour(PHI, vertices, 6, 8);
+        distance_neighbour(PHI, vertices, 6, 15);
+        distance_neighbour(PHI, vertices, 6, 17);
+        distance_neighbour(PHI, vertices, 7, 9);
+        distance_neighbour(PHI, vertices, 7, 16);
+        distance_neighbour(PHI, vertices, 7, 18);
+        distance_neighbour(PHI, vertices, 8, 9);
+        distance_neighbour(PHI, vertices, 8, 17);
+        distance_neighbour(PHI, vertices, 8, 19);
+        distance_neighbour(PHI, vertices, 9, 18);
+        distance_neighbour(PHI, vertices, 9, 19);
+        distance_neighbour(PHI, vertices, 10, 11);
+        distance_neighbour(PHI, vertices, 10, 12);
+        distance_neighbour(PHI, vertices, 10, 16);
+        distance_neighbour(PHI, vertices, 10, 17);
+        distance_neighbour(PHI, vertices, 11, 13);
+        distance_neighbour(PHI, vertices, 11, 15);
+        distance_neighbour(PHI, vertices, 11, 18);
+        distance_neighbour(PHI, vertices, 12, 14);
+        distance_neighbour(PHI, vertices, 12, 15);
+        distance_neighbour(PHI, vertices, 12, 19);
+        distance_neighbour(PHI, vertices, 13, 14);
+        distance_neighbour(PHI, vertices, 13, 16);
+        distance_neighbour(PHI, vertices, 13, 19);
+        distance_neighbour(PHI, vertices, 14, 17);
+        distance_neighbour(PHI, vertices, 14, 18);
+        distance_neighbour(PHI, vertices, 15, 18);
+        distance_neighbour(PHI, vertices, 15, 19);
+        distance_neighbour(PHI, vertices, 16, 17);
+        distance_neighbour(PHI, vertices, 16, 19);
+        distance_neighbour(PHI, vertices, 17, 18);
+    }
+
+    #[test]
+    fn dodecahedron_nonadjacents_second() {
+        let shape = make_shape(PlatonicSolid::Dodecahedron);
+        let vertices = shape.vertices();
+
+        let distance = Real::sqrt(3. + SQRT_5); // sqrt(2phi^2)
+        distance_neighbour(distance, vertices, 0, 8);
+        distance_neighbour(distance, vertices, 0, 9);
+        distance_neighbour(distance, vertices, 0, 12);
+        distance_neighbour(distance, vertices, 0, 13);
+        distance_neighbour(distance, vertices, 0, 15);
+        distance_neighbour(distance, vertices, 0, 16);
+        distance_neighbour(distance, vertices, 1, 7);
+        distance_neighbour(distance, vertices, 1, 9);
+        distance_neighbour(distance, vertices, 1, 11);
+        distance_neighbour(distance, vertices, 1, 14);
+        distance_neighbour(distance, vertices, 1, 15);
+        distance_neighbour(distance, vertices, 1, 17);
+        distance_neighbour(distance, vertices, 2, 6);
+        distance_neighbour(distance, vertices, 2, 8);
+        distance_neighbour(distance, vertices, 2, 10);
+        distance_neighbour(distance, vertices, 2, 14);
+        distance_neighbour(distance, vertices, 2, 16);
+        distance_neighbour(distance, vertices, 2, 18);
+        distance_neighbour(distance, vertices, 3, 5);
+        distance_neighbour(distance, vertices, 3, 7);
+        distance_neighbour(distance, vertices, 3, 10);
+        distance_neighbour(distance, vertices, 3, 13);
+        distance_neighbour(distance, vertices, 3, 17);
+        distance_neighbour(distance, vertices, 3, 19);
+        distance_neighbour(distance, vertices, 4, 5);
+        distance_neighbour(distance, vertices, 4, 6);
+        distance_neighbour(distance, vertices, 4, 11);
+        distance_neighbour(distance, vertices, 4, 12);
+        distance_neighbour(distance, vertices, 4, 18);
+        distance_neighbour(distance, vertices, 4, 19);
+        distance_neighbour(distance, vertices, 5, 12);
+        distance_neighbour(distance, vertices, 5, 13);
+        distance_neighbour(distance, vertices, 5, 17);
+        distance_neighbour(distance, vertices, 5, 18);
+        distance_neighbour(distance, vertices, 6, 11);
+        distance_neighbour(distance, vertices, 6, 14);
+        distance_neighbour(distance, vertices, 6, 16);
+        distance_neighbour(distance, vertices, 6, 19);
+        distance_neighbour(distance, vertices, 7, 10);
+        distance_neighbour(distance, vertices, 7, 14);
+        distance_neighbour(distance, vertices, 7, 15);
+        distance_neighbour(distance, vertices, 7, 19);
+        distance_neighbour(distance, vertices, 8, 10);
+        distance_neighbour(distance, vertices, 8, 13);
+        distance_neighbour(distance, vertices, 8, 15);
+        distance_neighbour(distance, vertices, 8, 18);
+        distance_neighbour(distance, vertices, 9, 11);
+        distance_neighbour(distance, vertices, 9, 12);
+        distance_neighbour(distance, vertices, 9, 16);
+        distance_neighbour(distance, vertices, 9, 17);
+        distance_neighbour(distance, vertices, 10, 18);
+        distance_neighbour(distance, vertices, 10, 19);
+        distance_neighbour(distance, vertices, 11, 17);
+        distance_neighbour(distance, vertices, 11, 19);
+        distance_neighbour(distance, vertices, 12, 16);
+        distance_neighbour(distance, vertices, 12, 18);
+        distance_neighbour(distance, vertices, 13, 15);
+        distance_neighbour(distance, vertices, 13, 17);
+        distance_neighbour(distance, vertices, 14, 15);
+        distance_neighbour(distance, vertices, 14, 16);
+    }
+
+    #[test]
+    fn dodecahedron_nonadjacents_third() {
+        let shape = make_shape(PlatonicSolid::Dodecahedron);
+        let vertices = shape.vertices();
+
+        distance_neighbour(PHI + 1., vertices, 0, 14);
+        distance_neighbour(PHI + 1., vertices, 0, 17);
+        distance_neighbour(PHI + 1., vertices, 0, 18);
+        distance_neighbour(PHI + 1., vertices, 1, 13);
+        distance_neighbour(PHI + 1., vertices, 1, 16);
+        distance_neighbour(PHI + 1., vertices, 1, 19);
+        distance_neighbour(PHI + 1., vertices, 2, 12);
+        distance_neighbour(PHI + 1., vertices, 2, 15);
+        distance_neighbour(PHI + 1., vertices, 2, 19);
+        distance_neighbour(PHI + 1., vertices, 3, 11);
+        distance_neighbour(PHI + 1., vertices, 3, 15);
+        distance_neighbour(PHI + 1., vertices, 3, 18);
+        distance_neighbour(PHI + 1., vertices, 4, 10);
+        distance_neighbour(PHI + 1., vertices, 4, 16);
+        distance_neighbour(PHI + 1., vertices, 4, 17);
+        distance_neighbour(PHI + 1., vertices, 5, 8);
+        distance_neighbour(PHI + 1., vertices, 5, 9);
+        distance_neighbour(PHI + 1., vertices, 5, 19);
+        distance_neighbour(PHI + 1., vertices, 6, 7);
+        distance_neighbour(PHI + 1., vertices, 6, 9);
+        distance_neighbour(PHI + 1., vertices, 6, 18);
+        distance_neighbour(PHI + 1., vertices, 7, 8);
+        distance_neighbour(PHI + 1., vertices, 7, 17);
+        distance_neighbour(PHI + 1., vertices, 8, 16);
+        distance_neighbour(PHI + 1., vertices, 9, 15);
+        distance_neighbour(PHI + 1., vertices, 10, 13);
+        distance_neighbour(PHI + 1., vertices, 10, 14);
+        distance_neighbour(PHI + 1., vertices, 11, 12);
+        distance_neighbour(PHI + 1., vertices, 11, 14);
+        distance_neighbour(PHI + 1., vertices, 12, 13);
+    }
+
+    #[test]
     fn icosahedron_centered() {
         equidistant(make_shape(PlatonicSolid::Icosahedron).vertices());
     }
@@ -466,5 +658,42 @@ mod tests {
         distance_neighbour(diameter, vertices, 3, 8);
         distance_neighbour(diameter, vertices, 4, 7);
         distance_neighbour(diameter, vertices, 5, 6);
+    }
+
+    #[test]
+    fn icosahedron_nonadjacents() {
+        let shape = make_shape(PlatonicSolid::Icosahedron);
+        let vertices = shape.vertices();
+
+        distance_neighbour(PHI, vertices, 0, 6);
+        distance_neighbour(PHI, vertices, 0, 7);
+        distance_neighbour(PHI, vertices, 0, 8);
+        distance_neighbour(PHI, vertices, 0, 9);
+        distance_neighbour(PHI, vertices, 0, 10);
+        distance_neighbour(PHI, vertices, 1, 4);
+        distance_neighbour(PHI, vertices, 1, 5);
+        distance_neighbour(PHI, vertices, 1, 8);
+        distance_neighbour(PHI, vertices, 1, 9);
+        distance_neighbour(PHI, vertices, 1, 11);
+        distance_neighbour(PHI, vertices, 2, 3);
+        distance_neighbour(PHI, vertices, 2, 5);
+        distance_neighbour(PHI, vertices, 2, 7);
+        distance_neighbour(PHI, vertices, 2, 10);
+        distance_neighbour(PHI, vertices, 2, 11);
+        distance_neighbour(PHI, vertices, 3, 4);
+        distance_neighbour(PHI, vertices, 3, 6);
+        distance_neighbour(PHI, vertices, 3, 10);
+        distance_neighbour(PHI, vertices, 3, 11);
+        distance_neighbour(PHI, vertices, 4, 6);
+        distance_neighbour(PHI, vertices, 4, 9);
+        distance_neighbour(PHI, vertices, 4, 11);
+        distance_neighbour(PHI, vertices, 5, 7);
+        distance_neighbour(PHI, vertices, 5, 8);
+        distance_neighbour(PHI, vertices, 5, 11);
+        distance_neighbour(PHI, vertices, 6, 9);
+        distance_neighbour(PHI, vertices, 6, 10);
+        distance_neighbour(PHI, vertices, 7, 8);
+        distance_neighbour(PHI, vertices, 7, 10);
+        distance_neighbour(PHI, vertices, 8, 9);
     }
 }
