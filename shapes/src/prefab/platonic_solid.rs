@@ -253,10 +253,9 @@ mod tests {
 
     type Real = f64;
 
-    const PHI: Real = 1.61803398874989484820;
-    const SQRT_2: Real = 1.41421356237309504880;
-    const SQRT_3: Real = 1.73205080756887729352;
-    const SQRT_5: Real = 2.23606797749978969640;
+    const PHI: Real = 1.618_033_988_749_895;
+    const SQRT_3: Real = 1.732_050_807_568_877_2;
+    const SQRT_5: Real = 2.236_067_977_499_79;
 
     fn make_shape(solid: PlatonicSolid) -> Shape<Real, u8> {
         solid.make(Default::default())
@@ -325,18 +324,19 @@ mod tests {
         let shape = make_shape(PlatonicSolid::Hexahedron);
         let vertices = shape.vertices();
 
-        distance_neighbour(SQRT_2, vertices, 0, 3);
-        distance_neighbour(SQRT_2, vertices, 0, 5);
-        distance_neighbour(SQRT_2, vertices, 0, 6);
-        distance_neighbour(SQRT_2, vertices, 1, 2);
-        distance_neighbour(SQRT_2, vertices, 1, 4);
-        distance_neighbour(SQRT_2, vertices, 1, 7);
-        distance_neighbour(SQRT_2, vertices, 2, 4);
-        distance_neighbour(SQRT_2, vertices, 2, 7);
-        distance_neighbour(SQRT_2, vertices, 3, 5);
-        distance_neighbour(SQRT_2, vertices, 3, 6);
-        distance_neighbour(SQRT_2, vertices, 4, 7);
-        distance_neighbour(SQRT_2, vertices, 5, 6);
+        use num_traits::FloatConst;
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 0, 3);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 0, 5);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 0, 6);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 1, 2);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 1, 4);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 1, 7);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 2, 4);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 2, 7);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 3, 5);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 3, 6);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 4, 7);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 5, 6);
     }
 
     #[test]
@@ -368,9 +368,10 @@ mod tests {
         let shape = make_shape(PlatonicSolid::Octahedron);
         let vertices = shape.vertices();
 
-        distance_neighbour(SQRT_2, vertices, 0, 5);
-        distance_neighbour(SQRT_2, vertices, 1, 3);
-        distance_neighbour(SQRT_2, vertices, 2, 4);
+        use num_traits::FloatConst;
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 0, 5);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 1, 3);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 2, 4);
     }
 
     #[test]

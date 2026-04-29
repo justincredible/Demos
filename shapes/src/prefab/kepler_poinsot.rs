@@ -286,7 +286,7 @@ mod tests {
 
     type Real = f64;
 
-    const PHI: Real = 1.6180339887498948482;
+    const PHI: Real = 1.618_033_988_749_895;
 
     fn make_shape(solid: KpPolyhedron) -> Shape<Real, u8> {
         solid.make(Default::default())
