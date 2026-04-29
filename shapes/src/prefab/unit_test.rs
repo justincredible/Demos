@@ -19,13 +19,6 @@ where C: Float
 }
 
 #[inline]
-pub(super) fn unit_neighbour<C>(vertices: &[[C; 3]], i: usize, j: usize)
-where C: Float
-{
-    assert!(C::abs(C::one() - magnitude_diff(vertices[i], vertices[j])) <= C::epsilon());
-}
-
-#[inline]
 pub(super) fn distance_neighbour<C>(distance: C, vertices: &[[C; 3]], i: usize, j: usize)
 where C: Float
 {

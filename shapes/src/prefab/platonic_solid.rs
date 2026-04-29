@@ -249,7 +249,7 @@ where
 mod tests {
     use super::{PlatonicSolid, Shape, Shaper};
 
-    use crate::prefab::unit_test::{distance_neighbour, equidistant, unit_neighbour};
+    use crate::prefab::unit_test::{distance_neighbour, equidistant};
 
     type Real = f64;
 
@@ -272,12 +272,12 @@ mod tests {
         let shape = make_shape(PlatonicSolid::Tetrahedron);
         let vertices = shape.vertices();
 
-        unit_neighbour(vertices, 0, 1);
-        unit_neighbour(vertices, 0, 2);
-        unit_neighbour(vertices, 0, 3);
-        unit_neighbour(vertices, 1, 2);
-        unit_neighbour(vertices, 1, 3);
-        unit_neighbour(vertices, 2, 3);
+        distance_neighbour(1., vertices, 0, 1);
+        distance_neighbour(1., vertices, 0, 2);
+        distance_neighbour(1., vertices, 0, 3);
+        distance_neighbour(1., vertices, 1, 2);
+        distance_neighbour(1., vertices, 1, 3);
+        distance_neighbour(1., vertices, 2, 3);
     }
 
     #[test]
@@ -295,18 +295,18 @@ mod tests {
         let shape = make_shape(PlatonicSolid::Hexahedron);
         let vertices = shape.vertices();
 
-        unit_neighbour(vertices, 0, 1);
-        unit_neighbour(vertices, 0, 2);
-        unit_neighbour(vertices, 0, 4);
-        unit_neighbour(vertices, 1, 3);
-        unit_neighbour(vertices, 1, 5);
-        unit_neighbour(vertices, 2, 3);
-        unit_neighbour(vertices, 2, 6);
-        unit_neighbour(vertices, 3, 7);
-        unit_neighbour(vertices, 4, 5);
-        unit_neighbour(vertices, 4, 6);
-        unit_neighbour(vertices, 5, 7);
-        unit_neighbour(vertices, 6, 7);
+        distance_neighbour(1., vertices, 0, 1);
+        distance_neighbour(1., vertices, 0, 2);
+        distance_neighbour(1., vertices, 0, 4);
+        distance_neighbour(1., vertices, 1, 3);
+        distance_neighbour(1., vertices, 1, 5);
+        distance_neighbour(1., vertices, 2, 3);
+        distance_neighbour(1., vertices, 2, 6);
+        distance_neighbour(1., vertices, 3, 7);
+        distance_neighbour(1., vertices, 4, 5);
+        distance_neighbour(1., vertices, 4, 6);
+        distance_neighbour(1., vertices, 5, 7);
+        distance_neighbour(1., vertices, 6, 7);
     }
 
     #[test]
@@ -349,18 +349,18 @@ mod tests {
         let shape = make_shape(PlatonicSolid::Octahedron);
         let vertices = shape.vertices();
 
-        unit_neighbour(vertices, 0, 1);
-        unit_neighbour(vertices, 0, 2);
-        unit_neighbour(vertices, 0, 3);
-        unit_neighbour(vertices, 0, 4);
-        unit_neighbour(vertices, 1, 2);
-        unit_neighbour(vertices, 1, 4);
-        unit_neighbour(vertices, 1, 5);
-        unit_neighbour(vertices, 2, 3);
-        unit_neighbour(vertices, 2, 5);
-        unit_neighbour(vertices, 3, 4);
-        unit_neighbour(vertices, 3, 5);
-        unit_neighbour(vertices, 4, 5);
+        distance_neighbour(1., vertices, 0, 1);
+        distance_neighbour(1., vertices, 0, 2);
+        distance_neighbour(1., vertices, 0, 3);
+        distance_neighbour(1., vertices, 0, 4);
+        distance_neighbour(1., vertices, 1, 2);
+        distance_neighbour(1., vertices, 1, 4);
+        distance_neighbour(1., vertices, 1, 5);
+        distance_neighbour(1., vertices, 2, 3);
+        distance_neighbour(1., vertices, 2, 5);
+        distance_neighbour(1., vertices, 3, 4);
+        distance_neighbour(1., vertices, 3, 5);
+        distance_neighbour(1., vertices, 4, 5);
     }
 
     #[test]
@@ -383,36 +383,36 @@ mod tests {
         let shape = make_shape(PlatonicSolid::Dodecahedron);
         let vertices = shape.vertices();
 
-        unit_neighbour(vertices, 0, 1);
-        unit_neighbour(vertices, 0, 2);
-        unit_neighbour(vertices, 0, 5);
-        unit_neighbour(vertices, 1, 3);
-        unit_neighbour(vertices, 1, 6);
-        unit_neighbour(vertices, 2, 4);
-        unit_neighbour(vertices, 2, 7);
-        unit_neighbour(vertices, 3, 4);
-        unit_neighbour(vertices, 3, 8);
-        unit_neighbour(vertices, 4, 9);
-        unit_neighbour(vertices, 5, 10);
-        unit_neighbour(vertices, 5, 11);
-        unit_neighbour(vertices, 6, 10);
-        unit_neighbour(vertices, 6, 12);
-        unit_neighbour(vertices, 7, 11);
-        unit_neighbour(vertices, 7, 13);
-        unit_neighbour(vertices, 8, 12);
-        unit_neighbour(vertices, 8, 14);
-        unit_neighbour(vertices, 9, 13);
-        unit_neighbour(vertices, 9, 14);
-        unit_neighbour(vertices, 10, 15);
-        unit_neighbour(vertices, 11, 16);
-        unit_neighbour(vertices, 12, 17);
-        unit_neighbour(vertices, 13, 18);
-        unit_neighbour(vertices, 14, 19);
-        unit_neighbour(vertices, 15, 16);
-        unit_neighbour(vertices, 15, 17);
-        unit_neighbour(vertices, 16, 18);
-        unit_neighbour(vertices, 17, 19);
-        unit_neighbour(vertices, 18, 19);
+        distance_neighbour(1., vertices, 0, 1);
+        distance_neighbour(1., vertices, 0, 2);
+        distance_neighbour(1., vertices, 0, 5);
+        distance_neighbour(1., vertices, 1, 3);
+        distance_neighbour(1., vertices, 1, 6);
+        distance_neighbour(1., vertices, 2, 4);
+        distance_neighbour(1., vertices, 2, 7);
+        distance_neighbour(1., vertices, 3, 4);
+        distance_neighbour(1., vertices, 3, 8);
+        distance_neighbour(1., vertices, 4, 9);
+        distance_neighbour(1., vertices, 5, 10);
+        distance_neighbour(1., vertices, 5, 11);
+        distance_neighbour(1., vertices, 6, 10);
+        distance_neighbour(1., vertices, 6, 12);
+        distance_neighbour(1., vertices, 7, 11);
+        distance_neighbour(1., vertices, 7, 13);
+        distance_neighbour(1., vertices, 8, 12);
+        distance_neighbour(1., vertices, 8, 14);
+        distance_neighbour(1., vertices, 9, 13);
+        distance_neighbour(1., vertices, 9, 14);
+        distance_neighbour(1., vertices, 10, 15);
+        distance_neighbour(1., vertices, 11, 16);
+        distance_neighbour(1., vertices, 12, 17);
+        distance_neighbour(1., vertices, 13, 18);
+        distance_neighbour(1., vertices, 14, 19);
+        distance_neighbour(1., vertices, 15, 16);
+        distance_neighbour(1., vertices, 15, 17);
+        distance_neighbour(1., vertices, 16, 18);
+        distance_neighbour(1., vertices, 17, 19);
+        distance_neighbour(1., vertices, 18, 19);
     }
 
     #[test]
@@ -615,36 +615,36 @@ mod tests {
         let shape = make_shape(PlatonicSolid::Icosahedron);
         let vertices = shape.vertices();
 
-        unit_neighbour(vertices, 0, 1);
-        unit_neighbour(vertices, 0, 2);
-        unit_neighbour(vertices, 0, 3);
-        unit_neighbour(vertices, 0, 4);
-        unit_neighbour(vertices, 0, 5);
-        unit_neighbour(vertices, 1, 2);
-        unit_neighbour(vertices, 1, 3);
-        unit_neighbour(vertices, 1, 6);
-        unit_neighbour(vertices, 1, 7);
-        unit_neighbour(vertices, 2, 4);
-        unit_neighbour(vertices, 2, 6);
-        unit_neighbour(vertices, 2, 8);
-        unit_neighbour(vertices, 3, 5);
-        unit_neighbour(vertices, 3, 7);
-        unit_neighbour(vertices, 3, 9);
-        unit_neighbour(vertices, 4, 5);
-        unit_neighbour(vertices, 4, 8);
-        unit_neighbour(vertices, 4, 10);
-        unit_neighbour(vertices, 5, 9);
-        unit_neighbour(vertices, 5, 10);
-        unit_neighbour(vertices, 6, 7);
-        unit_neighbour(vertices, 6, 8);
-        unit_neighbour(vertices, 6, 11);
-        unit_neighbour(vertices, 7, 9);
-        unit_neighbour(vertices, 7, 11);
-        unit_neighbour(vertices, 8, 10);
-        unit_neighbour(vertices, 8, 11);
-        unit_neighbour(vertices, 9, 10);
-        unit_neighbour(vertices, 9, 11);
-        unit_neighbour(vertices, 10, 11);
+        distance_neighbour(1., vertices, 0, 1);
+        distance_neighbour(1., vertices, 0, 2);
+        distance_neighbour(1., vertices, 0, 3);
+        distance_neighbour(1., vertices, 0, 4);
+        distance_neighbour(1., vertices, 0, 5);
+        distance_neighbour(1., vertices, 1, 2);
+        distance_neighbour(1., vertices, 1, 3);
+        distance_neighbour(1., vertices, 1, 6);
+        distance_neighbour(1., vertices, 1, 7);
+        distance_neighbour(1., vertices, 2, 4);
+        distance_neighbour(1., vertices, 2, 6);
+        distance_neighbour(1., vertices, 2, 8);
+        distance_neighbour(1., vertices, 3, 5);
+        distance_neighbour(1., vertices, 3, 7);
+        distance_neighbour(1., vertices, 3, 9);
+        distance_neighbour(1., vertices, 4, 5);
+        distance_neighbour(1., vertices, 4, 8);
+        distance_neighbour(1., vertices, 4, 10);
+        distance_neighbour(1., vertices, 5, 9);
+        distance_neighbour(1., vertices, 5, 10);
+        distance_neighbour(1., vertices, 6, 7);
+        distance_neighbour(1., vertices, 6, 8);
+        distance_neighbour(1., vertices, 6, 11);
+        distance_neighbour(1., vertices, 7, 9);
+        distance_neighbour(1., vertices, 7, 11);
+        distance_neighbour(1., vertices, 8, 10);
+        distance_neighbour(1., vertices, 8, 11);
+        distance_neighbour(1., vertices, 9, 10);
+        distance_neighbour(1., vertices, 9, 11);
+        distance_neighbour(1., vertices, 10, 11);
     }
 
     #[test]

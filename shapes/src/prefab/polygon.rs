@@ -99,7 +99,7 @@ where
 mod tests {
     use super::{Polygon, Shape, Shaper};
 
-    use crate::prefab::unit_test::{epsilon_error, magnitude_diff, unit_neighbour};
+    use crate::prefab::unit_test::{distance_neighbour, epsilon_error, magnitude_diff};
 
     fn make_shape(size: u16) -> Shape<f64, u16> {
         Polygon::new(size).make(Default::default())
@@ -148,11 +148,11 @@ mod tests {
         let shape = make_shape(11);
         let vertices = shape.vertices();
 
-        unit_neighbour(vertices, 1, 0);
+        distance_neighbour(1., vertices, 1, 0);
         for i in 2..vertices.len() {
-            unit_neighbour(vertices, i, i-2);
+            distance_neighbour(1., vertices, i, i-2);
         }
-        unit_neighbour(vertices, vertices.len()-1, vertices.len()-2);
+        distance_neighbour(1., vertices, vertices.len()-1, vertices.len()-2);
     }
 
     #[test]
@@ -175,11 +175,11 @@ mod tests {
         let shape = make_shape(10);
         let vertices = shape.vertices();
 
-        unit_neighbour(vertices, 1, 0);
+        distance_neighbour(1., vertices, 1, 0);
         for i in 2..vertices.len() {
-            unit_neighbour(vertices, i, i-2);
+            distance_neighbour(1., vertices, i, i-2);
         }
-        unit_neighbour(vertices, vertices.len()-1, vertices.len()-2);
+        distance_neighbour(1., vertices, vertices.len()-1, vertices.len()-2);
     }
 
     #[test]
