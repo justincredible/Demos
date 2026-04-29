@@ -26,6 +26,13 @@ where C: Float
 }
 
 #[inline]
+pub(super) fn near_distance_neighbour<C>(distance: C, epsilons: impl Into<C>, vertices: &[[C; 3]], i: usize, j: usize)
+where C: Float
+{
+    assert!(C::abs(distance - magnitude_diff(vertices[i], vertices[j])) <= epsilons.into() * C::epsilon());
+}
+
+#[inline]
 fn magnitude_squared<C>(vertex: [C; 3]) -> C
 where C: Float
 {

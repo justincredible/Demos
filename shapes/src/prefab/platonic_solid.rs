@@ -249,7 +249,7 @@ where
 mod tests {
     use super::{PlatonicSolid, Shape, Shaper};
 
-    use crate::prefab::unit_test::{distance_neighbour, equidistant};
+    use crate::prefab::unit_test::{distance_neighbour, equidistant, near_distance_neighbour};
 
     type Real = f64;
 
@@ -429,8 +429,8 @@ mod tests {
         distance_neighbour(diameter, vertices, 5, 14);
         distance_neighbour(diameter, vertices, 6, 13);
         distance_neighbour(diameter, vertices, 7, 12);
-        distance_neighbour(diameter, vertices, 8, 11);
-        distance_neighbour(diameter, vertices, 9, 10);
+        near_distance_neighbour(diameter, 2, vertices, 8, 11);
+        near_distance_neighbour(diameter, 2, vertices, 9, 10);
     }
 
     #[test]
@@ -510,32 +510,32 @@ mod tests {
         distance_neighbour(distance, vertices, 0, 9);
         distance_neighbour(distance, vertices, 0, 12);
         distance_neighbour(distance, vertices, 0, 13);
-        distance_neighbour(distance, vertices, 0, 15);
-        distance_neighbour(distance, vertices, 0, 16);
+        near_distance_neighbour(distance, 2, vertices, 0, 15);
+        near_distance_neighbour(distance, 2, vertices, 0, 16);
         distance_neighbour(distance, vertices, 1, 7);
         distance_neighbour(distance, vertices, 1, 9);
         distance_neighbour(distance, vertices, 1, 11);
         distance_neighbour(distance, vertices, 1, 14);
-        distance_neighbour(distance, vertices, 1, 15);
-        distance_neighbour(distance, vertices, 1, 17);
+        near_distance_neighbour(distance, 2, vertices, 1, 15);
+        near_distance_neighbour(distance, 2, vertices, 1, 17);
         distance_neighbour(distance, vertices, 2, 6);
         distance_neighbour(distance, vertices, 2, 8);
         distance_neighbour(distance, vertices, 2, 10);
         distance_neighbour(distance, vertices, 2, 14);
-        distance_neighbour(distance, vertices, 2, 16);
-        distance_neighbour(distance, vertices, 2, 18);
-        distance_neighbour(distance, vertices, 3, 5);
-        distance_neighbour(distance, vertices, 3, 7);
+        near_distance_neighbour(distance, 2, vertices, 2, 16);
+        near_distance_neighbour(distance, 2, vertices, 2, 18);
+        near_distance_neighbour(distance, 2, vertices, 3, 5);
+        near_distance_neighbour(distance, 2, vertices, 3, 7);
         distance_neighbour(distance, vertices, 3, 10);
         distance_neighbour(distance, vertices, 3, 13);
-        distance_neighbour(distance, vertices, 3, 17);
-        distance_neighbour(distance, vertices, 3, 19);
-        distance_neighbour(distance, vertices, 4, 5);
-        distance_neighbour(distance, vertices, 4, 6);
+        near_distance_neighbour(distance, 2, vertices, 3, 17);
+        near_distance_neighbour(distance, 2, vertices, 3, 19);
+        near_distance_neighbour(distance, 2, vertices, 4, 5);
+        near_distance_neighbour(distance, 2, vertices, 4, 6);
         distance_neighbour(distance, vertices, 4, 11);
         distance_neighbour(distance, vertices, 4, 12);
-        distance_neighbour(distance, vertices, 4, 18);
-        distance_neighbour(distance, vertices, 4, 19);
+        near_distance_neighbour(distance, 2, vertices, 4, 18);
+        near_distance_neighbour(distance, 2, vertices, 4, 19);
         distance_neighbour(distance, vertices, 5, 12);
         distance_neighbour(distance, vertices, 5, 13);
         distance_neighbour(distance, vertices, 5, 17);
@@ -560,12 +560,12 @@ mod tests {
         distance_neighbour(distance, vertices, 10, 19);
         distance_neighbour(distance, vertices, 11, 17);
         distance_neighbour(distance, vertices, 11, 19);
-        distance_neighbour(distance, vertices, 12, 16);
+        near_distance_neighbour(distance, 2, vertices, 12, 16);
         distance_neighbour(distance, vertices, 12, 18);
-        distance_neighbour(distance, vertices, 13, 15);
+        near_distance_neighbour(distance, 2, vertices, 13, 15);
         distance_neighbour(distance, vertices, 13, 17);
-        distance_neighbour(distance, vertices, 14, 15);
-        distance_neighbour(distance, vertices, 14, 16);
+        near_distance_neighbour(distance, 2, vertices, 14, 15);
+        near_distance_neighbour(distance, 2, vertices, 14, 16);
     }
 
     #[test]
