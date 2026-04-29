@@ -22,8 +22,8 @@ use raw_window_handle::HasRawWindowHandle;
 use simple_targa::read_targa;
 
 use shapes::kepler_poinsot::KpPolyhedron;
-use shapes::polygons::Polygon;
-use shapes::platonic_solids::PlatonicSolid;
+use shapes::polygon::Polygon;
+use shapes::platonic_solid::PlatonicSolid;
 use shapes::Shaper;
 
 fn main() {
@@ -180,12 +180,9 @@ fn main() {
                     let scale = Vec3::ONE * if shape == 0 {
                         let angle = consts::TAU / sides as f32;
                         f32::sin(angle) / f32::cos(0.5 * angle)
-                    } else if shape == 4 {
+                    } else if shape == 4 || shape == 8 {
                         // the dodecahedron is rather large
-                        0.5
-                    } else if shape == 6 || shape == 8 {
-                        // the stellated dodecahedrons are even larger
-                        0.4
+                        0.7
                     } else {
                         1.0
                     };
@@ -218,8 +215,8 @@ fn main() {
                         physical_key: Code(KeyCode::ArrowUp),
                         ..
                     } => match shape {
-                        1 | 3 | 5 => shape = 2,
-                        2 => shape = 4,
+                        1 | 3 => shape = 2,
+                        2 | 5 => shape = 4,
                         0 => {
                             sides = sides.saturating_add(1);
                             shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
@@ -258,8 +255,8 @@ fn main() {
                         physical_key: Code(KeyCode::ArrowRight),
                         ..
                     } => match shape {
-                        1 => shape = 3,
-                        3 => shape = 5,
+                        1 | 2 => shape = 3,
+                        3 | 4 => shape = 5,
                         6 => shape = 7,
                         7 => shape = 8,
                         8 => shape = 9,
