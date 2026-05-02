@@ -254,8 +254,6 @@ mod tests {
     type Real = f64;
 
     const PHI: Real = 1.618_033_988_749_895;
-    const SQRT_3: Real = 1.732_050_807_568_877_2;
-    const SQRT_5: Real = 2.236_067_977_499_79;
 
     fn make_shape(solid: PlatonicSolid) -> Shape<Real, u8> {
         solid.make(Default::default())
@@ -313,10 +311,11 @@ mod tests {
         let shape = make_shape(PlatonicSolid::Hexahedron);
         let vertices = shape.vertices();
 
-        distance_neighbour(SQRT_3, vertices, 0, 7);
-        distance_neighbour(SQRT_3, vertices, 1, 6);
-        distance_neighbour(SQRT_3, vertices, 2, 5);
-        distance_neighbour(SQRT_3, vertices, 3, 4);
+        let diameter = Real::sqrt(3.);
+        distance_neighbour(diameter, vertices, 0, 7);
+        distance_neighbour(diameter, vertices, 1, 6);
+        distance_neighbour(diameter, vertices, 2, 5);
+        distance_neighbour(diameter, vertices, 3, 4);
     }
 
     #[test]
@@ -421,7 +420,7 @@ mod tests {
         let shape = make_shape(PlatonicSolid::Dodecahedron);
         let vertices = shape.vertices();
 
-        let diameter = Real::sqrt(0.5*(9. + 3.*SQRT_5)); // sqrt(3phi^2)
+        let diameter = Real::sqrt(3. * PHI * PHI);
         distance_neighbour(diameter, vertices, 0, 19);
         distance_neighbour(diameter, vertices, 1, 18);
         distance_neighbour(diameter, vertices, 2, 17);
@@ -506,7 +505,7 @@ mod tests {
         let shape = make_shape(PlatonicSolid::Dodecahedron);
         let vertices = shape.vertices();
 
-        let distance = Real::sqrt(3. + SQRT_5); // sqrt(2phi^2)
+        let distance = Real::sqrt(2. * PHI * PHI);
         distance_neighbour(distance, vertices, 0, 8);
         distance_neighbour(distance, vertices, 0, 9);
         distance_neighbour(distance, vertices, 0, 12);
@@ -653,7 +652,7 @@ mod tests {
         let shape = make_shape(PlatonicSolid::Icosahedron);
         let vertices = shape.vertices();
 
-        let diameter = Real::sqrt(0.5*(5. + SQRT_5)); // sqrt(phi + 2)
+        let diameter = Real::sqrt(2. + PHI);
         distance_neighbour(diameter, vertices, 0, 11);
         distance_neighbour(diameter, vertices, 1, 10);
         distance_neighbour(diameter, vertices, 2, 9);
