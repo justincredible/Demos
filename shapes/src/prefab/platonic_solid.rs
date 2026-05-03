@@ -98,8 +98,8 @@ where
                     [f0, half_h, f0],
                     [f0, f0, -half_h],
                     [-half_h, f0, f0],
-                    [f0, f0, half_h],
                     [half_h, f0, f0],
+                    [f0, f0, half_h],
                     [f0, -half_h, f0],
                 ];
 
@@ -110,17 +110,17 @@ where
 
                 if request.prefer_strips {
                     let strips = vec![
-                        vec![i[1], i[0], i[4], i[3], i[5], i[2]],
-                        vec![i[3], i[0], i[2], i[1], i[5], i[4]],
+                        vec![i[1], i[0], i[3], i[4], i[5], i[2]],
+                        vec![i[4], i[0], i[2], i[1], i[5], i[3]],
                     ];
 
                     Shape::Strips { vertices, strips }
                 } else {
                     let indices = vec![
-                        i[0], i[1], i[2], i[0], i[2], i[3],
-                        i[0], i[3], i[4], i[0], i[4], i[1],
-                        i[1], i[4], i[5], i[1], i[5], i[2],
-                        i[2], i[5], i[3], i[3], i[5], i[4],
+                        i[0], i[1], i[2], i[0], i[2], i[4],
+                        i[0], i[4], i[3], i[0], i[3], i[1],
+                        i[1], i[3], i[5], i[1], i[5], i[2],
+                        i[2], i[5], i[4], i[4], i[5], i[3],
                     ];
 
                     Shape::Triangles { vertices, indices }
@@ -353,9 +353,9 @@ mod tests {
         distance_neighbour(1., vertices, 0, 3);
         distance_neighbour(1., vertices, 0, 4);
         distance_neighbour(1., vertices, 1, 2);
-        distance_neighbour(1., vertices, 1, 4);
+        distance_neighbour(1., vertices, 1, 3);
         distance_neighbour(1., vertices, 1, 5);
-        distance_neighbour(1., vertices, 2, 3);
+        distance_neighbour(1., vertices, 2, 4);
         distance_neighbour(1., vertices, 2, 5);
         distance_neighbour(1., vertices, 3, 4);
         distance_neighbour(1., vertices, 3, 5);
@@ -369,8 +369,8 @@ mod tests {
 
         use num_traits::FloatConst;
         distance_neighbour(FloatConst::SQRT_2(), vertices, 0, 5);
-        distance_neighbour(FloatConst::SQRT_2(), vertices, 1, 3);
-        distance_neighbour(FloatConst::SQRT_2(), vertices, 2, 4);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 1, 4);
+        distance_neighbour(FloatConst::SQRT_2(), vertices, 2, 3);
     }
 
     #[test]
