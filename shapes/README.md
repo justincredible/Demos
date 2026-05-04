@@ -73,7 +73,7 @@ Better known as the cube, the vertices are immediately known for specific orient
 
 The edges of the triangles form a square perimeter from two pairs of non-adjacent vertices.
 The remaining two vertices outline a square with either pair, so the diameter is $\sqrt 2$.
-A non-coplanar vertex has a distance of $1 \over \sqrt 2$ from a square's center.
+A non-coplanar vertex has a distance of $1 \over \sqrt 2$ from its square's center.
 
 ### Dodecahedron
 
