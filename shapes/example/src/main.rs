@@ -218,7 +218,7 @@ fn main() {
                         1 | 3 => shape = 2,
                         2 | 5 => shape = 4,
                         0 => {
-                            sides = sides.saturating_add(1);
+                            sides = (sides + 1).min(255);
                             shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
                         },
                         _ => (),
