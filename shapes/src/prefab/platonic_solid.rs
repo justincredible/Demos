@@ -306,6 +306,12 @@ mod tests {
     }
 
     #[test]
+    fn tetrahedron_vertices() {
+        let solid = PlatonicSolid::Tetrahedron;
+        assert!(solid.vertex_count() == make_shape(solid).vertices().len());
+    }
+
+    #[test]
     fn tetrahedron_centered() {
         equidistant(make_shape(PlatonicSolid::Tetrahedron).vertices());
     }
@@ -326,6 +332,12 @@ mod tests {
     #[test]
     fn tetrahedron_diameters() {
         tetrahedron_edges();
+    }
+
+    #[test]
+    fn hexahedron_vertices() {
+        let solid = PlatonicSolid::Hexahedron;
+        assert!(solid.vertex_count() == make_shape(solid).vertices().len());
     }
 
     #[test]
@@ -373,6 +385,12 @@ mod tests {
     }
 
     #[test]
+    fn octahedron_vertices() {
+        let solid = PlatonicSolid::Octahedron;
+        assert!(solid.vertex_count() == make_shape(solid).vertices().len());
+    }
+
+    #[test]
     fn octahedron_centered() {
         equidistant(make_shape(PlatonicSolid::Octahedron).vertices());
     }
@@ -400,6 +418,12 @@ mod tests {
         for i in 0..solid.vertex_count() / 2 {
             distance_neighbour(diameter, vertices, i, solid.vertex_count() - 1 - i);
         }
+    }
+
+    #[test]
+    fn dodecahedron_vertices() {
+        let solid = PlatonicSolid::Dodecahedron;
+        assert!(solid.vertex_count() == make_shape(solid).vertices().len());
     }
 
     #[test]
@@ -470,6 +494,12 @@ mod tests {
                 distance_neighbour(1. + PHI, vertices, i, j);
             }
         }
+    }
+
+    #[test]
+    fn icosahedron_vertices() {
+        let solid = PlatonicSolid::Icosahedron;
+        assert!(solid.vertex_count() == make_shape(solid).vertices().len());
     }
 
     #[test]
