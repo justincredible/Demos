@@ -1,7 +1,9 @@
 pub(super) trait Polyhedral {
-    fn vertex_count(&self) -> usize;
+    /// Required
+    fn edges(&self) -> Vec<Vec<usize>>;
 
-    fn edges(&self) -> Vec<Vec<usize>> {
-        Vec::with_capacity(0)
+    /// Provided
+    fn vertex_count(&self) -> usize {
+        self.edges().len()
     }
 }

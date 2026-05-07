@@ -17,16 +17,6 @@ pub enum PlatonicSolid {
 }
 
 impl Polyhedral for PlatonicSolid {
-    fn vertex_count(&self) -> usize {
-        match self {
-            Self::Tetrahedron => 4,
-            Self::Hexahedron => 8,
-            Self::Octahedron => 6,
-            Self::Dodecahedron => 20,
-            Self::Icosahedron => 12,
-        }
-    }
-
     fn edges(&self) -> Vec<Vec<usize>> {
         match self {
             Self::Tetrahedron => [[1,2,3], [0,2,3], [0,1,3], [0,1,2]].iter().map(Into::into).collect(),
