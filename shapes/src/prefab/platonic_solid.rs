@@ -158,32 +158,30 @@ where
             Self::Dodecahedron => {
                 let f0 = zero::<C>();
                 let fh = cast::<_, C>(0.5).unwrap();
-                let pent = Pentagonal::new(Edge::Unit);
-                let agon = Pentagonal::new(Edge::Phi);
-                let inner = fh * fh / pent.width * pent.radius;
-                let outer = fh * (agon.radius + pent.radius);
+                let pent = Pentagonal::<C>::new(Edge::Unit);
+                let agon = Pentagonal::<C>::new(Edge::Phi);
 
                 let vertices = vec![
-                    [f0, pent.radius, outer],
-                    [-pent.width, pent.middle, outer],
-                    [pent.width, pent.middle, outer],
-                    [-fh, -pent.center, outer],
-                    [fh, -pent.center, outer],
-                    [f0, agon.radius, inner],
-                    [-agon.width, agon.middle, inner],
-                    [agon.width, agon.middle, inner],
-                    [-pent.width, -agon.center, inner],
-                    [pent.width, -agon.center, inner],
-                    [-pent.width, agon.center, -inner],
-                    [pent.width, agon.center, -inner],
-                    [-agon.width, -agon.middle, -inner],
-                    [agon.width, -agon.middle, -inner],
-                    [f0, -agon.radius, -inner],
-                    [-fh, pent.center, -outer],
-                    [fh, pent.center, -outer],
-                    [-pent.width, -pent.middle, -outer],
-                    [pent.width, -pent.middle, -outer],
-                    [f0, -pent.radius, -outer],
+                    [f0, fh, -agon.width],
+                    [-pent.width, pent.width, -pent.width],
+                    [pent.width, pent.width, -pent.width],
+                    [-fh, agon.width, f0],
+                    [fh, agon.width, f0],
+                    [f0, -fh, -agon.width],
+                    [-agon.width, f0, -fh],
+                    [agon.width, f0, -fh],
+                    [-pent.width, pent.width, pent.width],
+                    [pent.width, pent.width, pent.width],
+                    [-pent.width, -pent.width, -pent.width],
+                    [pent.width, -pent.width, -pent.width],
+                    [-agon.width, f0, fh],
+                    [agon.width, f0, fh],
+                    [f0, fh, agon.width],
+                    [-fh, -agon.width, f0],
+                    [fh, -agon.width, f0],
+                    [-pent.width, -pent.width, pent.width],
+                    [pent.width, -pent.width, pent.width],
+                    [f0, -fh, agon.width],
                 ];
 
                 let i = vec![zero(), one()]
@@ -278,7 +276,7 @@ where
 mod tests {
     use super::{PlatonicSolid, Polyhedral, Shape, Shaper};
 
-    use crate::prefab::unit_test::{distance_neighbour, equidistant, near_distance_neighbour};
+    use crate::prefab::unit_test::{distance_neighbour, equidistant};
 
     type Real = f64;
 
@@ -442,7 +440,7 @@ mod tests {
         let diameter = Real::sqrt(3. * PHI * PHI);
 
         for i in 0..solid.vertex_count() / 2 {
-            near_distance_neighbour(diameter, 2, vertices, i, solid.vertex_count() - 1 - i);
+            distance_neighbour(diameter, vertices, i, solid.vertex_count() - 1 - i);
         }
     }
 
@@ -468,7 +466,7 @@ mod tests {
 
         for i in 0..solid.vertex_count() {
             for j in DODECA_NEXTS[solid.vertex_count() - 1 - i].into_iter().filter(|&x| x > i) {
-                near_distance_neighbour(distance, 2, vertices, i, j);
+                distance_neighbour(distance, vertices, i, j);
             }
         }
     }
