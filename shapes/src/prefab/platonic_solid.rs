@@ -120,12 +120,14 @@ where
 
                     Shape::Strips { vertices, strips }
                 } else {
-                    let indices = vec![
-                        i[0], i[1], i[2], i[0], i[2], i[4], i[0], i[4], i[5],
-                        i[0], i[5], i[1], i[1], i[3], i[2], i[1], i[5], i[7],
-                        i[1], i[7], i[3], i[2], i[3], i[7], i[2], i[6], i[4],
-                        i[2], i[7], i[6], i[4], i[6], i[7], i[4], i[7], i[5],
-                    ];
+                    let mut indices = vec![];
+                    for face in self.faces() {
+                        let triangle1 = oriented_plane(&vertices, &face[0..3], request.orientation);
+                        let triangle2 = oriented_plane(&vertices, &face[1..4], request.orientation);
+                        for index in triangle1.into_iter().chain(triangle2) {
+                            indices.push(i[index]);
+                        }
+                    }
 
                     Shape::Triangles { vertices, indices }
                 }
@@ -281,7 +283,7 @@ where
     }
 }
 
-fn oriented_plane<C>(vertices: &Vec<[C; 3]>, unoriented: &Vec<usize>, orientation: Orientation) -> [usize; 3]
+fn oriented_plane<C>(vertices: &Vec<[C; 3]>, unoriented: &[usize], orientation: Orientation) -> [usize; 3]
 where
     C: Float
 {
