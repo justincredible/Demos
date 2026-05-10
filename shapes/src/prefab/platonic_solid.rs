@@ -66,7 +66,7 @@ where
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..4).map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 if request.prefer_strips {
@@ -98,7 +98,7 @@ where
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..8).map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 if request.prefer_strips {
@@ -134,7 +134,7 @@ where
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..6).map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 if request.prefer_strips {
@@ -188,7 +188,7 @@ where
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..20).map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 if request.prefer_strips {
@@ -242,7 +242,7 @@ where
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..12).map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 if request.prefer_strips {
