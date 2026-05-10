@@ -1,6 +1,6 @@
 use num_traits::{cast, Float, FloatConst, NumCast, one, Unsigned, zero};
 
-use crate::shapes::{Configuration, Shape, Shaper};
+use crate::shapes::{Configuration, Orientation, Shape, Shaper};
 use crate::prefab::{
     pentagonal::{Edge, Pentagonal},
     polyhedral::Polyhedral,
@@ -39,6 +39,14 @@ impl Polyhedral for PlatonicSolid {
             ].iter().map(Into::into).collect(),
         }
     }
+
+    fn vertices_per_face(&self) -> usize {
+        match self {
+            Self::Tetrahedron | Self::Octahedron | Self::Icosahedron => 3,
+            Self::Hexahedron => 4,
+            Self::Dodecahedron => 5,
+        }
+    }
 }
 
 impl<C, I> Shaper<C, I> for PlatonicSolid
@@ -74,10 +82,13 @@ where
 
                     Shape::Strips { vertices, strips }
                 } else {
-                    let indices = vec![
-                        i[0], i[1], i[2], i[0], i[2], i[3],
-                        i[0], i[3], i[1], i[1], i[3], i[2],
-                    ];
+                    let mut indices = vec![];
+                    for face in self.faces() {
+                        let triangle = oriented_plane(&vertices, &face, request.orientation);
+                        for index in triangle {
+                            indices.push(i[index]);
+                        }
+                    }
 
                     Shape::Triangles { vertices, indices }
                 }
@@ -145,12 +156,13 @@ where
 
                     Shape::Strips { vertices, strips }
                 } else {
-                    let indices = vec![
-                        i[0], i[1], i[2], i[0], i[2], i[4],
-                        i[0], i[4], i[3], i[0], i[3], i[1],
-                        i[1], i[3], i[5], i[1], i[5], i[2],
-                        i[2], i[5], i[4], i[4], i[5], i[3],
-                    ];
+                    let mut indices = vec![];
+                    for face in self.faces() {
+                        let triangle = oriented_plane(&vertices, &face, request.orientation);
+                        for index in triangle {
+                            indices.push(i[index]);
+                        }
+                    }
 
                     Shape::Triangles { vertices, indices }
                 }
@@ -254,23 +266,40 @@ where
 
                     Shape::Strips { vertices, strips }
                 } else {
-                    let indices = vec![
-                        i[0], i[1], i[2], i[0], i[2], i[4],
-                        i[0], i[3], i[1], i[0], i[4], i[5],
-                        i[0], i[5], i[3], i[1], i[3], i[7],
-                        i[1], i[6], i[2], i[1], i[7], i[6],
-                        i[2], i[6], i[8], i[2], i[8], i[4],
-                        i[3], i[9], i[7], i[3], i[5], i[9],
-                        i[4], i[8], i[10], i[4], i[10], i[5],
-                        i[5], i[10], i[9], i[6], i[7], i[11],
-                        i[6], i[11], i[8], i[7], i[9], i[11],
-                        i[8], i[11], i[10], i[9], i[10], i[11],
-                    ];
+                    let mut indices = vec![];
+                    for face in self.faces() {
+                        let triangle = oriented_plane(&vertices, &face, request.orientation);
+                        for index in triangle {
+                            indices.push(i[index]);
+                        }
+                    }
 
                     Shape::Triangles { vertices, indices }
                 }
             },
         }
+    }
+}
+
+fn oriented_plane<C>(vertices: &Vec<[C; 3]>, unoriented: &Vec<usize>, orientation: Orientation) -> [usize; 3]
+where
+    C: Float
+{
+    let a1 = vertices[unoriented[1]][0] - vertices[unoriented[0]][0];
+    let b1 = vertices[unoriented[1]][1] - vertices[unoriented[0]][1];
+    let c1 = vertices[unoriented[1]][2] - vertices[unoriented[0]][2];
+    let a2 = vertices[unoriented[2]][0] - vertices[unoriented[1]][0];
+    let b2 = vertices[unoriented[2]][1] - vertices[unoriented[1]][1];
+    let c2 = vertices[unoriented[2]][2] - vertices[unoriented[1]][2];
+    let a = b1*c2 - c1*b2;
+    let b = c1*a2 - a1*c2;
+    let c = a1*b2 - b1*a2;
+    let d = a*vertices[unoriented[0]][0] + b*vertices[unoriented[0]][1] + c*vertices[unoriented[0]][2];
+
+    if d > zero() && orientation.is_ccw() || d < zero() && orientation.is_cw() {
+        [unoriented[0], unoriented[1], unoriented[2]]
+    } else {
+        [unoriented[0], unoriented[2], unoriented[1]]
     }
 }
 
