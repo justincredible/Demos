@@ -215,20 +215,15 @@ where
 
                     Shape::Strips { vertices, strips }
                 } else {
-                    let indices = vec![
-                        i[0], i[1], i[3], i[0], i[2], i[7], i[0], i[3], i[4],
-                        i[0], i[4], i[2], i[0], i[5], i[10], i[0], i[6], i[1],
-                        i[0], i[7], i[11], i[0], i[10], i[6], i[0], i[11], i[5],
-                        i[1], i[6], i[12], i[1], i[12], i[3], i[2], i[4], i[7],
-                        i[3], i[12], i[8], i[3], i[8], i[4], i[4], i[8], i[9],
-                        i[4], i[9], i[7], i[5], i[11], i[10], i[6], i[10], i[15],
-                        i[6], i[15], i[17], i[6], i[17], i[12], i[7], i[9], i[13],
-                        i[7], i[13], i[11], i[8], i[12], i[19], i[8], i[19], i[14],
-                        i[8], i[14], i[9], i[9], i[14], i[19], i[9], i[19], i[13],
-                        i[10], i[11], i[16], i[10], i[16], i[15], i[11], i[13], i[16],
-                        i[12], i[17], i[19], i[13], i[19], i[18], i[13], i[18], i[16],
-                        i[15], i[16], i[19], i[15], i[19], i[17], i[16], i[18], i[19],
-                    ];
+                    let mut indices = vec![];
+                    for face in self.faces() {
+                        let triangle1 = oriented_plane(&vertices, &face[0..3], request.orientation);
+                        let triangle2 = oriented_plane(&vertices, &face[1..4], request.orientation);
+                        let triangle3 = oriented_plane(&vertices, &face[2..5], request.orientation);
+                        for index in triangle1.into_iter().chain(triangle2).chain(triangle3) {
+                            indices.push(i[index]);
+                        }
+                    }
 
                     Shape::Triangles { vertices, indices }
                 }
