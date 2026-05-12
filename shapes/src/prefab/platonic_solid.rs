@@ -78,7 +78,11 @@ where
                     .collect::<Vec<_>>();
 
                 if request.prefer_strips {
-                    let strips = vec!(vec![i[0], i[1], i[2], i[3], i[0], i[1]]);
+                    let strips = if request.orientation.is_ccw() {
+                        vec!(vec![i[0], i[1], i[2], i[3], i[0], i[1]])
+                    } else {
+                        vec!(vec![i[1], i[0], i[2], i[3], i[1], i[0]])
+                    };
 
                     Shape::Strips { vertices, strips }
                 } else {
@@ -113,10 +117,17 @@ where
                     .collect::<Vec<_>>();
 
                 if request.prefer_strips {
-                    let strips = vec!(vec![
-                        i[0], i[1], i[2], i[3], i[7], i[1], i[5],
-                        i[0], i[4], i[2], i[6], i[7], i[4], i[5],
-                    ]);
+                    let strips = if request.orientation.is_ccw() {
+                        vec!(vec![
+                             i[0], i[1], i[2], i[3], i[7], i[1], i[5],
+                             i[0], i[4], i[2], i[6], i[7], i[4], i[5],
+                        ])
+                    } else {
+                        vec!(vec![
+                             i[0], i[2], i[1], i[3], i[7], i[2], i[6],
+                             i[0], i[4], i[1], i[5], i[7], i[4], i[6],
+                        ])
+                    };
 
                     Shape::Strips { vertices, strips }
                 } else {
@@ -151,10 +162,17 @@ where
                     .collect::<Vec<_>>();
 
                 if request.prefer_strips {
-                    let strips = vec![
-                        vec![i[1], i[0], i[3], i[4], i[5], i[2]],
-                        vec![i[4], i[0], i[2], i[1], i[5], i[3]],
-                    ];
+                    let strips = if request.orientation.is_ccw() {
+                        vec![
+                            vec![i[1], i[0], i[3], i[4], i[5], i[2]],
+                            vec![i[4], i[0], i[2], i[1], i[5], i[3]],
+                        ]
+                    } else {
+                        vec![
+                            vec![i[3], i[0], i[1], i[2], i[5], i[4]],
+                            vec![i[2], i[0], i[4], i[3], i[5], i[1]],
+                        ]
+                    };
 
                     Shape::Strips { vertices, strips }
                 } else {
@@ -206,12 +224,21 @@ where
                     .collect::<Vec<_>>();
 
                 if request.prefer_strips {
-                    let strips = vec!(vec![
-                        i[0], i[1], i[2], i[3], i[4], i[9], i[2], i[13], i[7], i[11],
-                        i[2], i[5], i[0], i[10], i[1], i[6], i[3], i[8], i[9], i[14],
-                        i[13], i[18], i[11], i[16], i[5], i[15], i[10], i[17], i[6],
-                        i[12], i[8], i[17], i[14], i[19], i[18], i[17], i[16], i[15],
-                    ]);
+                    let strips = if request.orientation.is_ccw() {
+                        vec!(vec![
+                            i[0], i[1], i[2], i[3], i[4], i[9], i[2], i[13], i[7], i[11],
+                            i[2], i[5], i[0], i[10], i[1], i[6], i[3], i[8], i[9], i[14],
+                            i[13], i[18], i[11], i[16], i[5], i[15], i[10], i[17], i[6],
+                            i[12], i[8], i[17], i[14], i[19], i[18], i[17], i[16], i[15],
+                        ])
+                    } else {
+                        vec!(vec![
+                             i[19], i[18], i[17], i[16], i[15], i[10], i[17], i[6], i[12], i[8],
+                             i[17], i[14], i[19], i[9], i[18], i[13], i[16], i[11], i[10], i[5],
+                             i[6], i[1], i[8], i[3], i[14], i[4], i[9], i[2], i[13],
+                             i[7], i[11], i[2], i[5], i[0], i[1], i[2], i[3], i[4],
+                        ])
+                    };
 
                     Shape::Strips { vertices, strips }
                 } else {
@@ -255,11 +282,19 @@ where
                     .collect::<Vec<_>>();
 
                 if request.prefer_strips {
-                    let strips = vec![
-                        vec![i[0], i[1], i[2], i[6], i[8], i[11], i[10], i[9], i[5], i[3], i[0], i[1]],
-                        vec![i[0], i[2], i[4], i[8], i[10], i[11], i[9], i[7], i[3], i[1]],// i[0], i[2]],
-                        vec![i[0], i[4], i[5], i[10], i[9], i[11], i[7], i[6], i[1]],// i[2], i[0], i[4]],
-                    ];
+                    let strips = if request.orientation.is_ccw() {
+                        vec![
+                            vec![i[0], i[1], i[2], i[6], i[8], i[11], i[10], i[9], i[5], i[3], i[0], i[1]],
+                            vec![i[0], i[2], i[4], i[8], i[10], i[11], i[9], i[7], i[3], i[1]],// i[0], i[2]],
+                            vec![i[0], i[4], i[5], i[10], i[9], i[11], i[7], i[6], i[1]],// i[2], i[0], i[4]],
+                        ]
+                    } else {
+                        vec![
+                            vec![i[11], i[10], i[9], i[5], i[3], i[0], i[1], i[2], i[6], i[8], i[11], i[10]],
+                            vec![i[11], i[9], i[7], i[3], i[1], i[0], i[2], i[4], i[8], i[10]],// i[11], i[9]],
+                            vec![i[11], i[7], i[6], i[1], i[2], i[0], i[4], i[5], i[10]],// i[9], i[11], i[7]],
+                        ]
+                    };
 
                     Shape::Strips { vertices, strips }
                 } else {
