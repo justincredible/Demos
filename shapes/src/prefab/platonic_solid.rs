@@ -307,7 +307,7 @@ where
     }
 }
 
-fn oriented_plane<C>(vertices: &Vec<[C; 3]>, unoriented: &[usize], orientation: Orientation) -> [usize; 3]
+fn oriented_plane<C>(vertices: &[[C; 3]], unoriented: &[usize], orientation: Orientation) -> [usize; 3]
 where
     C: Float
 {
