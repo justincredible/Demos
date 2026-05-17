@@ -1,4 +1,11 @@
+use std::f32::consts;
+
+use glam::{Mat4, Quat, Vec3};
 use glow::*;
+use sdl2::event::Event;
+use sdl2::image::LoadSurface;
+use sdl2::keyboard::Keycode;
+use sdl2::surface::Surface;
 
 fn main() {
     // Create a context from a sdl2 window
@@ -13,30 +20,122 @@ fn main() {
     );
     unsafe { gl.use_program(Some(program)); }
 
+    let mut sides = 3;
     // Create a vertex buffer and vertex array object
     let (vbo, vao) = create_vertex_buffer(&gl);
 
-    // Upload some uniforms
-    set_uniform_matrix(
-        &gl,
-        program,
-        "transform",
-        &[1.0f32, 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.],
-    );
+    let initial_rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
+    let mut rotation = initial_rotation;
+    let mut rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01);
+    let mut rotating = true;
+
+    let mut shape = 5;
 
     unsafe { gl.clear_color(0.0, 0.0, 0.0, 1.0); }
 
+    println!(
+        "Up and Down arrows modify vertices per face.\n\
+        Left and Right arrows modify faces per vertex.\n\
+        G switches between polyhedra and polygons.\n\
+        R toggles rotation.\n\
+        H returns object to initial orientation."
+    );
     'render: loop {
         {
             for event in event_loop.poll_iter() {
-                if let sdl2::event::Event::Quit { .. } = event {
-                    break 'render;
+                match event {
+                    Event::Quit { .. } => break 'render,
+                    Event::KeyDown { keycode: Some(keycode), .. } => {
+                        match keycode {
+                            Keycode::Up => match shape {
+                                1 | 3 => shape = 2,
+                                2 | 5 => shape = 4,
+                                0 => {
+                                    sides = (sides + 1).min(255);
+                                    //shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
+                                },
+                                _ => (),
+                            },
+                            Keycode::Down => match shape {
+                                4 => shape = 2,
+                                2 => shape = 1,
+                                0 => {
+                                    if sides > 3 {
+                                        sides -= 1;
+                                    }
+                                    //shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
+                                },
+                                _ => (),
+                            },
+                            Keycode::Left => match shape {
+                                9 => shape = 8,
+                                8 => shape = 7,
+                                7 => shape = 6,
+                                5 => shape = 3,
+                                3 => shape = 1,
+                                _ => (),
+                            },
+                            Keycode::Right => match shape {
+                                1 | 2 => shape = 3,
+                                3 | 4 => shape = 5,
+                                6 => shape = 7,
+                                7 => shape = 8,
+                                8 => shape = 9,
+                                _ => (),
+                            },
+                            Keycode::G => match shape {
+                                0 => {
+                                    sides = 3;
+                                    //shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
+                                    shape = 5;
+                                },
+                                1 ..= 5 => shape = 6,
+                                _ => shape = 0,
+                            },
+                            Keycode::R => rotating = !rotating,
+                            Keycode::Num0 => rotation_delta = Quat::from_axis_angle(Vec3::ZERO, 0.01),
+                            Keycode::Num1 => rotation_delta = Quat::from_axis_angle(Vec3::new(0., 0., 1.), 0.01),
+                            Keycode::Num2 => rotation_delta = Quat::from_axis_angle(Vec3::new(0., 1., 0.), 0.01),
+                            Keycode::Num3 => rotation_delta = Quat::from_axis_angle(Vec3::new(0., 1., 1.), 0.01),
+                            Keycode::Num4 => rotation_delta = Quat::from_axis_angle(Vec3::new(1., 0., 0.), 0.01),
+                            Keycode::Num5 => rotation_delta = Quat::from_axis_angle(Vec3::new(1., 0., 1.), 0.01),
+                            Keycode::Num6 => rotation_delta = Quat::from_axis_angle(Vec3::new(1., 1., 0.), 0.01),
+                            Keycode::Num7 => rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01),
+                            Keycode::Minus => rotation_delta = rotation_delta.conjugate(),
+                            Keycode::H => rotation = initial_rotation,
+                            _ => (),
+                        }
+                    },
+                    _ => (),
                 }
             }
         }
 
+        if rotating {
+            rotation *= rotation_delta;
+        }
+        let scale = Vec3::ONE * if shape == 0 {
+            let angle = consts::TAU / sides as f32;
+            f32::sin(angle) / f32::cos(0.5 * angle)
+        } else if shape == 4 || shape == 8 {
+            // the dodecahedron is rather large
+            0.7
+        } else {
+            1.0
+        };
+        let matrix =
+            Mat4::from_scale_rotation_translation(scale, rotation.normalize(), Vec3::ZERO);
+
         unsafe {
             gl.clear(glow::COLOR_BUFFER_BIT);
+        }
+        set_uniform_matrix(
+            &gl,
+            program,
+            "transform",
+            &matrix.to_cols_array(),
+        );
+        unsafe {
             gl.draw_arrays(glow::TRIANGLES, 0, 3);
             window.gl_swap_window();
         }
@@ -62,12 +161,13 @@ fn create_sdl2_context() -> (
     gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
     gl_attr.set_context_version(4, 6);
     gl_attr.set_context_flags().forward_compatible().set();
-    let window = video
+    let mut window = video
         .window("Shapes", 800, 600)
         .opengl()
         .resizable()
         .build()
         .unwrap();
+    window.set_icon(Surface::from_file("res/icon.tga").unwrap());
     let gl_context = window.gl_create_context().unwrap();
     let gl = unsafe { glow::Context::from_loader_function(|s| video.gl_get_proc_address(s) as *const _) };
     let event_loop = sdl.event_pump().unwrap();
