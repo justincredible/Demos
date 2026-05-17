@@ -1,0 +1,9 @@
+[package]
+name = "example2"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+glow = "0.17"
+sdl2 = "0.37"
+shapes = { path = ".." }

@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "example"]
+members = [".", "example", "example2"]
 
 [package]
 name = "shapes"
