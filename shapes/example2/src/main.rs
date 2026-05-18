@@ -7,6 +7,11 @@ use sdl2::image::LoadSurface;
 use sdl2::keyboard::Keycode;
 use sdl2::surface::Surface;
 
+use shapes::kepler_poinsot::KpPolyhedron;
+use shapes::polygon::Polygon;
+use shapes::platonic_solid::PlatonicSolid;
+use shapes::Shaper;
+
 fn main() {
     // Create a context from a sdl2 window
     let (gl, window, mut event_loop, _context) = create_sdl2_context();
@@ -20,9 +25,26 @@ fn main() {
     );
     unsafe { gl.use_program(Some(program)); }
 
+    unsafe {
+        gl.enable(glow::DEPTH_TEST);
+        gl.depth_func(glow::GREATER);
+        gl.enable(glow::CULL_FACE);
+        gl.cull_face(glow::BACK);
+    }
     let mut sides = 3;
-    // Create a vertex buffer and vertex array object
-    let (vbo, vao) = create_vertex_buffer(&gl);
+    let config = Default::default();
+    let mut shapes = [
+        Shape::new(&gl, Polygon::new(sides).make(config)),
+        Shape::new(&gl, PlatonicSolid::Tetrahedron.make(config)),
+        Shape::new(&gl, PlatonicSolid::Hexahedron.make(config)),
+        Shape::new(&gl, PlatonicSolid::Octahedron.make(config)),
+        Shape::new(&gl, PlatonicSolid::Dodecahedron.make(config)),
+        Shape::new(&gl, PlatonicSolid::Icosahedron.make(config)),
+        Shape::new(&gl, KpPolyhedron::StellatedDodecahedron.make(config)),
+        Shape::new(&gl, KpPolyhedron::GreatDodecahedron.make(config)),
+        Shape::new(&gl, KpPolyhedron::GreatStellatedDodecahedron.make(config)),
+        Shape::new(&gl, KpPolyhedron::GreatIcosahedron.make(config)),
+    ];
 
     let initial_rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
     let mut rotation = initial_rotation;
@@ -31,7 +53,10 @@ fn main() {
 
     let mut shape = 5;
 
-    unsafe { gl.clear_color(0.0, 0.0, 0.0, 1.0); }
+    unsafe {
+        gl.clear_color(0., 0., 0., 1.);
+        gl.clear_depth(0.);
+    }
 
     println!(
         "Up and Down arrows modify vertices per face.\n\
@@ -52,7 +77,7 @@ fn main() {
                                 2 | 5 => shape = 4,
                                 0 => {
                                     sides = (sides + 1).min(255);
-                                    //shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
+                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).make(config));
                                 },
                                 _ => (),
                             },
@@ -63,7 +88,7 @@ fn main() {
                                     if sides > 3 {
                                         sides -= 1;
                                     }
-                                    //shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
+                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).make(config));
                                 },
                                 _ => (),
                             },
@@ -86,7 +111,7 @@ fn main() {
                             Keycode::G => match shape {
                                 0 => {
                                     sides = 3;
-                                    //shapes[shape] = Shape::new(&display, Polygon::new(sides).make(config));
+                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).make(config));
                                     shape = 5;
                                 },
                                 1 ..= 5 => shape = 6,
@@ -123,20 +148,41 @@ fn main() {
         } else {
             1.0
         };
-        let matrix =
-            Mat4::from_scale_rotation_translation(scale, rotation.normalize(), Vec3::ZERO);
-
-        unsafe {
-            gl.clear(glow::COLOR_BUFFER_BIT);
-        }
+        let matrix = Mat4::from_scale_rotation_translation(scale, rotation.normalize(), Vec3::ZERO);
         set_uniform_matrix(
             &gl,
             program,
             "transform",
             &matrix.to_cols_array(),
         );
+
         unsafe {
-            gl.draw_arrays(glow::TRIANGLES, 0, 3);
+            gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
+            gl.bind_vertex_array(Some(shapes[shape].vertices.0));
+            //gl.bind_buffer(glow::ARRAY_BUFFER, Some(shapes[shape].vertices.1));
+            match &shapes[shape].indices.0 {
+                Indices::None => gl.draw_arrays(glow::TRIANGLE_STRIP, 0, shapes[shape].vertices.2 as i32),
+                Indices::One(buffer) => {
+                    gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(buffer.0));
+                    gl.draw_elements(
+                        shapes[shape].indices.1,
+                        buffer.1 as i32,
+                        glow::UNSIGNED_BYTE,
+                        0,
+                    );
+                },
+                Indices::Some(vertex) => {
+                    for buffer in vertex {
+                        gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(buffer.0));
+                        gl.draw_elements(
+                            shapes[shape].indices.1,
+                            buffer.1 as i32,
+                            glow::UNSIGNED_BYTE,
+                            0,
+                        );
+                    }
+                },
+            }
             window.gl_swap_window();
         }
     }
@@ -144,8 +190,20 @@ fn main() {
     // Clean up
     unsafe {
         gl.delete_program(program);
-        gl.delete_vertex_array(vao);
-        gl.delete_buffer(vbo)
+        gl.bind_vertex_array(None);
+        gl.bind_buffer(glow::ARRAY_BUFFER, None);
+        gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, None);
+        for shape in shapes {
+            match &shape.indices.0 {
+                Indices::None => (),
+                Indices::One(buffer) => gl.delete_buffer(buffer.0),
+                Indices::Some(vertex) => for buffer in vertex {
+                    gl.delete_buffer(buffer.0);
+                },
+            }
+            gl.delete_buffer(shape.vertices.1);
+            gl.delete_vertex_array(shape.vertices.0);
+        }
     }
 }
 
@@ -163,8 +221,8 @@ fn create_sdl2_context() -> (
     gl_attr.set_context_flags().forward_compatible().set();
     let mut window = video
         .window("Shapes", 800, 600)
+        .position_centered()
         .opengl()
-        .resizable()
         .build()
         .unwrap();
     window.set_icon(Surface::from_file("res/icon.tga").unwrap());
@@ -223,39 +281,88 @@ fn create_program(
     program
 }
 
-fn create_vertex_buffer(gl: &glow::Context) -> (NativeBuffer, NativeVertexArray) {
-    // This is a flat array of f32s that are to be interpreted as vec3s.
-    let triangle_vertices = [0.0f32, 0.5, 0., -0.5, -0.5, 0., 0.5, -0.5, 0.];
-    let triangle_vertices_u8: &[u8] = unsafe { core::slice::from_raw_parts(
-        triangle_vertices.as_ptr() as *const u8,
-        triangle_vertices.len() * core::mem::size_of::<f32>(),
-    ) };
-
-    // We construct a buffer and upload the data
-    let vbo = unsafe { gl.create_buffer().unwrap() };
-    unsafe {
-        gl.bind_buffer(glow::ARRAY_BUFFER, Some(vbo));
-        gl.buffer_data_u8_slice(glow::ARRAY_BUFFER, triangle_vertices_u8, glow::STATIC_DRAW);
-    }
-
-    // We now construct a vertex array to describe the format of the input buffer
+fn create_vertex_buffer(gl: &glow::Context, vertices: &Vec<[f32; 3]>) -> (NativeVertexArray, NativeBuffer, usize) {
     let vao = unsafe { gl.create_vertex_array().unwrap() };
+    unsafe { gl.bind_vertex_array(Some(vao)); }
+    let vbo = unsafe { gl.create_buffer().unwrap() };
+    unsafe { gl.bind_buffer(glow::ARRAY_BUFFER, Some(vbo)); }
+    let vertices_flat = vertices.iter().flatten().map(Clone::clone).collect::<Vec<_>>();
+    let vertices_u8: &[u8] = unsafe {
+        core::slice::from_raw_parts(
+            vertices_flat.as_ptr() as *const u8,
+            vertices_flat.len() * core::mem::size_of::<f32>(),
+        )
+    };
+    unsafe { gl.buffer_data_u8_slice(glow::ARRAY_BUFFER, vertices_u8, glow::STATIC_DRAW); }
     unsafe {
-        gl.bind_vertex_array(Some(vao));
         gl.enable_vertex_attrib_array(0);
-        gl.vertex_attrib_pointer_f32(0, 3, glow::FLOAT, false, 12, 0);
+        gl.vertex_attrib_pointer_f32(0, 3, glow::FLOAT, false, 3 * core::mem::size_of::<f32>() as i32, 0);
+        gl.bind_vertex_array(None);
+        gl.bind_buffer(glow::ARRAY_BUFFER, None);
     }
 
-    (vbo, vao)
+    (vao, vbo, vertices_flat.len())
+}
+
+fn create_index_buffer(gl: &glow::Context, indices: &Vec<u8>) -> (NativeBuffer, usize) {
+    let ebo = unsafe { gl.create_buffer().unwrap() };
+    unsafe {
+        gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(ebo));
+        gl.buffer_data_u8_slice(glow::ELEMENT_ARRAY_BUFFER, indices, glow::STATIC_DRAW);
+        gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, None);
+    }
+
+    (ebo, indices.len())
 }
 
 fn set_uniform_matrix(gl: &glow::Context, program: NativeProgram, name: &str, matrix: &[f32]) {
     let uniform_location = unsafe { gl.get_uniform_location(program, name) };
-    unsafe { gl.uniform_matrix_4_f32_slice(
-        uniform_location.as_ref(),
-        false,
-        matrix,
-    ); }
+    unsafe {
+        gl.uniform_matrix_4_f32_slice(
+            uniform_location.as_ref(),
+            false,
+            matrix,
+        );
+    }
+}
+
+enum Indices {
+    None,
+    One((NativeBuffer, usize)),
+    Some(Vec<(NativeBuffer, usize)>),
+}
+
+struct Shape {
+    vertices: (NativeVertexArray, NativeBuffer, usize),
+    indices: (Indices, u32),
+}
+
+impl Shape {
+    pub fn new(gl: &glow::Context, shape: shapes::Shape<f32, u8>) -> Self {
+        if let shapes::Shape::Triangles { vertices, indices } = shape {
+            let vertices = create_vertex_buffer(gl, &vertices);
+            let indices = (Indices::One(create_index_buffer(gl, &indices)), glow::TRIANGLES);
+
+            Self { vertices, indices }
+        } else if let shapes::Shape::NormalTriangles { vertices, indices, .. } = shape {
+            let vertices = create_vertex_buffer(gl, &vertices);
+            let indices = (Indices::One(create_index_buffer(gl, &indices)), glow::TRIANGLES);
+
+            Self { vertices, indices }
+        } else if let shapes::Shape::Strips { vertices, strips } = shape {
+            let vertices = create_vertex_buffer(gl, &vertices);
+            let indices = if strips.is_empty() {
+                (Indices::None, glow::TRIANGLE_STRIP)
+            } else {
+                let buffers = strips.iter().map(|strip|
+                    create_index_buffer(gl, strip)
+                ).collect();
+                (Indices::Some(buffers), glow::TRIANGLE_STRIP)
+            };
+
+            Self { vertices, indices }
+        } else { unreachable!() }
+    }
 }
 
 const VERTEX_SHADER_SOURCE: &str = r#"#version 150
