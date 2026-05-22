@@ -187,8 +187,9 @@ fn main() {
                     }
                 },
             }
-            window.gl_swap_window();
         }
+
+        window.gl_swap_window();
     }
 
     // Clean up
