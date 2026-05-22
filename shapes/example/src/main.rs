@@ -56,6 +56,10 @@ fn main() {
     unsafe {
         gl.clear_color(0., 0., 0., 1.);
         gl.clear_depth(0.);
+        gl.uniform_1_f32(
+            gl.get_uniform_location(program, "signum").as_ref(),
+            (2 * Into::<i8>::into(config.orientation.is_ccw()) - 1).into(),
+        );
     }
 
     println!(
@@ -400,12 +404,13 @@ const GEOMETRY_SHADER_SOURCE: &str = r#"#version 150
 
     out vec3 g_normal;
 
+    uniform float signum;
     uniform mat4 transform;
 
     void main() {
         vec3 a = normalize(v_position[1] - v_position[0]);
         vec3 b = normalize(v_position[2] - v_position[0]);
-        vec3 normal = normalize(mat3x3(transform) * cross(a, b));
+        vec3 normal = normalize(mat3x3(transform) * signum * cross(a, b));
 
         gl_Position = transform * vec4(v_position[0], 1);
         g_normal = normal;
