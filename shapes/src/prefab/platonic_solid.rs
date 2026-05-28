@@ -49,19 +49,6 @@ impl Polyhedral for PlatonicSolid {
     }
 }
 
-const TETRA_STRIP: [usize; 6] = [0, 1, 2, 3, 0, 1];
-const HEXA_STRIP: [usize; 14] = [0, 1, 2, 3, 7, 1, 5, 0, 4, 2, 6, 7, 4, 5];
-const OCTA_STRIPS: [[usize; 6]; 2] = [[1, 0, 3, 4, 5, 2], [4, 0, 2, 1, 5, 3]];
-const DODECA_STRIP: [usize; 38] = [
-    0, 1, 2, 3, 4, 9, 2, 13, 7, 11, 2, 5, 0, 10, 1, 6, 3, 8, 9, 14,
-    13, 18, 11, 16, 5, 15, 10, 17, 6, 12, 8, 17, 14, 19, 18, 17, 16, 15,
-];
-const ICOSA_STRIPS: [[usize; 12]; 3] = [
-    [0, 1, 2, 6, 8, 11, 10, 9, 5, 3, 0, 1],
-    [0, 2, 4, 8, 10, 11, 9, 7, 3, 1, 0, 2],
-    [0, 4, 5, 10, 9, 11, 7, 6, 1, 2, 0, 4],
-];
-
 impl<C, I> Shaper<C, I> for PlatonicSolid
 where
     C: Float + FloatConst,
@@ -101,6 +88,7 @@ where
                     } else {
                         i[self.vertex_count() - 1 - idx]
                     };
+                    const TETRA_STRIP: [usize; 6] = [0, 1, 2, 3, 0, 1];
                     let strips = vec![TETRA_STRIP.into_iter().map(lookup).collect()];
 
                     Shape::Strips { vertices, strips }
@@ -146,6 +134,7 @@ where
                     } else {
                         i[self.vertex_count() - 1 - idx]
                     };
+                    const HEXA_STRIP: [usize; 14] = [0, 1, 2, 3, 7, 1, 5, 0, 4, 2, 6, 7, 4, 5];
                     let strips = vec![HEXA_STRIP.into_iter().map(lookup).collect()];
 
                     Shape::Strips { vertices, strips }
@@ -191,6 +180,7 @@ where
                     } else {
                         i[self.vertex_count() - 1 - idx]
                     };
+                    const OCTA_STRIPS: [[usize; 6]; 2] = [[1, 0, 3, 4, 5, 2], [4, 0, 2, 1, 5, 3]];
                     let mut strips = vec![];
                     for strip in OCTA_STRIPS {
                         strips.push(strip.into_iter().map(lookup).collect());
@@ -256,6 +246,10 @@ where
                     } else {
                         i[self.vertex_count() - 1 - idx]
                     };
+                    const DODECA_STRIP: [usize; 38] = [
+                        0, 1, 2, 3, 4, 9, 2, 13, 7, 11, 2, 5, 0, 10, 1, 6, 3, 8, 9, 14,
+                        13, 18, 11, 16, 5, 15, 10, 17, 6, 12, 8, 17, 14, 19, 18, 17, 16, 15,
+                    ];
                     let strips = vec![DODECA_STRIP.into_iter().map(lookup).collect()];
 
                     Shape::Strips { vertices, strips }
@@ -310,6 +304,11 @@ where
                     } else {
                         i[self.vertex_count() - 1 - idx]
                     };
+                    const ICOSA_STRIPS: [[usize; 12]; 3] = [
+                        [0, 1, 2, 6, 8, 11, 10, 9, 5, 3, 0, 1],
+                        [0, 2, 4, 8, 10, 11, 9, 7, 3, 1, 0, 2],
+                        [0, 4, 5, 10, 9, 11, 7, 6, 1, 2, 0, 4],
+                    ];
                     let mut strips = vec![];
                     for strip in ICOSA_STRIPS {
                         strips.push(strip.into_iter().map(lookup).collect());
