@@ -28,8 +28,6 @@ fn main() {
     unsafe {
         gl.clear_color(0., 0., 0., 1.);
         gl.enable(glow::DEPTH_TEST);
-        gl.depth_func(glow::GREATER);
-        gl.clear_depth(0.);
         gl.enable(glow::CULL_FACE);
         gl.cull_face(glow::BACK);
     }
@@ -55,11 +53,24 @@ fn main() {
 
     let mut shape = 5;
 
+    let rh_cross = config.orientation.is_ccw() && config.orientation.is_right()
+        || config.orientation.is_cw() && config.orientation.is_left();
     unsafe {
         gl.uniform_1_f32(
-            gl.get_uniform_location(program, "signum").as_ref(),
-            (2 * Into::<i8>::into(config.orientation.is_ccw()) - 1).into(),
+            gl.get_uniform_location(program, "rh_cross").as_ref(),
+            (2 * Into::<i8>::into(rh_cross) - 1).into(),
         );
+        gl.uniform_1_f32(
+            gl.get_uniform_location(program, "rh").as_ref(),
+            (2 * Into::<i8>::into(config.orientation.is_right()) - 1).into(),
+        );
+        if config.orientation.is_right() {
+            gl.depth_func(glow::GREATER);
+            gl.clear_depth(0.);
+        }
+        if config.orientation.is_cw() {
+            gl.front_face(glow::CW);
+        }
     }
 
     println!(
@@ -382,15 +393,17 @@ const VERTEX_SHADER_SOURCE: &str = r#"#version 150
 "#;
 const FRAGMENT_SHADER_SOURCE: &str = r#"#version 140
 
-    const vec3 LIGHT_DIR = vec3(-1.0, 1, 1);
     const vec4 AMBIENT = vec4(0.01, 0.01, 0.01, 1);
 
     in vec3 g_normal;
 
     out vec4 f_colour;
 
+    uniform float rh;
+
     void main() {
-        float saturation = clamp(dot(normalize(LIGHT_DIR), g_normal), 0, 1);
+        vec3 light_dir = vec3(-1.0, 1, rh * 1);
+        float saturation = clamp(dot(normalize(light_dir), g_normal), 0, 1);
         vec4 colour = vec4(1.0, gl_FrontFacing, 1, 1);
 
         f_colour = saturation * colour + AMBIENT;
@@ -405,13 +418,13 @@ const GEOMETRY_SHADER_SOURCE: &str = r#"#version 150
 
     out vec3 g_normal;
 
-    uniform float signum;
+    uniform float rh_cross;
     uniform mat4 transform;
 
     void main() {
         vec3 a = normalize(v_position[1] - v_position[0]);
         vec3 b = normalize(v_position[2] - v_position[0]);
-        vec3 normal = normalize(mat3x3(transform) * signum * cross(a, b));
+        vec3 normal = normalize(mat3x3(transform) * rh_cross * cross(a, b));
 
         gl_Position = transform * vec4(v_position[0], 1);
         g_normal = normal;
