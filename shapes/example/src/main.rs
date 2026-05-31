@@ -26,8 +26,10 @@ fn main() {
     unsafe { gl.use_program(Some(program)); }
 
     unsafe {
+        gl.clear_color(0., 0., 0., 1.);
         gl.enable(glow::DEPTH_TEST);
         gl.depth_func(glow::GREATER);
+        gl.clear_depth(0.);
         gl.enable(glow::CULL_FACE);
         gl.cull_face(glow::BACK);
     }
@@ -54,8 +56,6 @@ fn main() {
     let mut shape = 5;
 
     unsafe {
-        gl.clear_color(0., 0., 0., 1.);
-        gl.clear_depth(0.);
         gl.uniform_1_f32(
             gl.get_uniform_location(program, "signum").as_ref(),
             (2 * Into::<i8>::into(config.orientation.is_ccw()) - 1).into(),
