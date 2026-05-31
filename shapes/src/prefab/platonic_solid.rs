@@ -346,7 +346,9 @@ where
     let c = a1*b2 - b1*a2;
     let d = a*vertices[unoriented[0]][0] + b*vertices[unoriented[0]][1] + c*vertices[unoriented[0]][2];
 
-    if d > zero() && orientation.is_ccw() || d < zero() && orientation.is_cw() {
+    if d > zero() && orientation.is_ccw() == orientation.is_right() ||
+        d < zero() && orientation.is_ccw() != orientation.is_right()
+    {
         [unoriented[0], unoriented[1], unoriented[2]]
     } else {
         [unoriented[0], unoriented[2], unoriented[1]]
