@@ -94,15 +94,21 @@ where
 
                     Shape::Strips { vertices, strips }
                 } else {
+                    let mut normals = vec![];
                     let mut indices = vec![];
                     for face in self.faces() {
-                        let triangle = oriented_plane(&vertices, &face, request.orientation);
+                        let (normal, triangle) = oriented_plane(&vertices, &face, request.orientation);
                         for index in triangle {
                             indices.push(i[index]);
                         }
+                        normals.push(normal);
                     }
 
-                    Shape::Triangles { vertices, indices }
+                    if request.generate_normals {
+                        Shape::NormalTriangles { vertices, normals, indices }
+                    } else {
+                        Shape::Triangles { vertices, indices }
+                    }
                 }
             },
             Self::Hexahedron => {
@@ -141,16 +147,22 @@ where
 
                     Shape::Strips { vertices, strips }
                 } else {
+                    let mut normals = vec![];
                     let mut indices = vec![];
                     for face in self.faces() {
-                        let triangle1 = oriented_plane(&vertices, &face[0..3], request.orientation);
-                        let triangle2 = oriented_plane(&vertices, &face[1..4], request.orientation);
+                        let (normal, triangle1) = oriented_plane(&vertices, &face, request.orientation);
+                        let (_, triangle2) = oriented_plane(&vertices, &face[1..4], request.orientation);
                         for index in triangle1.into_iter().chain(triangle2) {
                             indices.push(i[index]);
                         }
+                        normals.push(normal);
                     }
 
-                    Shape::Triangles { vertices, indices }
+                    if request.generate_normals {
+                        Shape::NormalTriangles { vertices, normals, indices }
+                    } else {
+                        Shape::Triangles { vertices, indices }
+                    }
                 }
             },
             Self::Octahedron => {
@@ -191,15 +203,21 @@ where
 
                     Shape::Strips { vertices, strips }
                 } else {
+                    let mut normals = vec![];
                     let mut indices = vec![];
                     for face in self.faces() {
-                        let triangle = oriented_plane(&vertices, &face, request.orientation);
+                        let (normal, triangle) = oriented_plane(&vertices, &face, request.orientation);
                         for index in triangle {
                             indices.push(i[index]);
                         }
+                        normals.push(normal);
                     }
 
-                    Shape::Triangles { vertices, indices }
+                    if request.generate_normals {
+                        Shape::NormalTriangles { vertices, normals, indices }
+                    } else {
+                        Shape::Triangles { vertices, indices }
+                    }
                 }
             },
             Self::Dodecahedron => {
@@ -258,17 +276,23 @@ where
 
                     Shape::Strips { vertices, strips }
                 } else {
+                    let mut normals = vec![];
                     let mut indices = vec![];
                     for face in self.faces() {
-                        let triangle1 = oriented_plane(&vertices, &face[0..3], request.orientation);
-                        let triangle2 = oriented_plane(&vertices, &face[1..4], request.orientation);
-                        let triangle3 = oriented_plane(&vertices, &face[2..5], request.orientation);
+                        let (normal, triangle1) = oriented_plane(&vertices, &face, request.orientation);
+                        let (_, triangle2) = oriented_plane(&vertices, &face[1..4], request.orientation);
+                        let (_, triangle3) = oriented_plane(&vertices, &face[2..5], request.orientation);
                         for index in triangle1.into_iter().chain(triangle2).chain(triangle3) {
                             indices.push(i[index]);
                         }
+                        normals.push(normal);
                     }
 
-                    Shape::Triangles { vertices, indices }
+                    if request.generate_normals {
+                        Shape::NormalTriangles { vertices, normals, indices }
+                    } else {
+                        Shape::Triangles { vertices, indices }
+                    }
                 }
             },
             Self::Icosahedron => {
@@ -321,22 +345,28 @@ where
 
                     Shape::Strips { vertices, strips }
                 } else {
+                    let mut normals = vec![];
                     let mut indices = vec![];
                     for face in self.faces() {
-                        let triangle = oriented_plane(&vertices, &face, request.orientation);
+                        let (normal, triangle) = oriented_plane(&vertices, &face, request.orientation);
                         for index in triangle {
                             indices.push(i[index]);
                         }
+                        normals.push(normal);
                     }
 
-                    Shape::Triangles { vertices, indices }
+                    if request.generate_normals {
+                        Shape::NormalTriangles { vertices, normals, indices }
+                    } else {
+                        Shape::Triangles { vertices, indices }
+                    }
                 }
             },
         }
     }
 }
 
-fn oriented_plane<C>(vertices: &[[C; 3]], unoriented: &[usize], orientation: Orientation) -> [usize; 3]
+fn oriented_plane<C>(vertices: &[[C; 3]], unoriented: &[usize], orientation: Orientation) -> ([C; 3], [usize; 3])
 where
     C: Float
 {
@@ -349,14 +379,18 @@ where
     let a = b1*c2 - c1*b2;
     let b = c1*a2 - a1*c2;
     let c = a1*b2 - b1*a2;
+    let mag = (a*a + b*b + c*c).sqrt();
+    let a = a / mag;
+    let b = b / mag;
+    let c = c / mag;
     let d = a*vertices[unoriented[0]][0] + b*vertices[unoriented[0]][1] + c*vertices[unoriented[0]][2];
 
     if d > zero() && orientation.is_ccw() == orientation.is_right() ||
         d < zero() && orientation.is_ccw() != orientation.is_right()
     {
-        [unoriented[0], unoriented[1], unoriented[2]]
+        ([a, b, c], [unoriented[0], unoriented[1], unoriented[2]])
     } else {
-        [unoriented[0], unoriented[2], unoriented[1]]
+        ([-a, -b, -c], [unoriented[0], unoriented[2], unoriented[1]])
     }
 }
 
