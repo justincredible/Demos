@@ -65,12 +65,18 @@ where
                 let base = -fh / sr2 / sr3;
                 let apex = fh * sr3 / sr2;
 
-                let vertices = vec![
+                let mut vertices = vec![
                     [-fh, base, fh / sr3],
                     [fh, base, fh / sr3],
                     [f0, apex, f0],
                     [f0, base, -f1 / sr3],
                 ];
+
+                if request.orientation.is_left() {
+                    for vertex in &mut vertices {
+                        vertex[2] = vertex[2].neg();
+                    }
+                }
 
                 let i = vec![zero(), one()]
                     .into_iter()
@@ -102,7 +108,7 @@ where
             Self::Hexahedron => {
                 let fh = cast::<_, C>(0.5).unwrap();
 
-                let vertices = vec![
+                let mut vertices = vec![
                     [-fh, -fh, fh],
                     [fh, -fh, fh],
                     [-fh, fh, fh],
@@ -112,6 +118,12 @@ where
                     [-fh, fh, -fh],
                     [fh, fh, -fh],
                 ];
+
+                if request.orientation.is_left() {
+                    for vertex in &mut vertices {
+                        vertex[2] = vertex[2].neg();
+                    }
+                }
 
                 let i = vec![zero(), one()]
                     .into_iter()
@@ -145,7 +157,7 @@ where
                 let f0 = zero::<C>();
                 let half_h = FloatConst::FRAC_1_SQRT_2();
 
-                let vertices = vec![
+                let mut vertices = vec![
                     [f0, half_h, f0],
                     [f0, f0, -half_h],
                     [-half_h, f0, f0],
@@ -153,6 +165,12 @@ where
                     [f0, f0, half_h],
                     [f0, -half_h, f0],
                 ];
+
+                if request.orientation.is_left() {
+                    for vertex in &mut vertices {
+                        vertex[2] = vertex[2].neg();
+                    }
+                }
 
                 let i = vec![zero(), one()]
                     .into_iter()
@@ -192,7 +210,7 @@ where
                 let inner = fh * fh / pent.width * pent.radius;
                 let outer = fh * (agon.radius + pent.radius);
 
-                let vertices = vec![
+                let mut vertices = vec![
                     [f0, pent.radius, outer],
                     [-pent.width, pent.middle, outer],
                     [pent.width, pent.middle, outer],
@@ -214,6 +232,12 @@ where
                     [pent.width, -pent.middle, -outer],
                     [f0, -pent.radius, -outer],
                 ];
+
+                if request.orientation.is_left() {
+                    for vertex in &mut vertices {
+                        vertex[2] = vertex[2].neg();
+                    }
+                }
 
                 let i = vec![zero(), one()]
                     .into_iter()
@@ -253,7 +277,7 @@ where
                 let pent = Pentagonal::<C>::new(Edge::Unit);
                 let apex = (pent.width / fh - fh) * pent.radius;
 
-                let vertices = vec![
+                let mut vertices = vec![
                     [f0, apex, f0],
                     [f0, fh * pent.radius, -pent.radius],
                     [-pent.width, fh * pent.radius, -pent.middle],
@@ -267,6 +291,12 @@ where
                     [f0, -fh * pent.radius, pent.radius],
                     [f0, -apex, f0],
                 ];
+
+                if request.orientation.is_left() {
+                    for vertex in &mut vertices {
+                        vertex[2] = vertex[2].neg();
+                    }
+                }
 
                 let i = vec![zero(), one()]
                     .into_iter()
