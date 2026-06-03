@@ -64,17 +64,12 @@ where
                 let sr3 = cast::<_, C>(3.).unwrap().sqrt();
                 let base = -fh / sr2 / sr3;
                 let apex = fh * sr3 / sr2;
-                let z = if request.orientation.is_right() {
-                    f1
-                } else {
-                    -f1
-                };
 
                 let vertices = vec![
-                    [-fh, base, z * fh / sr3],
-                    [fh, base, z * fh / sr3],
-                    [f0, apex, z * f0],
-                    [f0, base, -z * f1 / sr3],
+                    [-fh, base, fh / sr3],
+                    [fh, base, fh / sr3],
+                    [f0, apex, f0],
+                    [f0, base, -f1 / sr3],
                 ];
 
                 let i = vec![zero(), one()]
@@ -106,21 +101,16 @@ where
             },
             Self::Hexahedron => {
                 let fh = cast::<_, C>(0.5).unwrap();
-                let z = if request.orientation.is_right() {
-                    one::<C>()
-                } else {
-                    -one::<C>()
-                };
 
                 let vertices = vec![
-                    [-fh, -fh, z * fh],
-                    [fh, -fh, z * fh],
-                    [-fh, fh, z * fh],
-                    [fh, fh, z * fh],
-                    [-fh, -fh, -z * fh],
-                    [fh, -fh, -z * fh],
-                    [-fh, fh, -z * fh],
-                    [fh, fh, -z * fh],
+                    [-fh, -fh, fh],
+                    [fh, -fh, fh],
+                    [-fh, fh, fh],
+                    [fh, fh, fh],
+                    [-fh, -fh, -fh],
+                    [fh, -fh, -fh],
+                    [-fh, fh, -fh],
+                    [fh, fh, -fh],
                 ];
 
                 let i = vec![zero(), one()]
@@ -154,19 +144,14 @@ where
             Self::Octahedron => {
                 let f0 = zero::<C>();
                 let half_h = FloatConst::FRAC_1_SQRT_2();
-                let z = if request.orientation.is_right() {
-                    one::<C>()
-                } else {
-                    -one::<C>()
-                };
 
                 let vertices = vec![
-                    [f0, half_h, z * f0],
-                    [f0, f0, -z * half_h],
-                    [-half_h, f0, z * f0],
-                    [half_h, f0, z * f0],
-                    [f0, f0, z * half_h],
-                    [f0, -half_h, z * f0],
+                    [f0, half_h, f0],
+                    [f0, f0, -half_h],
+                    [-half_h, f0, f0],
+                    [half_h, f0, f0],
+                    [f0, f0, half_h],
+                    [f0, -half_h, f0],
                 ];
 
                 let i = vec![zero(), one()]
@@ -206,33 +191,28 @@ where
                 let agon = Pentagonal::new(Edge::Phi);
                 let inner = fh * fh / pent.width * pent.radius;
                 let outer = fh * (agon.radius + pent.radius);
-                let z = if request.orientation.is_right() {
-                    one::<C>()
-                } else {
-                    -one::<C>()
-                };
 
                 let vertices = vec![
-                    [f0, pent.radius, z * outer],
-                    [-pent.width, pent.middle, z * outer],
-                    [pent.width, pent.middle, z * outer],
-                    [-fh, -pent.center, z * outer],
-                    [fh, -pent.center, z * outer],
-                    [f0, agon.radius, z * inner],
-                    [-agon.width, agon.middle, z * inner],
-                    [agon.width, agon.middle, z * inner],
-                    [-pent.width, -agon.center, z * inner],
-                    [pent.width, -agon.center, z * inner],
-                    [-pent.width, agon.center, -z * inner],
-                    [pent.width, agon.center, -z * inner],
-                    [-agon.width, -agon.middle, -z * inner],
-                    [agon.width, -agon.middle, -z * inner],
-                    [f0, -agon.radius, -z * inner],
-                    [-fh, pent.center, -z * outer],
-                    [fh, pent.center, -z * outer],
-                    [-pent.width, -pent.middle, -z * outer],
-                    [pent.width, -pent.middle, -z * outer],
-                    [f0, -pent.radius, -z * outer],
+                    [f0, pent.radius, outer],
+                    [-pent.width, pent.middle, outer],
+                    [pent.width, pent.middle, outer],
+                    [-fh, -pent.center, outer],
+                    [fh, -pent.center, outer],
+                    [f0, agon.radius, inner],
+                    [-agon.width, agon.middle, inner],
+                    [agon.width, agon.middle, inner],
+                    [-pent.width, -agon.center, inner],
+                    [pent.width, -agon.center, inner],
+                    [-pent.width, agon.center, -inner],
+                    [pent.width, agon.center, -inner],
+                    [-agon.width, -agon.middle, -inner],
+                    [agon.width, -agon.middle, -inner],
+                    [f0, -agon.radius, -inner],
+                    [-fh, pent.center, -outer],
+                    [fh, pent.center, -outer],
+                    [-pent.width, -pent.middle, -outer],
+                    [pent.width, -pent.middle, -outer],
+                    [f0, -pent.radius, -outer],
                 ];
 
                 let i = vec![zero(), one()]
@@ -272,25 +252,20 @@ where
                 let fh = cast::<_, C>(0.5).unwrap();
                 let pent = Pentagonal::<C>::new(Edge::Unit);
                 let apex = (pent.width / fh - fh) * pent.radius;
-                let z = if request.orientation.is_right() {
-                    one::<C>()
-                } else {
-                    -one::<C>()
-                };
 
                 let vertices = vec![
-                    [f0, apex, z * f0],
-                    [f0, fh * pent.radius, -z * pent.radius],
-                    [-pent.width, fh * pent.radius, -z * pent.middle],
-                    [pent.width, fh * pent.radius, -z * pent.middle],
-                    [-fh, fh * pent.radius, z * pent.center],
-                    [fh, fh * pent.radius, z * pent.center],
-                    [-fh, -fh * pent.radius, -z * pent.center],
-                    [fh, -fh * pent.radius, -z * pent.center],
-                    [-pent.width, -fh * pent.radius, z * pent.middle],
-                    [pent.width, -fh * pent.radius, z * pent.middle],
-                    [f0, -fh * pent.radius, z * pent.radius],
-                    [f0, -apex, z * f0],
+                    [f0, apex, f0],
+                    [f0, fh * pent.radius, -pent.radius],
+                    [-pent.width, fh * pent.radius, -pent.middle],
+                    [pent.width, fh * pent.radius, -pent.middle],
+                    [-fh, fh * pent.radius, pent.center],
+                    [fh, fh * pent.radius, pent.center],
+                    [-fh, -fh * pent.radius, -pent.center],
+                    [fh, -fh * pent.radius, -pent.center],
+                    [-pent.width, -fh * pent.radius, pent.middle],
+                    [pent.width, -fh * pent.radius, pent.middle],
+                    [f0, -fh * pent.radius, pent.radius],
+                    [f0, -apex, f0],
                 ];
 
                 let i = vec![zero(), one()]
