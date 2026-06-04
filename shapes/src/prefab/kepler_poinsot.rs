@@ -1,14 +1,49 @@
 use num_traits::{cast, Float, FloatConst, NumCast, one, Unsigned, zero};
 
 use crate::shapes::{Configuration, Shape, Shaper};
-use crate::prefab::pentagonal::{Edge, Pentagonal};
+use crate::prefab::{
+    pentagonal::{Edge, Pentagonal},
+    polyhedral::Polyhedral,
+};
 
 /// All possible Kepler-Poinsot polyhedra.
+#[derive(Clone, Copy)]
 pub enum KpPolyhedron {
     StellatedDodecahedron,
     GreatDodecahedron,
     GreatStellatedDodecahedron,
     GreatIcosahedron,
+}
+
+impl Polyhedral for KpPolyhedron {
+    fn edges(&self) -> Vec<Vec<usize>> {
+        match self {
+            Self::GreatStellatedDodecahedron => [
+                [14,17,18], [13,16,19], [12,15,19], [11,15,18], [10,16,17],
+                [8,9,19], [7,9,18], [6,8,17], [5,7,16], [5,6,15],
+                [4,13,14], [3,12,14], [2,11,13], [1,10,12], [0,10,11],
+                [2,3,9], [1,4,8], [0,4,7], [0,3,6], [1,2,5],
+            ].iter().map(Into::into).collect(),
+            _ => {
+                let iterator = [
+                    [6,7,8,9,10], [4,5,8,9,11], [3,5,7,10,11], [2,4,6,10,11], [1,3,6,9,11], [1,2,7,8,11],
+                    [0,3,4,9,10], [0,2,5,8,10], [0,1,5,7,9], [0,1,4,6,8], [0,2,3,6,7], [1,2,3,4,5],
+                ].iter().map(Into::into);
+                if matches!(self, Self::GreatDodecahedron) {
+                    iterator.rev().collect()
+                } else {
+                    iterator.collect()
+                }
+            },
+        }
+    }
+
+    fn vertices_per_face(&self) -> usize {
+        match self {
+            Self::GreatIcosahedron => 3,
+            _ => 5,
+        }
+    }
 }
 
 impl<C, I> Shaper<C, I> for KpPolyhedron
@@ -78,7 +113,7 @@ where
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..32).map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..vertices.len()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 let indices = vec![
@@ -128,7 +163,7 @@ where
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..12).map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 let indices = vec![
@@ -212,7 +247,7 @@ where
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..32).map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..vertices.len()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 let indices = vec![
@@ -270,7 +305,7 @@ where
 
                 let i = vec![zero(), one()]
                     .into_iter()
-                    .chain((2..12).map(|i| cast::<_, I>(i).unwrap()))
+                    .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
                 let indices = vec![
@@ -304,7 +339,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{KpPolyhedron, Shape, Shaper};
+    use super::{KpPolyhedron, Polyhedral, Shape, Shaper};
 
     use crate::prefab::unit_test::{distance_neighbour, equidistant};
 
@@ -325,39 +360,15 @@ mod tests {
 
     #[test]
     fn stellated_dodecahedron_edges() {
-        let shape = make_shape(KpPolyhedron::StellatedDodecahedron);
+        let solid = KpPolyhedron::StellatedDodecahedron;
+        let shape = make_shape(solid);
         let vertices = shape.vertices();
 
-        distance_neighbour(PHI, vertices, 0, 6);
-        distance_neighbour(PHI, vertices, 0, 7);
-        distance_neighbour(PHI, vertices, 0, 8);
-        distance_neighbour(PHI, vertices, 0, 9);
-        distance_neighbour(PHI, vertices, 0, 10);
-        distance_neighbour(PHI, vertices, 1, 4);
-        distance_neighbour(PHI, vertices, 1, 5);
-        distance_neighbour(PHI, vertices, 1, 8);
-        distance_neighbour(PHI, vertices, 1, 9);
-        distance_neighbour(PHI, vertices, 1, 11);
-        distance_neighbour(PHI, vertices, 2, 3);
-        distance_neighbour(PHI, vertices, 2, 5);
-        distance_neighbour(PHI, vertices, 2, 7);
-        distance_neighbour(PHI, vertices, 2, 10);
-        distance_neighbour(PHI, vertices, 2, 11);
-        distance_neighbour(PHI, vertices, 3, 4);
-        distance_neighbour(PHI, vertices, 3, 6);
-        distance_neighbour(PHI, vertices, 3, 10);
-        distance_neighbour(PHI, vertices, 3, 11);
-        distance_neighbour(PHI, vertices, 4, 6);
-        distance_neighbour(PHI, vertices, 4, 9);
-        distance_neighbour(PHI, vertices, 4, 11);
-        distance_neighbour(PHI, vertices, 5, 7);
-        distance_neighbour(PHI, vertices, 5, 8);
-        distance_neighbour(PHI, vertices, 5, 11);
-        distance_neighbour(PHI, vertices, 6, 9);
-        distance_neighbour(PHI, vertices, 6, 10);
-        distance_neighbour(PHI, vertices, 7, 8);
-        distance_neighbour(PHI, vertices, 7, 10);
-        distance_neighbour(PHI, vertices, 8, 9);
+        for i in 0..solid.vertex_count() {
+            for j in solid.edges()[i].iter().map(Clone::clone).filter(|&x| x > i) {
+                distance_neighbour(PHI, vertices, i, j);
+            }
+        }
     }
 
     #[test]
@@ -367,39 +378,15 @@ mod tests {
 
     #[test]
     fn great_dodecahedron_edges() {
-        let shape = make_shape(KpPolyhedron::GreatDodecahedron);
+        let solid = KpPolyhedron::GreatDodecahedron;
+        let shape = make_shape(solid);
         let vertices = shape.vertices();
 
-        distance_neighbour(1., vertices, 0, 1);
-        distance_neighbour(1., vertices, 0, 2);
-        distance_neighbour(1., vertices, 0, 3);
-        distance_neighbour(1., vertices, 0, 4);
-        distance_neighbour(1., vertices, 0, 5);
-        distance_neighbour(1., vertices, 1, 2);
-        distance_neighbour(1., vertices, 1, 3);
-        distance_neighbour(1., vertices, 1, 6);
-        distance_neighbour(1., vertices, 1, 7);
-        distance_neighbour(1., vertices, 2, 4);
-        distance_neighbour(1., vertices, 2, 6);
-        distance_neighbour(1., vertices, 2, 8);
-        distance_neighbour(1., vertices, 3, 5);
-        distance_neighbour(1., vertices, 3, 7);
-        distance_neighbour(1., vertices, 3, 9);
-        distance_neighbour(1., vertices, 4, 5);
-        distance_neighbour(1., vertices, 4, 8);
-        distance_neighbour(1., vertices, 4, 10);
-        distance_neighbour(1., vertices, 5, 9);
-        distance_neighbour(1., vertices, 5, 10);
-        distance_neighbour(1., vertices, 6, 7);
-        distance_neighbour(1., vertices, 6, 8);
-        distance_neighbour(1., vertices, 6, 11);
-        distance_neighbour(1., vertices, 7, 9);
-        distance_neighbour(1., vertices, 7, 11);
-        distance_neighbour(1., vertices, 8, 10);
-        distance_neighbour(1., vertices, 8, 11);
-        distance_neighbour(1., vertices, 9, 10);
-        distance_neighbour(1., vertices, 9, 11);
-        distance_neighbour(1., vertices, 10, 11);
+        for i in 0..solid.vertex_count() {
+            for j in solid.edges()[i].iter().map(Clone::clone).filter(|&x| x > i) {
+                distance_neighbour(1., vertices, i, j);
+            }
+        }
     }
 
     #[test]
@@ -411,39 +398,15 @@ mod tests {
 
     #[test]
     fn great_stellated_dodecahedron_edges() {
-        let shape = make_shape(KpPolyhedron::GreatStellatedDodecahedron);
+        let solid = KpPolyhedron::GreatStellatedDodecahedron;
+        let shape = make_shape(solid);
         let vertices = shape.vertices();
 
-        distance_neighbour(PHI + 1., vertices, 0, 14);
-        distance_neighbour(PHI + 1., vertices, 0, 17);
-        distance_neighbour(PHI + 1., vertices, 0, 18);
-        distance_neighbour(PHI + 1., vertices, 1, 13);
-        distance_neighbour(PHI + 1., vertices, 1, 16);
-        distance_neighbour(PHI + 1., vertices, 1, 19);
-        distance_neighbour(PHI + 1., vertices, 2, 12);
-        distance_neighbour(PHI + 1., vertices, 2, 15);
-        distance_neighbour(PHI + 1., vertices, 2, 19);
-        distance_neighbour(PHI + 1., vertices, 3, 11);
-        distance_neighbour(PHI + 1., vertices, 3, 15);
-        distance_neighbour(PHI + 1., vertices, 3, 18);
-        distance_neighbour(PHI + 1., vertices, 4, 10);
-        distance_neighbour(PHI + 1., vertices, 4, 16);
-        distance_neighbour(PHI + 1., vertices, 4, 17);
-        distance_neighbour(PHI + 1., vertices, 5, 8);
-        distance_neighbour(PHI + 1., vertices, 5, 9);
-        distance_neighbour(PHI + 1., vertices, 5, 19);
-        distance_neighbour(PHI + 1., vertices, 6, 7);
-        distance_neighbour(PHI + 1., vertices, 6, 9);
-        distance_neighbour(PHI + 1., vertices, 6, 18);
-        distance_neighbour(PHI + 1., vertices, 7, 8);
-        distance_neighbour(PHI + 1., vertices, 7, 17);
-        distance_neighbour(PHI + 1., vertices, 8, 16);
-        distance_neighbour(PHI + 1., vertices, 9, 15);
-        distance_neighbour(PHI + 1., vertices, 10, 13);
-        distance_neighbour(PHI + 1., vertices, 10, 14);
-        distance_neighbour(PHI + 1., vertices, 11, 12);
-        distance_neighbour(PHI + 1., vertices, 11, 14);
-        distance_neighbour(PHI + 1., vertices, 12, 13);
+        for i in 0..solid.vertex_count() {
+            for j in solid.edges()[i].iter().map(Clone::clone).filter(|&x| x > i) {
+                distance_neighbour(PHI + 1., vertices, i, j);
+            }
+        }
     }
 
     #[test]
@@ -453,38 +416,14 @@ mod tests {
 
     #[test]
     fn great_icosahedron_edges() {
-        let shape = make_shape(KpPolyhedron::GreatIcosahedron);
+        let solid = KpPolyhedron::GreatIcosahedron;
+        let shape = make_shape(solid);
         let vertices = shape.vertices();
 
-        distance_neighbour(PHI, vertices, 0, 6);
-        distance_neighbour(PHI, vertices, 0, 7);
-        distance_neighbour(PHI, vertices, 0, 8);
-        distance_neighbour(PHI, vertices, 0, 9);
-        distance_neighbour(PHI, vertices, 0, 10);
-        distance_neighbour(PHI, vertices, 1, 4);
-        distance_neighbour(PHI, vertices, 1, 5);
-        distance_neighbour(PHI, vertices, 1, 8);
-        distance_neighbour(PHI, vertices, 1, 9);
-        distance_neighbour(PHI, vertices, 1, 11);
-        distance_neighbour(PHI, vertices, 2, 3);
-        distance_neighbour(PHI, vertices, 2, 5);
-        distance_neighbour(PHI, vertices, 2, 7);
-        distance_neighbour(PHI, vertices, 2, 10);
-        distance_neighbour(PHI, vertices, 2, 11);
-        distance_neighbour(PHI, vertices, 3, 4);
-        distance_neighbour(PHI, vertices, 3, 6);
-        distance_neighbour(PHI, vertices, 3, 10);
-        distance_neighbour(PHI, vertices, 3, 11);
-        distance_neighbour(PHI, vertices, 4, 6);
-        distance_neighbour(PHI, vertices, 4, 9);
-        distance_neighbour(PHI, vertices, 4, 11);
-        distance_neighbour(PHI, vertices, 5, 7);
-        distance_neighbour(PHI, vertices, 5, 8);
-        distance_neighbour(PHI, vertices, 5, 11);
-        distance_neighbour(PHI, vertices, 6, 9);
-        distance_neighbour(PHI, vertices, 6, 10);
-        distance_neighbour(PHI, vertices, 7, 8);
-        distance_neighbour(PHI, vertices, 7, 10);
-        distance_neighbour(PHI, vertices, 8, 9);
+        for i in 0..solid.vertex_count() {
+            for j in solid.edges()[i].iter().map(Clone::clone).filter(|&x| x > i) {
+                distance_neighbour(PHI, vertices, i, j);
+            }
+        }
     }
 }
