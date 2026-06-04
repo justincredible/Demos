@@ -16,7 +16,7 @@ where
     C: Float + FloatConst,
     I: Copy + NumCast + Unsigned,
 {
-    fn make(&self, _request: Configuration) -> Shape<C, I> {
+    fn make(&self, request: Configuration) -> Shape<C, I> {
         match self {
             Self::StellatedDodecahedron => {
                 // Icosahedron
@@ -34,7 +34,7 @@ where
                 let psi2 = fh * (f3 - sr5); // 1/phi^2
                 let npsi3h = fh * (sr5 - f2); // 1/phi^3
 
-                let vertices = vec![
+                let mut vertices = vec![
                     [f0, f0, apex],
                     [f0, pent.radius, fh * pent.radius],
                     [-pent.width, pent.middle, fh * pent.radius],
@@ -70,6 +70,12 @@ where
                     [fh * psi2, -psi2 * pent.center, -fh * pent.radius],
                 ];
 
+                if request.orientation.is_left() {
+                    for vertex in &mut vertices {
+                        vertex[2] = vertex[2].neg();
+                    }
+                }
+
                 let i = vec![zero(), one()]
                     .into_iter()
                     .chain((2..32).map(|i| cast::<_, I>(i).unwrap()))
@@ -99,7 +105,7 @@ where
                 let pent = Pentagonal::<C>::new(Edge::Unit);
                 let apex = (pent.width / fh - fh) * pent.radius;
 
-                let vertices = vec![
+                let mut vertices = vec![
                     [f0, f0, apex],
                     [f0, pent.radius, fh * pent.radius],
                     [-pent.width, pent.middle, fh * pent.radius],
@@ -113,6 +119,12 @@ where
                     [f0, -pent.radius, -fh * pent.radius],
                     [f0, f0, -apex],
                 ];
+
+                if request.orientation.is_left() {
+                    for vertex in &mut vertices {
+                        vertex[2] = vertex[2].neg();
+                    }
+                }
 
                 let i = vec![zero(), one()]
                     .into_iter()
@@ -156,7 +168,7 @@ where
                 let half_height = fq * (f5 - sr5) * pent.radius;
                 let circle = fh * npsi * pent.radius;
 
-                let vertices = vec![
+                let mut vertices = vec![
                     [f0, pent.radius, outer],
                     [-pent.width, pent.middle, outer],
                     [pent.width, pent.middle, outer],
@@ -191,6 +203,12 @@ where
                     [fh * npsi, psi2 * pent.middle - npsi * pent.radius, -circle],
                     [f0, f0, -half_height],
                 ];
+
+                if request.orientation.is_left() {
+                    for vertex in &mut vertices {
+                        vertex[2] = vertex[2].neg();
+                    }
+                }
 
                 let i = vec![zero(), one()]
                     .into_iter()
@@ -229,7 +247,7 @@ where
                 let pent = Pentagonal::<C>::new(Edge::Unit);
                 let apex = (pent.width / fh - fh) * pent.radius;
 
-                let vertices = vec![
+                let mut vertices = vec![
                     [f0, f0, apex],
                     [f0, -pent.radius, fh * pent.radius],
                     [-pent.width, -pent.middle, fh * pent.radius],
@@ -243,6 +261,12 @@ where
                     [f0, pent.radius, -fh * pent.radius],
                     [f0, f0, -apex],
                 ];
+
+                if request.orientation.is_left() {
+                    for vertex in &mut vertices {
+                        vertex[2] = vertex[2].neg();
+                    }
+                }
 
                 let i = vec![zero(), one()]
                     .into_iter()
