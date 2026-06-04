@@ -42,9 +42,9 @@ impl Polyhedral for PlatonicSolid {
 
     fn vertices_per_face(&self) -> usize {
         match self {
-            Self::Tetrahedron | Self::Octahedron | Self::Icosahedron => 3,
-            Self::Hexahedron => 4,
             Self::Dodecahedron => 5,
+            Self::Hexahedron => 4,
+            _ => 3,
         }
     }
 }
