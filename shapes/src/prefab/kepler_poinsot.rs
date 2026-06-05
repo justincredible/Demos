@@ -2,6 +2,7 @@ use num_traits::{cast, Float, FloatConst, NumCast, one, Unsigned, zero};
 
 use crate::shapes::{Configuration, Shape, Shaper};
 use crate::prefab::{
+    linear_algebra::oriented_plane,
     pentagonal::{Edge, Pentagonal},
     polyhedral::Polyhedral,
 };
@@ -166,22 +167,23 @@ where
                     .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
-                let indices = vec![
-                    i[0], i[3], i[2], i[2], i[3], i[7], i[2], i[7], i[6],
-                    i[0], i[1], i[4], i[4], i[1], i[6], i[4], i[6], i[8],
-                    i[0], i[5], i[1], i[1], i[5], i[9], i[1], i[9], i[7],
-                    i[0], i[2], i[5], i[5], i[2], i[8], i[5], i[8], i[10],
-                    i[0], i[4], i[3], i[3], i[4], i[10], i[3], i[10], i[9],
-                    i[1], i[2], i[3], i[3], i[2], i[4], i[3], i[4], i[5],
-                    i[1], i[7], i[2], i[2], i[7], i[11], i[2], i[11], i[8],
-                    i[1], i[3], i[6], i[6], i[3], i[9], i[6], i[9], i[11],
-                    i[2], i[6], i[4], i[4], i[6], i[11], i[4], i[11], i[10],
-                    i[3], i[5], i[7], i[7], i[5], i[10], i[7], i[10], i[11],
-                    i[4], i[8], i[5], i[5], i[8], i[11], i[5], i[11], i[9],
-                    i[6], i[7], i[8], i[8], i[7], i[9], i[8], i[9], i[10],
-                ];
+                let mut normals = vec![];
+                let mut indices = vec![];
+                for face in self.edges() {
+                    let (normal, triangle1) = oriented_plane(&vertices, &face, request.orientation);
+                    let (_, triangle2) = oriented_plane(&vertices, &face[1..4], request.orientation);
+                    let (_, triangle3) = oriented_plane(&vertices, &face[2..5], request.orientation);
+                    for index in triangle1.into_iter().chain(triangle2).chain(triangle3) {
+                        indices.push(i[index]);
+                    }
+                    normals.push(normal);
+                }
 
-                Shape::Triangles { vertices, indices }
+                if request.generate_normals {
+                    Shape::NormalTriangles { vertices, normals, indices }
+                } else {
+                    Shape::Triangles { vertices, indices }
+                }
             },
             Self::GreatStellatedDodecahedron => {
                 // Dodecahedron
@@ -308,30 +310,21 @@ where
                     .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
-                let indices = vec![
-                    i[0], i[9], i[6], i[0], i[6], i[9],
-                    i[0], i[10], i[6], i[0], i[6], i[10],
-                    i[0], i[8], i[7], i[0], i[7], i[8],
-                    i[0], i[10], i[7], i[0], i[7], i[10],
-                    i[0], i[9], i[8], i[0], i[8], i[9],
-                    i[1], i[9], i[4], i[1], i[4], i[9],
-                    i[1], i[11], i[4], i[1], i[4], i[11],
-                    i[1], i[8], i[5], i[1], i[5], i[8],
-                    i[1], i[11], i[5], i[1], i[5], i[11],
-                    i[1], i[9], i[8], i[1], i[8], i[9],
-                    i[2], i[10], i[3], i[2], i[3], i[10],
-                    i[2], i[11], i[3], i[2], i[3], i[11],
-                    i[2], i[7], i[5], i[2], i[5], i[7],
-                    i[2], i[11], i[5], i[2], i[5], i[11],
-                    i[2], i[10], i[7], i[2], i[7], i[10],
-                    i[3], i[6], i[4], i[3], i[4], i[6],
-                    i[3], i[11], i[4], i[3], i[4], i[11],
-                    i[3], i[10], i[6], i[3], i[6], i[10],
-                    i[4], i[9], i[6], i[4], i[6], i[9],
-                    i[5], i[8], i[7], i[5], i[7], i[8],
-                ];
+                let mut normals = vec![];
+                let mut indices = vec![];
+                for face in self.faces() {
+                    let (normal, triangle) = oriented_plane(&vertices, &face, request.orientation);
+                    for index in triangle {
+                        indices.push(i[index]);
+                    }
+                    normals.push(normal);
+                }
 
-                Shape::Triangles { vertices, indices }
+                if request.generate_normals {
+                    Shape::NormalTriangles { vertices, normals, indices }
+                } else {
+                    Shape::Triangles { vertices, indices }
+                }
             },
         }
     }
