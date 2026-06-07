@@ -1,10 +1,11 @@
+use std::collections::HashSet;
 use num_traits::{cast, Float, FloatConst, NumCast, one, Unsigned, zero};
 
 use crate::shapes::{Configuration, Shape, Shaper};
 use crate::prefab::{
     linear_algebra::oriented_plane,
     pentagonal::{Edge, Pentagonal},
-    polyhedral::Polyhedral,
+    polyhedral::{platonic_solid, Polyhedral},
 };
 
 /// All possible Kepler-Poinsot polyhedra.
@@ -43,6 +44,49 @@ impl Polyhedral for KpPolyhedron {
         match self {
             Self::GreatIcosahedron => 3,
             _ => 5,
+        }
+    }
+
+    fn faces(&self) -> HashSet<Vec<usize>> {
+        match self {
+            Self::GreatIcosahedron => platonic_solid(self),
+            Self::GreatDodecahedron => self.edges().into_iter().collect(),
+            Self::StellatedDodecahedron => [
+                [0, 13, 12], [0, 12, 14], [0, 15, 13], [0, 14, 16], [0, 16, 15],
+                [1, 12, 13], [1, 17, 12], [1, 13, 18], [1, 22, 17], [1, 18, 22],
+                [2, 14, 12], [2, 12, 17], [2, 19, 14], [2, 17, 23], [2, 23, 19],
+                [3, 13, 15], [3, 18, 13], [3, 15, 20], [3, 24, 18], [3, 20, 24],
+                [4, 16, 14], [4, 14, 19], [4, 21, 16], [4, 19, 25], [4, 25, 21],
+                [5, 15, 16], [5, 20, 15], [5, 16, 21], [5, 26, 20], [5, 21, 26],
+                [6, 17, 22], [6, 23, 17], [6, 22, 27], [6, 28, 23], [6, 27, 28],
+                [7, 22, 18], [7, 18, 24], [7, 27, 22], [7, 24, 29], [7, 29, 27],
+                [8, 19, 23], [8, 25, 19], [8, 23, 28], [8, 30, 25], [8, 28, 30],
+                [9, 24, 20], [9, 20, 26], [9, 29, 24], [9, 26, 31], [9, 31, 29],
+                [10, 21, 25], [10, 26, 21], [10, 25, 30], [10, 31, 26], [10, 30, 31],
+                [11, 28, 27], [11, 27, 29], [11, 30, 28], [11, 29, 31], [11, 31, 30],
+            ].iter().map(Into::into).collect(),
+            Self::GreatStellatedDodecahedron => [
+                [0, 21, 20], [0, 20, 22], [0, 22, 21],
+                [1, 20, 21], [1, 23, 20], [1, 21, 23],
+                [2, 22, 20], [2, 20, 24], [2, 24, 22],
+                [3, 20, 23], [3, 25, 20], [3, 23, 25],
+                [4, 24, 20], [4, 20, 25], [4, 25, 24],
+                [5, 21, 22], [5, 26, 21], [5, 22, 26],
+                [6, 23, 21], [6, 21, 27], [6, 27, 23],
+                [7, 22, 24], [7, 28, 22], [7, 24, 28],
+                [8, 25, 23], [8, 23, 29], [8, 29, 25],
+                [9, 24, 25], [9, 30, 24], [9, 25, 30],
+                [10, 21, 26], [10, 27, 21], [10, 26, 27],
+                [11, 26, 22], [11, 22, 28], [11, 28, 26],
+                [12, 23, 27], [12, 29, 23], [12, 27, 29],
+                [13, 28, 24], [13, 24, 30], [13, 30, 28],
+                [14, 25, 29], [14, 30, 25], [14, 29, 30],
+                [15, 27, 26], [15, 26, 31], [15, 31, 27],
+                [16, 26, 28], [16, 31, 26], [16, 28, 31],
+                [17, 29, 27], [17, 27, 31], [17, 31, 29],
+                [18, 28, 30], [18, 31, 28], [18, 30, 31],
+                [19, 30, 29], [19, 29, 31], [19, 31, 30],
+            ].iter().map(Into::into).collect(),
         }
     }
 }
@@ -117,22 +161,21 @@ where
                     .chain((2..vertices.len()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
-                let indices = vec![
-                    i[0], i[13], i[12], i[0], i[12], i[14], i[0], i[15], i[13], i[0], i[14], i[16], i[0], i[16], i[15],
-                    i[1], i[12], i[13], i[1], i[17], i[12], i[1], i[13], i[18], i[1], i[22], i[17], i[1], i[18], i[22],
-                    i[2], i[14], i[12], i[2], i[12], i[17], i[2], i[19], i[14], i[2], i[17], i[23], i[2], i[23], i[19],
-                    i[3], i[13], i[15], i[3], i[18], i[13], i[3], i[15], i[20], i[3], i[24], i[18], i[3], i[20], i[24],
-                    i[4], i[16], i[14], i[4], i[14], i[19], i[4], i[21], i[16], i[4], i[19], i[25], i[4], i[25], i[21],
-                    i[5], i[15], i[16], i[5], i[20], i[15], i[5], i[16], i[21], i[5], i[26], i[20], i[5], i[21], i[26],
-                    i[6], i[17], i[22], i[6], i[23], i[17], i[6], i[22], i[27], i[6], i[28], i[23], i[6], i[27], i[28],
-                    i[7], i[22], i[18], i[7], i[18], i[24], i[7], i[27], i[22], i[7], i[24], i[29], i[7], i[29], i[27],
-                    i[8], i[19], i[23], i[8], i[25], i[19], i[8], i[23], i[28], i[8], i[30], i[25], i[8], i[28], i[30],
-                    i[9], i[24], i[20], i[9], i[20], i[26], i[9], i[29], i[24], i[9], i[26], i[31], i[9], i[31], i[29],
-                    i[10], i[21], i[25], i[10], i[26], i[21], i[10], i[25], i[30], i[10], i[31], i[26], i[10], i[30], i[31],
-                    i[11], i[28], i[27], i[11], i[27], i[29], i[11], i[30], i[28], i[11], i[29], i[31], i[11], i[31], i[30],
-                ];
+                let mut normals = vec![];
+                let mut indices = vec![];
+                for face in self.faces() {
+                    let (normal, triangle) = oriented_plane(&vertices, &face, request.orientation);
+                    for index in triangle {
+                        indices.push(i[index]);
+                    }
+                    normals.push(normal);
+                }
 
-                Shape::Triangles { vertices, indices }
+                if request.generate_normals {
+                    Shape::NormalTriangles { vertices, normals, indices }
+                } else {
+                    Shape::Triangles { vertices, indices }
+                }
             },
             Self::GreatDodecahedron => {
                 // Icosahedron
@@ -169,7 +212,7 @@ where
 
                 let mut normals = vec![];
                 let mut indices = vec![];
-                for face in self.edges() {
+                for face in self.faces() {
                     let (normal, triangle1) = oriented_plane(&vertices, &face, request.orientation);
                     let (_, triangle2) = oriented_plane(&vertices, &face[1..4], request.orientation);
                     let (_, triangle3) = oriented_plane(&vertices, &face[2..5], request.orientation);
@@ -252,30 +295,21 @@ where
                     .chain((2..vertices.len()).map(|i| cast::<_, I>(i).unwrap()))
                     .collect::<Vec<_>>();
 
-                let indices = vec![
-                    i[0], i[21], i[20], i[0], i[20], i[22], i[0], i[22], i[21],
-                    i[1], i[20], i[21], i[1], i[23], i[20], i[1], i[21], i[23],
-                    i[2], i[22], i[20], i[2], i[20], i[24], i[2], i[24], i[22],
-                    i[3], i[20], i[23], i[3], i[25], i[20], i[3], i[23], i[25],
-                    i[4], i[24], i[20], i[4], i[20], i[25], i[4], i[25], i[24],
-                    i[5], i[21], i[22], i[5], i[26], i[21], i[5], i[22], i[26],
-                    i[6], i[23], i[21], i[6], i[21], i[27], i[6], i[27], i[23],
-                    i[7], i[22], i[24], i[7], i[28], i[22], i[7], i[24], i[28],
-                    i[8], i[25], i[23], i[8], i[23], i[29], i[8], i[29], i[25],
-                    i[9], i[24], i[25], i[9], i[30], i[24], i[9], i[25], i[30],
-                    i[10], i[21], i[26], i[10], i[27], i[21], i[10], i[26], i[27],
-                    i[11], i[26], i[22], i[11], i[22], i[28], i[11], i[28], i[26],
-                    i[12], i[23], i[27], i[12], i[29], i[23], i[12], i[27], i[29],
-                    i[13], i[28], i[24], i[13], i[24], i[30], i[13], i[30], i[28],
-                    i[14], i[25], i[29], i[14], i[30], i[25], i[14], i[29], i[30],
-                    i[15], i[27], i[26], i[15], i[26], i[31], i[15], i[31], i[27],
-                    i[16], i[26], i[28], i[16], i[31], i[26], i[16], i[28], i[31],
-                    i[17], i[29], i[27], i[17], i[27], i[31], i[17], i[31], i[29],
-                    i[18], i[28], i[30], i[18], i[31], i[28], i[18], i[30], i[31],
-                    i[19], i[30], i[29], i[19], i[29], i[31], i[19], i[31], i[30],
-                ];
+                let mut normals = vec![];
+                let mut indices = vec![];
+                for face in self.faces() {
+                    let (normal, triangle) = oriented_plane(&vertices, &face, request.orientation);
+                    for index in triangle {
+                        indices.push(i[index]);
+                    }
+                    normals.push(normal);
+                }
 
-                Shape::Triangles { vertices, indices }
+                if request.generate_normals {
+                    Shape::NormalTriangles { vertices, normals, indices }
+                } else {
+                    Shape::Triangles { vertices, indices }
+                }
             },
             Self::GreatIcosahedron => {
                 // Icosahedron
