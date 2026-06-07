@@ -380,9 +380,10 @@ mod tests {
 
     #[test]
     fn stellated_dodecahedron_centered() {
+        let shape = KpPolyhedron::StellatedDodecahedron;
         // test the polyhedral and render vertices separately
-        equidistant(&make_shape(KpPolyhedron::StellatedDodecahedron).vertices()[0..12]);
-        equidistant(&make_shape(KpPolyhedron::StellatedDodecahedron).vertices()[12..]);
+        equidistant(&make_shape(shape).vertices()[0..shape.vertex_count()]);
+        equidistant(&make_shape(shape).vertices()[shape.vertex_count()..]);
     }
 
     #[test]
@@ -418,9 +419,10 @@ mod tests {
 
     #[test]
     fn great_stellated_dodecahedron_centered() {
+        let shape = KpPolyhedron::GreatStellatedDodecahedron;
         // test the polyhedral and render vertices separately
-        equidistant(&make_shape(KpPolyhedron::GreatStellatedDodecahedron).vertices()[0..20]);
-        equidistant(&make_shape(KpPolyhedron::GreatStellatedDodecahedron).vertices()[20..]);
+        equidistant(&make_shape(shape).vertices()[0..shape.vertex_count()]);
+        equidistant(&make_shape(shape).vertices()[shape.vertex_count()..]);
     }
 
     #[test]
