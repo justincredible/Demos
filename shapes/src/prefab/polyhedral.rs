@@ -10,15 +10,19 @@ pub(super) trait Polyhedral {
     }
 
     fn faces(&self) -> HashSet<Vec<usize>> {
-        let mut faces = HashSet::new();
-        let edges = self.edges();
-
-        for i in 0..self.vertex_count() {
-            find_face(&mut faces, &edges, self.vertices_per_face(), vec![i]);
-        }
-
-        faces
+        platonic_solid(self)
     }
+}
+
+pub(super) fn platonic_solid(solid: &(impl Polyhedral + ?Sized)) -> HashSet<Vec<usize>> {
+    let mut faces = HashSet::new();
+    let edges = solid.edges();
+
+    for i in 0..solid.vertex_count() {
+        find_face(&mut faces, &edges, solid.vertices_per_face(), vec![i]);
+    }
+
+    faces
 }
 
 fn find_face(faces: &mut HashSet<Vec<usize>>, edges: &Vec<Vec<usize>>, target: usize, mut current: Vec<usize>) {
