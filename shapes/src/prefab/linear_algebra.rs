@@ -21,11 +21,10 @@ pub(super) fn oriented_plane<C>(
     let c = c / mag;
     let d = a*vertices[unoriented[0]][0] + b*vertices[unoriented[0]][1] + c*vertices[unoriented[0]][2];
 
-    if d > zero() && orientation.is_ccw() == orientation.is_right() ||
-        d < zero() && orientation.is_ccw() != orientation.is_right()
-    {
-        ([a, b, c], [unoriented[0], unoriented[1], unoriented[2]])
-    } else {
-        ([-a, -b, -c], [unoriented[0], unoriented[2], unoriented[1]])
+    match (d > zero(), orientation.is_ccw() == orientation.is_right()) {
+        (false, false) => ([-a, -b, -c], [unoriented[0], unoriented[1], unoriented[2]]),
+        (false, true) => ([-a, -b, -c], [unoriented[0], unoriented[2], unoriented[1]]),
+        (true, false) => ([a, b, c], [unoriented[0], unoriented[2], unoriented[1]]),
+        (true, true) => ([a, b, c], [unoriented[0], unoriented[1], unoriented[2]]),
     }
 }
