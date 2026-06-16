@@ -214,8 +214,8 @@ where
                 let mut indices = vec![];
                 for face in self.faces() {
                     let (normal, triangle1) = oriented_plane(&vertices, &face, request.orientation);
-                    let (_, triangle2) = oriented_plane(&vertices, &face[1..4], request.orientation);
-                    let (_, triangle3) = oriented_plane(&vertices, &face[2..5], request.orientation);
+                    let (_, triangle2) = oriented_plane(&vertices, &face[1..], request.orientation);
+                    let (_, triangle3) = oriented_plane(&vertices, &face[2..], request.orientation);
                     for index in triangle1.into_iter().chain(triangle2).chain(triangle3) {
                         indices.push(i[index]);
                     }
