@@ -1,8 +1,6 @@
-use num_traits::{cast, Float, FloatConst, NumCast, one, Unsigned, zero};
+use num_traits::{cast, Float, FloatConst, one, zero};
 
-use crate::shapes::{Configuration, Shape, Shaper};
 use crate::prefab::{
-    linear_algebra::oriented_plane,
     pentagonal::{Edge, Pentagonal},
     polyhedral::Polyhedral,
 };
@@ -17,7 +15,110 @@ pub enum PlatonicSolid {
     Icosahedron,
 }
 
-impl Polyhedral for PlatonicSolid {
+impl Polyhedral for PlatonicSolid
+{
+    fn vertices<C>(&self) -> Vec<[C; 3]>
+    where C: Float + FloatConst
+    {
+        match self {
+            Self::Tetrahedron => {
+                let f0 = zero();
+                let f1 = one::<C>();
+                let fh = cast::<_, C>(0.5).unwrap();
+                let sr2 = FloatConst::SQRT_2();
+                let sr3 = cast::<_, C>(3.).unwrap().sqrt();
+                let base = -fh / sr2 / sr3;
+                let apex = fh * sr3 / sr2;
+
+                vec![
+                    [-fh, base, fh / sr3],
+                    [fh, base, fh / sr3],
+                    [f0, apex, f0],
+                    [f0, base, -f1 / sr3],
+                ]
+            },
+            Self::Hexahedron => {
+                let fh = cast::<_, C>(0.5).unwrap();
+
+                vec![
+                    [-fh, -fh, fh],
+                    [fh, -fh, fh],
+                    [-fh, fh, fh],
+                    [fh, fh, fh],
+                    [-fh, -fh, -fh],
+                    [fh, -fh, -fh],
+                    [-fh, fh, -fh],
+                    [fh, fh, -fh],
+                ]
+            },
+            Self::Octahedron => {
+                let f0 = zero::<C>();
+                let half_h = FloatConst::FRAC_1_SQRT_2();
+
+                vec![
+                    [f0, half_h, f0],
+                    [f0, f0, -half_h],
+                    [-half_h, f0, f0],
+                    [half_h, f0, f0],
+                    [f0, f0, half_h],
+                    [f0, -half_h, f0],
+                ]
+            },
+            Self::Dodecahedron => {
+                let f0 = zero::<C>();
+                let fh = cast::<_, C>(0.5).unwrap();
+                let pent = Pentagonal::new(Edge::Unit);
+                let agon = Pentagonal::new(Edge::Phi);
+                let inner = fh * fh / pent.width * pent.radius;
+                let outer = fh * (agon.radius + pent.radius);
+
+                vec![
+                    [f0, pent.radius, outer],
+                    [-pent.width, pent.middle, outer],
+                    [pent.width, pent.middle, outer],
+                    [-fh, -pent.center, outer],
+                    [fh, -pent.center, outer],
+                    [f0, agon.radius, inner],
+                    [-agon.width, agon.middle, inner],
+                    [agon.width, agon.middle, inner],
+                    [-pent.width, -agon.center, inner],
+                    [pent.width, -agon.center, inner],
+                    [-pent.width, agon.center, -inner],
+                    [pent.width, agon.center, -inner],
+                    [-agon.width, -agon.middle, -inner],
+                    [agon.width, -agon.middle, -inner],
+                    [f0, -agon.radius, -inner],
+                    [-fh, pent.center, -outer],
+                    [fh, pent.center, -outer],
+                    [-pent.width, -pent.middle, -outer],
+                    [pent.width, -pent.middle, -outer],
+                    [f0, -pent.radius, -outer],
+                ]
+            },
+            Self::Icosahedron => {
+                let f0 = zero();
+                let fh = cast::<_, C>(0.5).unwrap();
+                let pent = Pentagonal::<C>::new(Edge::Unit);
+                let apex = (pent.width / fh - fh) * pent.radius;
+
+                vec![
+                    [f0, apex, f0],
+                    [f0, fh * pent.radius, -pent.radius],
+                    [-pent.width, fh * pent.radius, -pent.middle],
+                    [pent.width, fh * pent.radius, -pent.middle],
+                    [-fh, fh * pent.radius, pent.center],
+                    [fh, fh * pent.radius, pent.center],
+                    [-fh, -fh * pent.radius, -pent.center],
+                    [fh, -fh * pent.radius, -pent.center],
+                    [-pent.width, -fh * pent.radius, pent.middle],
+                    [pent.width, -fh * pent.radius, pent.middle],
+                    [f0, -fh * pent.radius, pent.radius],
+                    [f0, -apex, f0],
+                ]
+            },
+        }
+    }
+
     fn edges(&self) -> Vec<Vec<usize>> {
         match self {
             Self::Tetrahedron => [[1,2,3], [0,2,3], [0,1,3], [0,1,2]].iter().map(Into::into).collect(),
@@ -48,329 +149,43 @@ impl Polyhedral for PlatonicSolid {
             _ => 3,
         }
     }
-}
 
-impl<C, I> Shaper<C, I> for PlatonicSolid
-where
-    C: Float + FloatConst,
-    I: Copy + NumCast + Unsigned,
-{
-    fn make(&self, request: Configuration) -> Shape<C, I> {
-        match self {
+    fn strips(&self) -> Option<Vec<Vec<usize>>> {
+        Some(match self {
             Self::Tetrahedron => {
-                let f0 = zero();
-                let f1 = one::<C>();
-                let fh = cast::<_, C>(0.5).unwrap();
-                let sr2 = FloatConst::SQRT_2();
-                let sr3 = cast::<_, C>(3.).unwrap().sqrt();
-                let base = -fh / sr2 / sr3;
-                let apex = fh * sr3 / sr2;
-
-                let mut vertices = vec![
-                    [-fh, base, fh / sr3],
-                    [fh, base, fh / sr3],
-                    [f0, apex, f0],
-                    [f0, base, -f1 / sr3],
-                ];
-
-                if request.orientation.is_left() {
-                    for vertex in &mut vertices {
-                        vertex[2] = vertex[2].neg();
-                    }
-                }
-
-                let i = vec![zero(), one()]
-                    .into_iter()
-                    .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
-                    .collect::<Vec<_>>();
-
-                if request.prefer_strips {
-                    let lookup = |idx| if request.orientation.is_ccw() {
-                        i[idx]
-                    } else {
-                        i[self.vertex_count() - 1 - idx]
-                    };
-                    const TETRA_STRIP: [usize; 6] = [0, 1, 2, 3, 0, 1];
-                    let strips = vec![TETRA_STRIP.into_iter().map(lookup).collect()];
-
-                    Shape::Strips { vertices, strips }
-                } else {
-                    let mut normals = vec![];
-                    let mut indices = vec![];
-                    for face in self.faces() {
-                        let (normal, triangle) = oriented_plane(&vertices, &face, request.orientation);
-                        for index in triangle {
-                            indices.push(i[index]);
-                        }
-                        normals.push(normal);
-                    }
-
-                    if request.generate_normals {
-                        Shape::NormalTriangles { vertices, normals, indices }
-                    } else {
-                        Shape::Triangles { vertices, indices }
-                    }
-                }
+                vec![vec![0, 1, 2, 3, 0, 1]]
             },
             Self::Hexahedron => {
-                let fh = cast::<_, C>(0.5).unwrap();
-
-                let mut vertices = vec![
-                    [-fh, -fh, fh],
-                    [fh, -fh, fh],
-                    [-fh, fh, fh],
-                    [fh, fh, fh],
-                    [-fh, -fh, -fh],
-                    [fh, -fh, -fh],
-                    [-fh, fh, -fh],
-                    [fh, fh, -fh],
-                ];
-
-                if request.orientation.is_left() {
-                    for vertex in &mut vertices {
-                        vertex[2] = vertex[2].neg();
-                    }
-                }
-
-                let i = vec![zero(), one()]
-                    .into_iter()
-                    .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
-                    .collect::<Vec<_>>();
-
-                if request.prefer_strips {
-                    let lookup = |idx| if request.orientation.is_ccw() {
-                        i[idx]
-                    } else {
-                        i[self.vertex_count() - 1 - idx]
-                    };
-                    const HEXA_STRIP: [usize; 14] = [0, 1, 2, 3, 7, 1, 5, 0, 4, 2, 6, 7, 4, 5];
-                    let strips = vec![HEXA_STRIP.into_iter().map(lookup).collect()];
-
-                    Shape::Strips { vertices, strips }
-                } else {
-                    let mut normals = vec![];
-                    let mut indices = vec![];
-                    for face in self.faces() {
-                        let (normal, triangle1) = oriented_plane(&vertices, &face, request.orientation);
-                        let (_, triangle2) = oriented_plane(&vertices, &face[1..], request.orientation);
-                        for index in triangle1.into_iter().chain(triangle2) {
-                            indices.push(i[index]);
-                        }
-                        normals.push(normal);
-                    }
-
-                    if request.generate_normals {
-                        Shape::NormalTriangles { vertices, normals, indices }
-                    } else {
-                        Shape::Triangles { vertices, indices }
-                    }
-                }
+                vec![vec![0, 1, 2, 3, 7, 1, 5, 0, 4, 2, 6, 7, 4, 5]]
             },
             Self::Octahedron => {
-                let f0 = zero::<C>();
-                let half_h = FloatConst::FRAC_1_SQRT_2();
-
-                let mut vertices = vec![
-                    [f0, half_h, f0],
-                    [f0, f0, -half_h],
-                    [-half_h, f0, f0],
-                    [half_h, f0, f0],
-                    [f0, f0, half_h],
-                    [f0, -half_h, f0],
-                ];
-
-                if request.orientation.is_left() {
-                    for vertex in &mut vertices {
-                        vertex[2] = vertex[2].neg();
-                    }
-                }
-
-                let i = vec![zero(), one()]
-                    .into_iter()
-                    .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
-                    .collect::<Vec<_>>();
-
-                if request.prefer_strips {
-                    let lookup = |idx| if request.orientation.is_ccw() {
-                        i[idx]
-                    } else {
-                        i[self.vertex_count() - 1 - idx]
-                    };
-                    const OCTA_STRIPS: [[usize; 6]; 2] = [[1, 0, 3, 4, 5, 2], [4, 0, 2, 1, 5, 3]];
-                    let mut strips = vec![];
-                    for strip in OCTA_STRIPS {
-                        strips.push(strip.into_iter().map(lookup).collect());
-                    }
-
-                    Shape::Strips { vertices, strips }
-                } else {
-                    let mut normals = vec![];
-                    let mut indices = vec![];
-                    for face in self.faces() {
-                        let (normal, triangle) = oriented_plane(&vertices, &face, request.orientation);
-                        for index in triangle {
-                            indices.push(i[index]);
-                        }
-                        normals.push(normal);
-                    }
-
-                    if request.generate_normals {
-                        Shape::NormalTriangles { vertices, normals, indices }
-                    } else {
-                        Shape::Triangles { vertices, indices }
-                    }
-                }
+                vec![
+                     vec![1, 0, 3, 4, 5, 2],
+                     vec![4, 0, 2, 1, 5, 3],
+                ]
             },
             Self::Dodecahedron => {
-                let f0 = zero::<C>();
-                let fh = cast::<_, C>(0.5).unwrap();
-                let pent = Pentagonal::new(Edge::Unit);
-                let agon = Pentagonal::new(Edge::Phi);
-                let inner = fh * fh / pent.width * pent.radius;
-                let outer = fh * (agon.radius + pent.radius);
-
-                let mut vertices = vec![
-                    [f0, pent.radius, outer],
-                    [-pent.width, pent.middle, outer],
-                    [pent.width, pent.middle, outer],
-                    [-fh, -pent.center, outer],
-                    [fh, -pent.center, outer],
-                    [f0, agon.radius, inner],
-                    [-agon.width, agon.middle, inner],
-                    [agon.width, agon.middle, inner],
-                    [-pent.width, -agon.center, inner],
-                    [pent.width, -agon.center, inner],
-                    [-pent.width, agon.center, -inner],
-                    [pent.width, agon.center, -inner],
-                    [-agon.width, -agon.middle, -inner],
-                    [agon.width, -agon.middle, -inner],
-                    [f0, -agon.radius, -inner],
-                    [-fh, pent.center, -outer],
-                    [fh, pent.center, -outer],
-                    [-pent.width, -pent.middle, -outer],
-                    [pent.width, -pent.middle, -outer],
-                    [f0, -pent.radius, -outer],
-                ];
-
-                if request.orientation.is_left() {
-                    for vertex in &mut vertices {
-                        vertex[2] = vertex[2].neg();
-                    }
-                }
-
-                let i = vec![zero(), one()]
-                    .into_iter()
-                    .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
-                    .collect::<Vec<_>>();
-
-                if request.prefer_strips {
-                    let lookup = |idx| if request.orientation.is_ccw() {
-                        i[idx]
-                    } else {
-                        i[self.vertex_count() - 1 - idx]
-                    };
-                    const DODECA_STRIP: [usize; 38] = [
-                        0, 1, 2, 3, 4, 9, 2, 13, 7, 11, 2, 5, 0, 10, 1, 6, 3, 8, 9, 14,
-                        13, 18, 11, 16, 5, 15, 10, 17, 6, 12, 8, 17, 14, 19, 18, 17, 16, 15,
-                    ];
-                    let strips = vec![DODECA_STRIP.into_iter().map(lookup).collect()];
-
-                    Shape::Strips { vertices, strips }
-                } else {
-                    let mut normals = vec![];
-                    let mut indices = vec![];
-                    for face in self.faces() {
-                        let (normal, triangle1) = oriented_plane(&vertices, &face, request.orientation);
-                        let (_, triangle2) = oriented_plane(&vertices, &face[1..], request.orientation);
-                        let (_, triangle3) = oriented_plane(&vertices, &face[2..], request.orientation);
-                        for index in triangle1.into_iter().chain(triangle2).chain(triangle3) {
-                            indices.push(i[index]);
-                        }
-                        normals.push(normal);
-                    }
-
-                    if request.generate_normals {
-                        Shape::NormalTriangles { vertices, normals, indices }
-                    } else {
-                        Shape::Triangles { vertices, indices }
-                    }
-                }
+                vec![vec![
+                     0, 1, 2, 3, 4, 9, 2, 13, 7, 11, 2, 5, 0, 10, 1, 6, 3, 8, 9, 14,
+                     13, 18, 11, 16, 5, 15, 10, 17, 6, 12, 8, 17, 14, 19, 18, 17, 16, 15,
+                ]]
             },
             Self::Icosahedron => {
-                let f0 = zero();
-                let fh = cast::<_, C>(0.5).unwrap();
-                let pent = Pentagonal::<C>::new(Edge::Unit);
-                let apex = (pent.width / fh - fh) * pent.radius;
-
-                let mut vertices = vec![
-                    [f0, apex, f0],
-                    [f0, fh * pent.radius, -pent.radius],
-                    [-pent.width, fh * pent.radius, -pent.middle],
-                    [pent.width, fh * pent.radius, -pent.middle],
-                    [-fh, fh * pent.radius, pent.center],
-                    [fh, fh * pent.radius, pent.center],
-                    [-fh, -fh * pent.radius, -pent.center],
-                    [fh, -fh * pent.radius, -pent.center],
-                    [-pent.width, -fh * pent.radius, pent.middle],
-                    [pent.width, -fh * pent.radius, pent.middle],
-                    [f0, -fh * pent.radius, pent.radius],
-                    [f0, -apex, f0],
-                ];
-
-                if request.orientation.is_left() {
-                    for vertex in &mut vertices {
-                        vertex[2] = vertex[2].neg();
-                    }
-                }
-
-                let i = vec![zero(), one()]
-                    .into_iter()
-                    .chain((2..self.vertex_count()).map(|i| cast::<_, I>(i).unwrap()))
-                    .collect::<Vec<_>>();
-
-                if request.prefer_strips {
-                    let lookup = |idx| if request.orientation.is_ccw() {
-                        i[idx]
-                    } else {
-                        i[self.vertex_count() - 1 - idx]
-                    };
-                    const ICOSA_STRIPS: [[usize; 12]; 3] = [
-                        [0, 1, 2, 6, 8, 11, 10, 9, 5, 3, 0, 1],
-                        [0, 2, 4, 8, 10, 11, 9, 7, 3, 1, 0, 2],
-                        [0, 4, 5, 10, 9, 11, 7, 6, 1, 2, 0, 4],
-                    ];
-                    let mut strips = vec![];
-                    for strip in ICOSA_STRIPS {
-                        strips.push(strip.into_iter().map(lookup).collect());
-                    }
-
-                    Shape::Strips { vertices, strips }
-                } else {
-                    let mut normals = vec![];
-                    let mut indices = vec![];
-                    for face in self.faces() {
-                        let (normal, triangle) = oriented_plane(&vertices, &face, request.orientation);
-                        for index in triangle {
-                            indices.push(i[index]);
-                        }
-                        normals.push(normal);
-                    }
-
-                    if request.generate_normals {
-                        Shape::NormalTriangles { vertices, normals, indices }
-                    } else {
-                        Shape::Triangles { vertices, indices }
-                    }
-                }
+                vec![
+                     vec![0, 1, 2, 6, 8, 11, 10, 9, 5, 3, 0, 1],
+                     vec![0, 2, 4, 8, 10, 11, 9, 7, 3, 1, 0, 2],
+                     vec![0, 4, 5, 10, 9, 11, 7, 6, 1, 2, 0, 4],
+                ]
             },
-        }
+        })
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{PlatonicSolid, Polyhedral, Shape, Shaper};
+    use super::{PlatonicSolid, Polyhedral};
 
+    use crate::{Shape, Shaper};
     use crate::prefab::unit_test::{distance_neighbour, equidistant, near_distance_neighbour};
 
     type Real = f64;
