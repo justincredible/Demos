@@ -24,7 +24,7 @@ impl Polyhedral for KpPolyhedron
         match self {
             Self::StellatedDodecahedron => {
                 let f0 = zero();
-                let f1 = one::<C>();
+                let f1 = one();
                 let f2 = cast::<_, C>(2.).unwrap();
                 let f3 = cast::<_, C>(3.).unwrap();
                 let fh = cast::<_, C>(0.5).unwrap();
@@ -32,7 +32,7 @@ impl Polyhedral for KpPolyhedron
                 let npsi = fh * (sr5 - f1);
                 let psi2 = fh * (f3 - sr5);
                 let npsi3h = fh * (sr5 - f2);
-                let pent = Pentagonal::<C>::new(Edge::Unit);
+                let pent = Pentagonal::new(Edge::Unit);
 
                 PlatonicSolid::Icosahedron.vertices()
                     .into_iter()
@@ -68,8 +68,8 @@ impl Polyhedral for KpPolyhedron
                     .collect()
             },
             Self::GreatStellatedDodecahedron => {
-                let f0 = zero::<C>();
-                let f1 = one::<C>();
+                let f0 = zero();
+                let f1 = one();
                 let f3 = cast::<_, C>(3.).unwrap();
                 let f5 = cast::<_, C>(5.).unwrap();
                 let fh = cast::<_, C>(0.5).unwrap();

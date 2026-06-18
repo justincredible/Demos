@@ -52,7 +52,7 @@ impl Polyhedral for PlatonicSolid
                 ]
             },
             Self::Octahedron => {
-                let f0 = zero::<C>();
+                let f0 = zero();
                 let half_h = FloatConst::FRAC_1_SQRT_2();
 
                 vec![
@@ -65,7 +65,7 @@ impl Polyhedral for PlatonicSolid
                 ]
             },
             Self::Dodecahedron => {
-                let f0 = zero::<C>();
+                let f0 = zero();
                 let fh = cast::<_, C>(0.5).unwrap();
                 let pent = Pentagonal::new(Edge::Unit);
                 let agon = Pentagonal::new(Edge::Phi);
@@ -98,7 +98,7 @@ impl Polyhedral for PlatonicSolid
             Self::Icosahedron => {
                 let f0 = zero();
                 let fh = cast::<_, C>(0.5).unwrap();
-                let pent = Pentagonal::<C>::new(Edge::Unit);
+                let pent = Pentagonal::new(Edge::Unit);
                 let apex = (pent.width / fh - fh) * pent.radius;
 
                 vec![
