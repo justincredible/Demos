@@ -297,7 +297,7 @@ fn create_program(
     program
 }
 
-fn create_vertex_buffer(gl: &glow::Context, vertices: &Vec<[f32; 3]>) -> (NativeVertexArray, NativeBuffer, usize) {
+fn create_vertex_buffer(gl: &glow::Context, vertices: &[[f32; 3]]) -> (NativeVertexArray, NativeBuffer, usize) {
     let vao = unsafe { gl.create_vertex_array().unwrap() };
     unsafe { gl.bind_vertex_array(Some(vao)); }
     let vbo = unsafe { gl.create_buffer().unwrap() };
@@ -320,7 +320,7 @@ fn create_vertex_buffer(gl: &glow::Context, vertices: &Vec<[f32; 3]>) -> (Native
     (vao, vbo, vertices_flat.len())
 }
 
-fn create_index_buffer(gl: &glow::Context, indices: &Vec<u8>) -> (NativeBuffer, usize) {
+fn create_index_buffer(gl: &glow::Context, indices: &[u8]) -> (NativeBuffer, usize) {
     let ebo = unsafe { gl.create_buffer().unwrap() };
     unsafe {
         gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(ebo));
