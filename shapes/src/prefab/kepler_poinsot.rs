@@ -3,6 +3,7 @@ use num_traits::{cast, Float, FloatConst, one, zero};
 
 use crate::prefab::{
     pentagonal::{Edge, Pentagonal},
+    platonic_solid::PlatonicSolid,
     polyhedral::{platonic_solid, Polyhedral},
 };
 
@@ -22,156 +23,87 @@ impl Polyhedral for KpPolyhedron
     {
         match self {
             Self::StellatedDodecahedron => {
-                // Icosahedron
                 let f0 = zero();
-                let fh = cast::<_, C>(0.5).unwrap();
-                let pent = Pentagonal::<C>::new(Edge::Unit);
-                let apex = (pent.width / fh - fh) * pent.radius;
-
-                // Stellation
                 let f1 = one::<C>();
                 let f2 = cast::<_, C>(2.).unwrap();
                 let f3 = cast::<_, C>(3.).unwrap();
+                let fh = cast::<_, C>(0.5).unwrap();
                 let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-                let npsi = fh * (sr5 - f1); // 1/phi
-                let psi2 = fh * (f3 - sr5); // 1/phi^2
-                let npsi3h = fh * (sr5 - f2); // 1/phi^3
+                let npsi = fh * (sr5 - f1);
+                let psi2 = fh * (f3 - sr5);
+                let npsi3h = fh * (sr5 - f2);
+                let pent = Pentagonal::<C>::new(Edge::Unit);
 
-                vec![
-                    [f0, f0, apex],
-                    [f0, pent.radius, fh * pent.radius],
-                    [-pent.width, pent.middle, fh * pent.radius],
-                    [pent.width, pent.middle, fh * pent.radius],
-                    [-fh, -pent.center, fh * pent.radius],
-                    [fh, -pent.center, fh * pent.radius],
-                    [-fh, pent.center, -fh * pent.radius],
-                    [fh, pent.center, -fh * pent.radius],
-                    [-pent.width, -pent.middle, -fh * pent.radius],
-                    [pent.width, -pent.middle, -fh * pent.radius],
-                    [f0, -pent.radius, -fh * pent.radius],
-                    [f0, f0, -apex],
-
-                    [-fh * psi2, psi2 * pent.center, fh * pent.radius],
-                    [fh * psi2, psi2 * pent.center, fh * pent.radius],
-                    [-fh * npsi, -psi2 * pent.middle, fh * pent.radius],
-                    [fh * npsi, -psi2 * pent.middle, fh * pent.radius],
-                    [f0, psi2 * -pent.radius, fh * pent.radius],
-                    [-fh * npsi, npsi * pent.center, npsi3h * pent.radius],
-                    [fh * npsi, npsi * pent.center, npsi3h * pent.radius],
-                    [-fh, -npsi * pent.middle, npsi3h * pent.radius],
-                    [fh, -npsi * pent.middle, npsi3h * pent.radius],
-                    [f0, -npsi * pent.radius, npsi3h * pent.radius],
-                    [f0, npsi * pent.radius, -npsi3h * pent.radius],
-                    [-fh, npsi * pent.middle, -npsi3h * pent.radius],
-                    [fh, npsi * pent.middle, -npsi3h * pent.radius],
-                    [-fh * npsi, -npsi * pent.center, -npsi3h * pent.radius],
-                    [fh * npsi, -npsi * pent.center, -npsi3h * pent.radius],
-                    [f0, psi2 * pent.radius, -fh * pent.radius],
-                    [-fh * npsi, psi2 * pent.middle, -fh * pent.radius],
-                    [fh * npsi, psi2 * pent.middle, -fh * pent.radius],
-                    [-fh * psi2, -psi2 * pent.center, -fh * pent.radius],
-                    [fh * psi2, -psi2 * pent.center, -fh * pent.radius],
-                ]
+                PlatonicSolid::Icosahedron.vertices()
+                    .into_iter()
+                    .map(|[x,y,z]: [C; 3]| [x,-z,y])
+                    .chain([
+                        [-fh * psi2, psi2 * pent.center, fh * pent.radius],
+                        [fh * psi2, psi2 * pent.center, fh * pent.radius],
+                        [-fh * npsi, -psi2 * pent.middle, fh * pent.radius],
+                        [fh * npsi, -psi2 * pent.middle, fh * pent.radius],
+                        [f0, psi2 * -pent.radius, fh * pent.radius],
+                        [-fh * npsi, npsi * pent.center, npsi3h * pent.radius],
+                        [fh * npsi, npsi * pent.center, npsi3h * pent.radius],
+                        [-fh, -npsi * pent.middle, npsi3h * pent.radius],
+                        [fh, -npsi * pent.middle, npsi3h * pent.radius],
+                        [f0, -npsi * pent.radius, npsi3h * pent.radius],
+                        [f0, npsi * pent.radius, -npsi3h * pent.radius],
+                        [-fh, npsi * pent.middle, -npsi3h * pent.radius],
+                        [fh, npsi * pent.middle, -npsi3h * pent.radius],
+                        [-fh * npsi, -npsi * pent.center, -npsi3h * pent.radius],
+                        [fh * npsi, -npsi * pent.center, -npsi3h * pent.radius],
+                        [f0, psi2 * pent.radius, -fh * pent.radius],
+                        [-fh * npsi, psi2 * pent.middle, -fh * pent.radius],
+                        [fh * npsi, psi2 * pent.middle, -fh * pent.radius],
+                        [-fh * psi2, -psi2 * pent.center, -fh * pent.radius],
+                        [fh * psi2, -psi2 * pent.center, -fh * pent.radius],
+                    ])
+                    .collect()
             },
             Self::GreatDodecahedron => {
-                // Icosahedron
-                let f0 = zero();
-                let fh = cast::<_, C>(0.5).unwrap();
-                let pent = Pentagonal::<C>::new(Edge::Unit);
-                let apex = (pent.width / fh - fh) * pent.radius;
-
-                vec![
-                    [f0, f0, apex],
-                    [f0, pent.radius, fh * pent.radius],
-                    [-pent.width, pent.middle, fh * pent.radius],
-                    [pent.width, pent.middle, fh * pent.radius],
-                    [-fh, -pent.center, fh * pent.radius],
-                    [fh, -pent.center, fh * pent.radius],
-                    [-fh, pent.center, -fh * pent.radius],
-                    [fh, pent.center, -fh * pent.radius],
-                    [-pent.width, -pent.middle, -fh * pent.radius],
-                    [pent.width, -pent.middle, -fh * pent.radius],
-                    [f0, -pent.radius, -fh * pent.radius],
-                    [f0, f0, -apex],
-                ]
+                PlatonicSolid::Icosahedron.vertices()
+                    .into_iter()
+                    .map(|[x,y,z]: [C; 3]| [x,-z,y])
+                    .collect()
             },
             Self::GreatStellatedDodecahedron => {
-                // Dodecahedron
                 let f0 = zero::<C>();
-                let fh = cast::<_, C>(0.5).unwrap();
-                let pent = Pentagonal::new(Edge::Unit);
-                let agon = Pentagonal::new(Edge::Phi);
-                let inner = fh * fh / pent.width * pent.radius;
-                let outer = fh * (agon.radius + pent.radius);
-
-                // GSD
                 let f1 = one::<C>();
                 let f3 = cast::<_, C>(3.).unwrap();
                 let f5 = cast::<_, C>(5.).unwrap();
+                let fh = cast::<_, C>(0.5).unwrap();
                 let fq = cast::<_, C>(0.25).unwrap();
                 let sr5 = cast::<_, C>(5.).unwrap().sqrt();
-                let npsi = fh * (sr5 - f1); // 1/phi
-                let psi2 = fh * (f3 - sr5); // 1/phi^2
+                let npsi = fh * (sr5 - f1);
+                let psi2 = fh * (f3 - sr5);
+                let pent = Pentagonal::new(Edge::Unit);
                 let half_height = fq * (f5 - sr5) * pent.radius;
                 let circle = fh * npsi * pent.radius;
 
-                vec![
-                    [f0, pent.radius, outer],
-                    [-pent.width, pent.middle, outer],
-                    [pent.width, pent.middle, outer],
-                    [-fh, -pent.center, outer],
-                    [fh, -pent.center, outer],
-                    [f0, agon.radius, inner],
-                    [-agon.width, agon.middle, inner],
-                    [agon.width, agon.middle, inner],
-                    [-pent.width, -agon.center, inner],
-                    [pent.width, -agon.center, inner],
-                    [-pent.width, agon.center, -inner],
-                    [pent.width, agon.center, -inner],
-                    [-agon.width, -agon.middle, -inner],
-                    [agon.width, -agon.middle, -inner],
-                    [f0, -agon.radius, -inner],
-                    [-fh, pent.center, -outer],
-                    [fh, pent.center, -outer],
-                    [-pent.width, -pent.middle, -outer],
-                    [pent.width, -pent.middle, -outer],
-                    [f0, -pent.radius, -outer],
-
-                    [f0, f0, half_height],
-                    [-fh * npsi, -psi2 * pent.middle + npsi * pent.radius, circle],
-                    [fh * npsi, -psi2 * pent.middle + npsi * pent.radius, circle],
-                    [-fh, -psi2 * pent.radius + npsi * pent.middle, circle],
-                    [fh, -psi2 * pent.radius + npsi * pent.middle, circle],
-                    [f0, -npsi * pent.radius, circle],
-                    [f0, npsi * pent.radius, -circle],
-                    [-fh, psi2 * pent.radius - npsi * pent.middle, -circle],
-                    [fh, psi2 * pent.radius - npsi * pent.middle, -circle],
-                    [-fh * npsi, psi2 * pent.middle - npsi * pent.radius, -circle],
-                    [fh * npsi, psi2 * pent.middle - npsi * pent.radius, -circle],
-                    [f0, f0, -half_height],
-                ]
+                PlatonicSolid::Dodecahedron.vertices()
+                    .into_iter()
+                    .chain([
+                        [f0, f0, half_height],
+                        [-fh * npsi, -psi2 * pent.middle + npsi * pent.radius, circle],
+                        [fh * npsi, -psi2 * pent.middle + npsi * pent.radius, circle],
+                        [-fh, -psi2 * pent.radius + npsi * pent.middle, circle],
+                        [fh, -psi2 * pent.radius + npsi * pent.middle, circle],
+                        [f0, -npsi * pent.radius, circle],
+                        [f0, npsi * pent.radius, -circle],
+                        [-fh, psi2 * pent.radius - npsi * pent.middle, -circle],
+                        [fh, psi2 * pent.radius - npsi * pent.middle, -circle],
+                        [-fh * npsi, psi2 * pent.middle - npsi * pent.radius, -circle],
+                        [fh * npsi, psi2 * pent.middle - npsi * pent.radius, -circle],
+                        [f0, f0, -half_height],
+                    ])
+                    .collect()
             },
             Self::GreatIcosahedron => {
-                // Icosahedron
-                let f0 = zero();
-                let fh = cast::<_, C>(0.5).unwrap();
-                let pent = Pentagonal::<C>::new(Edge::Unit);
-                let apex = (pent.width / fh - fh) * pent.radius;
-
-                vec![
-                    [f0, f0, apex],
-                    [f0, -pent.radius, fh * pent.radius],
-                    [-pent.width, -pent.middle, fh * pent.radius],
-                    [pent.width, -pent.middle, fh * pent.radius],
-                    [-fh, pent.center, fh * pent.radius],
-                    [fh, pent.center, fh * pent.radius],
-                    [-fh, -pent.center, -fh * pent.radius],
-                    [fh, -pent.center, -fh * pent.radius],
-                    [-pent.width, pent.middle, -fh * pent.radius],
-                    [pent.width, pent.middle, -fh * pent.radius],
-                    [f0, pent.radius, -fh * pent.radius],
-                    [f0, f0, -apex],
-                ]
+                PlatonicSolid::Icosahedron.vertices()
+                    .into_iter()
+                    .map(|[x,y,z]: [C; 3]| [x,z,y])
+                    .collect()
             },
         }
     }
