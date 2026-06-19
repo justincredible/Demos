@@ -199,7 +199,7 @@ mod tests {
 
 
     fn make_shape(solid: PlatonicSolid) -> Shape<Real, u8> {
-        solid.make(Default::default())
+        solid.shape(Default::default())
     }
 
     #[test]

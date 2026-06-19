@@ -193,7 +193,7 @@ mod tests {
     const PHI: Real = 1.618_033_988_749_895;
 
     fn make_shape(solid: KpPolyhedron) -> Shape<Real, u8> {
-        solid.make(Default::default())
+        solid.shape(Default::default())
     }
 
     #[test]

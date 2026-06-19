@@ -59,7 +59,7 @@ where
     C: Float + FloatConst,
     I: Copy + NumCast + Unsigned,
 {
-    fn make(&self, request: Configuration) -> Shape<C, I> {
+    fn shape(&self, request: Configuration) -> Shape<C, I> {
         let mut vertices: Vec<[C; 3]> = self.vertices();
 
         if request.orientation.is_left() {

@@ -105,7 +105,7 @@ pub struct Configuration {
 
 /// Construct a well-defined [`Shape`] on demand.
 pub trait Shaper<C: Float, I: Unsigned> {
-    fn make(&self, _request: Configuration) -> Shape<C, I> {
+    fn shape(&self, _request: Configuration) -> Shape<C, I> {
         Shape::Triangles { vertices: vec!(), indices: vec!() }
     }
 }

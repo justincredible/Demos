@@ -26,7 +26,7 @@ where
     C: Float + FloatConst,
     I: AddAssign + Copy + NumCast + Unsigned,
 {
-    fn make(&self, request: Configuration) -> Shape<C, I> {
+    fn shape(&self, request: Configuration) -> Shape<C, I> {
         let zero = zero();
         let one: C = one();
         let angle = <C as FloatConst>::TAU() / cast::<_, C>(self.sides).unwrap();
@@ -102,7 +102,7 @@ mod tests {
     use crate::prefab::unit_test::{distance_neighbour, epsilon_error, magnitude_diff};
 
     fn make_shape(size: u16) -> Shape<f64, u16> {
-        Polygon::new(size).make(Default::default())
+        Polygon::new(size).shape(Default::default())
     }
 
     #[test]
@@ -124,18 +124,18 @@ mod tests {
 
     #[test]
     fn u8_max_sides() {
-        let _: Shape<f32, u8> = Polygon::new(255).make(Default::default());
+        let _: Shape<f32, u8> = Polygon::new(255).shape(Default::default());
     }
 
     #[test]
     #[should_panic]
     fn u8_overflow() {
-        let _: Shape<f32, u8> = Polygon::new(256).make(Default::default());
+        let _: Shape<f32, u8> = Polygon::new(256).shape(Default::default());
     }
 
     #[test]
     fn u16_min_sides() {
-        let _: Shape<f32, u16> = Polygon::new(256).make(Default::default());
+        let _: Shape<f32, u16> = Polygon::new(256).shape(Default::default());
     }
 
     #[test]
