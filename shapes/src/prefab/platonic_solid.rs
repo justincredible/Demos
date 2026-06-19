@@ -15,8 +15,7 @@ pub enum PlatonicSolid {
     Icosahedron,
 }
 
-impl Polyhedral for PlatonicSolid
-{
+impl Polyhedral for PlatonicSolid {
     fn vertices<C>(&self) -> Vec<[C; 3]>
     where C: Float + FloatConst
     {

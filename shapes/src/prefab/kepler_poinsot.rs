@@ -16,8 +16,7 @@ pub enum KpPolyhedron {
     GreatIcosahedron,
 }
 
-impl Polyhedral for KpPolyhedron
-{
+impl Polyhedral for KpPolyhedron {
     fn vertices<C>(&self) -> Vec<[C; 3]>
     where C: Float + FloatConst
     {
