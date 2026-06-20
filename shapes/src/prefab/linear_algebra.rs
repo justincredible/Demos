@@ -1,5 +1,5 @@
 use num_traits::{Float, zero};
-use crate::shapes::Orientation;
+use crate::shapes::configuration::Orientation;
 
 pub(super) fn oriented_plane<C>(
     vertices: &[[C; 3]],
