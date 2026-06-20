@@ -84,7 +84,7 @@ where
                 strips.push(strip.into_iter().map(lookup).collect());
             }
 
-            Shape::Strips { vertices, strips }
+            Shape::as_strips(vertices, strips)
         } else {
             let mut normals = vec![];
             let mut indices = vec![];
@@ -103,9 +103,9 @@ where
             }
 
             if request.generate_normals {
-                Shape::NormalTriangles { vertices, normals, indices }
+                Shape::with_normals(vertices, normals, indices)
             } else {
-                Shape::Triangles { vertices, indices }
+                Shape::new(vertices, indices)
             }
         }
     }

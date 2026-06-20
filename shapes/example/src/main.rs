@@ -355,29 +355,24 @@ struct Shape {
 
 impl Shape {
     pub fn new(gl: &glow::Context, shape: shapes::Shape<f32, u8>) -> Self {
-        if let shapes::Shape::Triangles { vertices, indices } = shape {
-            let vertices = create_vertex_buffer(gl, &vertices);
-            let indices = (Indices::One(create_index_buffer(gl, &indices)), glow::TRIANGLES);
-
-            Self { vertices, indices }
-        } else if let shapes::Shape::NormalTriangles { vertices, indices, .. } = shape {
-            let vertices = create_vertex_buffer(gl, &vertices);
-            let indices = (Indices::One(create_index_buffer(gl, &indices)), glow::TRIANGLES);
-
-            Self { vertices, indices }
-        } else if let shapes::Shape::Strips { vertices, strips } = shape {
-            let vertices = create_vertex_buffer(gl, &vertices);
-            let indices = if strips.is_empty() {
+       if shape.is_strips() {
+            let vertices = create_vertex_buffer(gl, shape.vertices());
+            let indices = if shape.indices().is_empty() {
                 (Indices::None, glow::TRIANGLE_STRIP)
             } else {
-                let buffers = strips.iter().map(|strip|
+                let buffers = shape.indices().iter().map(|strip|
                     create_index_buffer(gl, strip)
                 ).collect();
                 (Indices::Some(buffers), glow::TRIANGLE_STRIP)
             };
 
             Self { vertices, indices }
-        } else { unreachable!() }
+        } else {
+            let vertices = create_vertex_buffer(gl, shape.vertices());
+            let indices = (Indices::One(create_index_buffer(gl, shape.indices()[0])), glow::TRIANGLES);
+
+            Self { vertices, indices }
+        }
     }
 }
 

@@ -58,7 +58,7 @@ where
         }
 
         if request.prefer_strips {
-            Shape::Strips { vertices, strips: vec!() }
+            Shape::as_strips(vertices, vec![])
         } else {
             let mut indices = vec!();
 
@@ -87,9 +87,9 @@ where
                     vec!([zero, zero, one])
                 };
 
-                Shape::NormalTriangles { vertices, normals, indices }
+                Shape::with_normals(vertices, normals, indices)
             } else {
-                Shape::Triangles { vertices, indices }
+                Shape::new(vertices, indices)
             }
         }
     }
