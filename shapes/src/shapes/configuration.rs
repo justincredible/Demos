@@ -1,3 +1,6 @@
+#[allow(unused)]
+use super::*;
+
 /// The handedness of the coordinate system, with:
 /// <br>&emsp;+X rightward
 /// <br>&emsp;+Y upward
@@ -47,8 +50,8 @@ impl Orientation {
     }
 }
 
-/// Passed to [`Shaper::make()`] to configure the returned [`Shape`].
-#[derive(Default, Clone, Copy)]
+/// Passed to [`Shaper::shape()`] to configure the returned [`Shape`].
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Configuration {
     /// Controls the coordinate space [`Chirality`] and primitive [`Winding`] order.
     pub orientation: Orientation,
