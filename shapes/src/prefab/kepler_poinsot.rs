@@ -8,7 +8,7 @@ use crate::prefab::{
 };
 
 /// All possible Kepler-Poinsot polyhedra.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Eq, PartialEq)]
 pub enum KpPolyhedron {
     StellatedDodecahedron,
     GreatDodecahedron,
