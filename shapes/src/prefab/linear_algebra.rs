@@ -41,3 +41,23 @@ pub(super) fn oriented_plane<C>(
         },
     )
 }
+
+/// Returns the length of the difference vector.
+#[inline]
+pub(super) fn magnitude_diff<C>(minuend: [C; 3], subtrahend: [C; 3]) -> C
+where C: Float
+{
+    let x = minuend[0] - subtrahend[0];
+    let y = minuend[1] - subtrahend[1];
+    let z = minuend[2] - subtrahend[2];
+
+    (x * x + y * y + z * z).sqrt()
+}
+
+/// Returns the square of the vector's magnitude.
+#[inline]
+pub(super) fn magnitude_squared<C>(vertex: [C; 3]) -> C
+where C: Float
+{
+    vertex[0] * vertex[0] + vertex[1] * vertex[1] + vertex[2] * vertex[2]
+}

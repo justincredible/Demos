@@ -100,7 +100,8 @@ where
 mod tests {
     use super::{Polygon, Shape, Shaper};
 
-    use crate::prefab::unit_test::{distance_neighbour, epsilon_error, magnitude_diff};
+    use super::super::linear_algebra::magnitude_diff;
+    use super::super::unit_test::{distance_neighbour, epsilon_error};
 
     fn make_shape(size: u16) -> Shape<f64, u16> {
         Polygon::new(size).shape(Default::default())
