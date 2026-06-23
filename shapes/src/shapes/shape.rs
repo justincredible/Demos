@@ -23,17 +23,34 @@ where
     I: Copy + NumCast + Unsigned,
 {
     /// Constructs a triangle list `Shape` without normals.
+    ///
+    /// # Panics
+    ///
+    /// May panic if an invalid index is provided.
     pub fn new(vertices: Vec<[C; 3]>, indices: Vec<I>) -> Self {
+        Self::validate(vertices.len(), &indices);
         Shape { vertices, normals: vec![], indices: Indices::Indexes(indices) }
     }
 
     /// Constructs a triangle list `Shape` with normals.
+    ///
+    /// # Panics
+    ///
+    /// May panic if an invalid index is provided.
     pub fn with_normals(vertices: Vec<[C; 3]>, normals: Vec<[C; 3]>, indices: Vec<I>) -> Self {
+        Self::validate(vertices.len(), &indices);
         Shape { vertices, normals, indices: Indices::Indexes(indices) }
     }
 
     /// Constructs a `Shape` as triangle strips.
+    ///
+    /// # Panics
+    ///
+    /// May panic if an invalid index is provided.
     pub fn as_strips(vertices: Vec<[C; 3]>, strips: Vec<Vec<I>>) -> Self {
+        for strip in &strips {
+            Self::validate(vertices.len(), strip);
+        }
         Shape { vertices, normals: vec![], indices: Indices::Strips(strips) }
     }
 
@@ -100,6 +117,14 @@ where
             }
 
             Ok(NormalShape { vertices: new_vertices, indices: new_indices })
+        }
+    }
+
+    fn validate(vertex_count: usize, indices: &[I]) {
+        for _ in indices.iter()
+            .map(|&i| cast::<I, usize>(i).unwrap())
+            .filter(|&i| i >= vertex_count)
+            .map(|_| panic!("Invalid index")) {
         }
     }
 }
