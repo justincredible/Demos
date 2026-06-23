@@ -1,6 +1,13 @@
 use num_traits::{Float, zero};
 use crate::shapes::configuration::Orientation;
 
+/// Returns the normal vector of the plane and the indices in winding order.
+///
+/// Requires origin is not in the plane.
+///
+/// # Panics
+///
+/// May panic if `unoriented` has size less than three, or indices refer to invalid entries in `vertices`.
 pub(super) fn oriented_plane<C>(
     vertices: &[[C; 3]],
     unoriented: &[usize],

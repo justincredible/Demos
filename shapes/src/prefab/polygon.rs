@@ -11,6 +11,7 @@ pub struct Polygon {
 
 impl Polygon {
     /// Create a regular polygon with vertices in triangle strip order.
+    ///
     /// # Panics
     ///
     /// May panic if `sides` is less than three.

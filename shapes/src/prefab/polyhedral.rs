@@ -5,27 +5,35 @@ use num_traits::{cast, Float, FloatConst, NumCast, one, Unsigned, zero};
 use crate::shapes::{Configuration, Shape, Shaper};
 use super::linear_algebra::oriented_plane;
 
+/// Represents a regular polyhedron with optional tessellation.
 pub(super) trait Polyhedral {
+    /// Cartesian coordinates of polyhedral vertices and render-assisting vertices
     fn vertices<C>(&self) -> Vec<[C; 3]>
     where C: Float + FloatConst;
 
+    /// Returns a copy of the edge lists of each polyhedral vertex.
     fn edges(&self) -> Vec<Vec<usize>>;
 
+    /// Returns the number of vertices per face.
     fn vertices_per_face(&self) -> usize;
 
+    /// Returns the number of polyhedral vertices.
     fn vertex_count(&self) -> usize {
         self.edges().len()
     }
 
+    /// Returns the faces of the polyhedron.
     fn faces(&self) -> HashSet<Vec<usize>> {
         platonic_solid(self)
     }
 
+    /// Returns a list of triangle strips that cover the polyhedron, if defined.
     fn strips(&self) -> Option<Vec<Vec<usize>>> {
         None
     }
 }
 
+/// Find all faces of a `Polyhedral` that can be enumerated by a DFS for cycles.
 pub(super) fn platonic_solid(solid: &(impl Polyhedral + ?Sized)) -> HashSet<Vec<usize>> {
     let mut faces = HashSet::new();
     let edges = solid.edges();
@@ -37,6 +45,7 @@ pub(super) fn platonic_solid(solid: &(impl Polyhedral + ?Sized)) -> HashSet<Vec<
     faces
 }
 
+/// Recursive helper function which finds a vertex's face via DFS and adds it to the result set.
 fn find_face(faces: &mut HashSet<Vec<usize>>, edges: &Vec<Vec<usize>>, target: usize, mut current: Vec<usize>) {
     let previous = current[current.len()-1];
     if current.len() == target {

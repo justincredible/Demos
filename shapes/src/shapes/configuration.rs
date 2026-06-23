@@ -33,18 +33,22 @@ pub struct Orientation {
 }
 
 impl Orientation {
+    /// Returns `true` is the orientation is left-handed.
     pub fn is_left(&self) -> bool {
         self.chirality == Chirality::Left
     }
 
+    /// Returns `true` is the orientation is right-handed.
     pub fn is_right(&self) -> bool {
         self.chirality == Chirality::Right
     }
 
+    /// Returns `true` is the orientation winds clockwise.
     pub fn is_cw(&self) -> bool {
         self.winding == Winding::Clockwise
     }
 
+    /// Returns `true` is the orientation winds counterclockwise.
     pub fn is_ccw(&self) -> bool {
         self.winding == Winding::Counterclockwise
     }

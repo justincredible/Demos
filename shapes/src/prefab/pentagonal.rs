@@ -1,17 +1,24 @@
 use num_traits::{cast, Float, FloatConst, one};
 
+/// Edge lengths of interest for a regular pentagon.
 pub(super) enum Edge {
     Unit,
     Phi,
 }
 
+/// Distances of utility for a regular pentagon.
 pub(super) struct Pentagonal<C>
 where
     C: Float + FloatConst,
 {
+    /// Half the distance between non-adjacent vertices.
     pub width: C,
+    /// The distance from the center to an edge's bisector.
     pub center: C,
+    /// The distance from the center to any vertex.
     pub radius: C,
+    /// The distance such that `(radius - middle)` and `width` are legs of a right triangle
+    /// with an edge as hypotenuse.
     pub middle: C,
     //pub axis: C = radius / phi,
     //pub base: C = center + middle,
