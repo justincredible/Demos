@@ -90,7 +90,7 @@ where
     ///
     /// Returns an error if there is no normal data,
     /// or if the new data cannot be indexed by the index type.
-    pub fn indexed_normal_vertices(&self) -> Result<NormalShape<C, I>, ShapingError> {
+    pub fn normalise(&self) -> Result<NormalShape<C, I>, ShapingError> {
         if self.normals().is_empty() {
             Err(ShapingError::NoData)
         } else {
