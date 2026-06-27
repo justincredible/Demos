@@ -22,6 +22,11 @@ where
     C: Float,
     I: Copy + NumCast + Unsigned,
 {
+    /// Constructs a configured `Shape` from a [`Shaper`].
+    ///
+    /// # Panics
+    ///
+    /// May panic if a [`ShapingError`] occurs.
     pub fn new(shape: impl Shaper<C, I>, config: Configuration) -> Self {
         shape.shape(config)
     }
@@ -124,6 +129,7 @@ where
         }
     }
 
+    /// Ensures the indices refer to valid indexes.
     fn validate(vertex_count: usize, indices: &[I]) {
         for _ in indices.iter()
             .map(|&i| cast::<I, usize>(i).unwrap())
