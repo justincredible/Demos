@@ -114,7 +114,7 @@ where
             if request.generate_normals {
                 Shape::with_normals(vertices, normals, indices)
             } else {
-                Shape::new(vertices, indices)
+                Shape::without_normals(vertices, indices)
             }
         }
     }

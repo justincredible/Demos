@@ -90,7 +90,7 @@ where
 
                 Shape::with_normals(vertices, normals, indices)
             } else {
-                Shape::new(vertices, indices)
+                Shape::without_normals(vertices, indices)
             }
         }
     }

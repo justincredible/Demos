@@ -22,12 +22,16 @@ where
     C: Float,
     I: Copy + NumCast + Unsigned,
 {
+    pub fn new(shape: impl Shaper<C, I>, config: Configuration) -> Self {
+        shape.shape(config)
+    }
+
     /// Constructs a triangle list `Shape` without normals.
     ///
     /// # Panics
     ///
     /// May panic if an invalid index is provided.
-    pub fn new(vertices: Vec<[C; 3]>, indices: Vec<I>) -> Self {
+    pub(in super::super) fn without_normals(vertices: Vec<[C; 3]>, indices: Vec<I>) -> Self {
         Self::validate(vertices.len(), &indices);
         Shape { vertices, normals: vec![], indices: Indices::Indexes(indices) }
     }
@@ -37,7 +41,7 @@ where
     /// # Panics
     ///
     /// May panic if an invalid index is provided.
-    pub fn with_normals(vertices: Vec<[C; 3]>, normals: Vec<[C; 3]>, indices: Vec<I>) -> Self {
+    pub(in super::super) fn with_normals(vertices: Vec<[C; 3]>, normals: Vec<[C; 3]>, indices: Vec<I>) -> Self {
         Self::validate(vertices.len(), &indices);
         Shape { vertices, normals, indices: Indices::Indexes(indices) }
     }
@@ -47,7 +51,7 @@ where
     /// # Panics
     ///
     /// May panic if an invalid index is provided.
-    pub fn as_strips(vertices: Vec<[C; 3]>, strips: Vec<Vec<I>>) -> Self {
+    pub(in super::super) fn as_strips(vertices: Vec<[C; 3]>, strips: Vec<Vec<I>>) -> Self {
         for strip in &strips {
             Self::validate(vertices.len(), strip);
         }
