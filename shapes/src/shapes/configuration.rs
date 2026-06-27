@@ -4,7 +4,7 @@ use super::*;
 /// The handedness of the coordinate system, with:
 /// <br>&emsp;+X rightward
 /// <br>&emsp;+Y upward
-#[derive(Default, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum Chirality {
     /// +Z forward
     Left,
@@ -14,7 +14,7 @@ pub enum Chirality {
 }
 
 /// Which direction defines the front face.
-#[derive(Default, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum Winding {
     Clockwise,
     #[default]
@@ -24,7 +24,7 @@ pub enum Winding {
 /// Defines the [`Shape`]'s local/object space.
 ///
 /// Generally not sufficient for direct use in the Normalized Device Coordinates (NDC) space.
-#[derive(Default, Clone, Copy)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Orientation {
     /// Whether the coordinate space is left- or right-handed.
     pub chirality: Chirality,

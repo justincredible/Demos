@@ -1,12 +1,14 @@
 use num_traits::{cast, Float, FloatConst, one};
 
 /// Edge lengths of interest for a regular pentagon.
+#[derive(Debug)]
 pub(super) enum Edge {
     Unit,
     Phi,
 }
 
 /// Distances of utility for a regular pentagon.
+#[derive(Debug)]
 pub(super) struct Pentagonal<C>
 where
     C: Float + FloatConst,

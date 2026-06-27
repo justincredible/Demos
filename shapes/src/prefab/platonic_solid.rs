@@ -6,7 +6,7 @@ use crate::prefab::{
 };
 
 /// All possible Platonic solids.
-#[derive(Clone, Copy, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum PlatonicSolid {
     Tetrahedron,
     Hexahedron,

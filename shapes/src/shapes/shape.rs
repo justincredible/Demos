@@ -4,6 +4,7 @@ use num_traits::{cast, Float, NumCast, Unsigned};
 
 use super::Configuration;
 
+#[derive(Debug)]
 pub enum Indices<I: Unsigned> {
     /// Indices of a triangle list.
     Indexes(Vec<I>),
@@ -11,6 +12,7 @@ pub enum Indices<I: Unsigned> {
     Strips(Vec<Vec<I>>),
 }
 
+#[derive(Debug)]
 pub struct Shape<C: Float, I: Unsigned> {
     vertices: Vec<[C; 3]>,
     normals: Vec<[C; 3]>,
@@ -140,6 +142,7 @@ where
 }
 
 /// A vertex with `position` and `normal` vectors.
+#[derive(Debug)]
 pub struct NormalVertex<C: Float> {
     pub position: [C; 3],
     pub normal: [C; 3],
@@ -151,6 +154,7 @@ impl<C: Float> From<NormalVertex<C>> for Vec<[C; 3]> {
     }
 }
 
+#[derive(Debug)]
 pub struct NormalShape<C: Float, I: Unsigned> {
     pub vertices: Vec<NormalVertex<C>>,
     pub indices: Vec<I>,
