@@ -106,8 +106,8 @@ where
             Err(ShapingError::NoData)
         } else {
             let indices_per_normal = self.indices()[0].len() / self.normals().len();
-            let mut new_indices = vec![];
-            let mut new_vertices = vec![];
+            let mut vertices = vec![];
+            let mut indices = vec![];
             let mut normal_index = 0;
             let mut map = HashMap::new();
             for (index_index, index) in self.indices()[0].iter().enumerate() {
@@ -118,16 +118,16 @@ where
                 let usz_idx = cast::<I, usize>(*index).unwrap();
                 let key = (usz_idx, normal_index);
                 if let Entry::Vacant(e) = map.entry(key) {
-                    e.insert(new_vertices.len());
-                    new_vertices.push(NormalVertex {
+                    e.insert(vertices.len());
+                    vertices.push(NormalVertex {
                         position: self.vertices()[usz_idx],
                         normal: self.normals()[normal_index],
                     });
                 }
-                new_indices.push(cast::<usize, I>(map[&key]).ok_or(ShapingError::IndexOverflow)?);
+                indices.push(cast::<usize, I>(map[&key]).ok_or(ShapingError::IndexOverflow)?);
             }
 
-            Ok(NormalShape { vertices: new_vertices, indices: new_indices })
+            Ok(NormalShape { vertices, indices })
         }
     }
 
