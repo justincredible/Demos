@@ -193,7 +193,7 @@ mod tests {
     const PHI: Real = 1.618_033_988_749_895;
 
     fn make_shape(solid: KpPolyhedron) -> Shape<Real, u8> {
-        solid.shape(Default::default())
+        solid.shape(Default::default()).expect("Infallible shape")
     }
 
     #[test]

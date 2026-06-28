@@ -199,7 +199,7 @@ mod tests {
 
 
     fn make_shape(solid: PlatonicSolid) -> Shape<Real, u8> {
-        solid.shape(Default::default())
+        solid.shape(Default::default()).expect("Infallible shape")
     }
 
     #[test]

@@ -2,7 +2,7 @@ use std::ops::AddAssign;
 
 use num_traits::{cast, Float, FloatConst, NumCast, one, Unsigned, zero};
 
-use crate::shapes::{Configuration, Shape, Shaper};
+use crate::shapes::{Configuration, Shape, Shaper, ShapingError};
 
 /// Regular polygons with less than 65536 sides.
 #[derive(Debug)]
@@ -28,7 +28,7 @@ where
     C: Float + FloatConst,
     I: AddAssign + Copy + NumCast + Unsigned,
 {
-    fn shape(&self, request: Configuration) -> Shape<C, I> {
+    fn shape(&self, request: Configuration) -> Result<Shape<C, I>, ShapingError> {
         let zero = zero();
         let one: C = one();
         let angle = <C as FloatConst>::TAU() / cast::<_, C>(self.sides).unwrap();
@@ -105,7 +105,7 @@ mod tests {
     use super::super::unit_test::{distance_neighbour, epsilon_error};
 
     fn make_shape(size: u16) -> Shape<f64, u16> {
-        Polygon::new(size).shape(Default::default())
+        Polygon::new(size).shape(Default::default()).expect("Panics occur before this call")
     }
 
     #[test]
@@ -127,18 +127,18 @@ mod tests {
 
     #[test]
     fn u8_max_sides() {
-        let _: Shape<f32, u8> = Polygon::new(255).shape(Default::default());
+        let _: Shape<f32, u8> = Polygon::new(255).shape(Default::default()).expect("Panics occur before this call");
     }
 
     #[test]
     #[should_panic]
     fn u8_overflow() {
-        let _: Shape<f32, u8> = Polygon::new(256).shape(Default::default());
+        let _: Shape<f32, u8> = Polygon::new(256).shape(Default::default()).expect("Panics occur before this call");
     }
 
     #[test]
     fn u16_min_sides() {
-        let _: Shape<f32, u16> = Polygon::new(256).shape(Default::default());
+        let _: Shape<f32, u16> = Polygon::new(256).shape(Default::default()).expect("Panics occur before this call");
     }
 
     #[test]

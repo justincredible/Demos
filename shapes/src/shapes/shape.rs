@@ -30,39 +30,27 @@ where
     ///
     /// May panic if a [`ShapingError`] occurs.
     pub fn new(shape: impl Shaper<C, I>, config: Configuration) -> Self {
-        shape.shape(config)
+        shape.shape(config).expect("Infallible shape")
     }
 
     /// Constructs a triangle list `Shape` without normals.
-    ///
-    /// # Panics
-    ///
-    /// May panic if an invalid index is provided.
-    pub(in super::super) fn without_normals(vertices: Vec<[C; 3]>, indices: Vec<I>) -> Self {
-        Self::validate(vertices.len(), &indices).unwrap();
-        Shape { vertices, normals: vec![], indices: Indices::Indexes(indices) }
+    pub(in super::super) fn without_normals(vertices: Vec<[C; 3]>, indices: Vec<I>) -> Result<Self, ShapingError> {
+        Self::validate(vertices.len(), &indices)?;
+        Ok(Shape { vertices, normals: vec![], indices: Indices::Indexes(indices) })
     }
 
     /// Constructs a triangle list `Shape` with normals.
-    ///
-    /// # Panics
-    ///
-    /// May panic if an invalid index is provided.
-    pub(in super::super) fn with_normals(vertices: Vec<[C; 3]>, normals: Vec<[C; 3]>, indices: Vec<I>) -> Self {
-        Self::validate(vertices.len(), &indices).unwrap();
-        Shape { vertices, normals, indices: Indices::Indexes(indices) }
+    pub(in super::super) fn with_normals(vertices: Vec<[C; 3]>, normals: Vec<[C; 3]>, indices: Vec<I>) -> Result<Self, ShapingError> {
+        Self::validate(vertices.len(), &indices)?;
+        Ok(Shape { vertices, normals, indices: Indices::Indexes(indices) })
     }
 
     /// Constructs a `Shape` as triangle strips.
-    ///
-    /// # Panics
-    ///
-    /// May panic if an invalid index is provided.
-    pub(in super::super) fn as_strips(vertices: Vec<[C; 3]>, strips: Vec<Vec<I>>) -> Self {
+    pub(in super::super) fn as_strips(vertices: Vec<[C; 3]>, strips: Vec<Vec<I>>) -> Result<Self, ShapingError> {
         for strip in &strips {
-            Self::validate(vertices.len(), strip).unwrap();
+            Self::validate(vertices.len(), strip)?;
         }
-        Shape { vertices, normals: vec![], indices: Indices::Strips(strips) }
+        Ok(Shape { vertices, normals: vec![], indices: Indices::Strips(strips) })
     }
 
     /// Returns `true` if the `Shape`'s `indices` are triangle strips.
@@ -132,6 +120,10 @@ where
     }
 
     /// Ensures the indices refer to valid indexes.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if an index exceeds the vertex count.
     pub fn validate(vertex_count: usize, indices: &[I]) -> Result<(), ShapingError> {
         indices.iter()
             .map(|&i| cast::<I, usize>(i).unwrap())
@@ -172,6 +164,6 @@ pub enum ShapingError {
 
 /// Construct a well-defined [`Shape`] on demand.
 pub trait Shaper<C: Float, I: Unsigned> {
-    fn shape(&self, request: Configuration) -> Shape<C, I>;
+    fn shape(&self, request: Configuration) -> Result<Shape<C, I>, ShapingError>;
 }
 

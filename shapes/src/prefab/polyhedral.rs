@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use num_traits::{cast, Float, FloatConst, NumCast, one, Unsigned, zero};
 
-use crate::shapes::{Configuration, Shape, Shaper};
+use crate::shapes::{Configuration, Shape, Shaper, ShapingError};
 use super::linear_algebra::oriented_plane;
 
 /// Represents a regular polyhedron with optional tessellation.
@@ -68,7 +68,7 @@ where
     C: Float + FloatConst,
     I: Copy + NumCast + Unsigned,
 {
-    fn shape(&self, request: Configuration) -> Shape<C, I> {
+    fn shape(&self, request: Configuration) -> Result<Shape<C, I>, ShapingError> {
         let mut vertices: Vec<[C; 3]> = self.vertices();
 
         if request.orientation.is_left() {

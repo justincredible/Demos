@@ -11,8 +11,9 @@ use shapes::kepler_poinsot::KpPolyhedron;
 use shapes::polygon::Polygon;
 use shapes::platonic_solid::PlatonicSolid;
 use shapes::Shaper;
+use shapes::shapes::ShapingError;
 
-fn main() {
+fn main() -> Result<(), ShapingError> {
     // Create a context from a sdl2 window
     let (gl, window, mut event_loop, _context) = create_sdl2_context();
 
@@ -34,16 +35,16 @@ fn main() {
     let mut sides = 3;
     let config = Default::default();
     let mut shapes = [
-        Shape::new(&gl, Polygon::new(sides).shape(config)),
-        Shape::new(&gl, PlatonicSolid::Tetrahedron.shape(config)),
-        Shape::new(&gl, PlatonicSolid::Hexahedron.shape(config)),
-        Shape::new(&gl, PlatonicSolid::Octahedron.shape(config)),
-        Shape::new(&gl, PlatonicSolid::Dodecahedron.shape(config)),
-        Shape::new(&gl, PlatonicSolid::Icosahedron.shape(config)),
-        Shape::new(&gl, KpPolyhedron::StellatedDodecahedron.shape(config)),
-        Shape::new(&gl, KpPolyhedron::GreatDodecahedron.shape(config)),
-        Shape::new(&gl, KpPolyhedron::GreatStellatedDodecahedron.shape(config)),
-        Shape::new(&gl, KpPolyhedron::GreatIcosahedron.shape(config)),
+        Shape::new(&gl, Polygon::new(sides).shape(config)?),
+        Shape::new(&gl, PlatonicSolid::Tetrahedron.shape(config)?),
+        Shape::new(&gl, PlatonicSolid::Hexahedron.shape(config)?),
+        Shape::new(&gl, PlatonicSolid::Octahedron.shape(config)?),
+        Shape::new(&gl, PlatonicSolid::Dodecahedron.shape(config)?),
+        Shape::new(&gl, PlatonicSolid::Icosahedron.shape(config)?),
+        Shape::new(&gl, KpPolyhedron::StellatedDodecahedron.shape(config)?),
+        Shape::new(&gl, KpPolyhedron::GreatDodecahedron.shape(config)?),
+        Shape::new(&gl, KpPolyhedron::GreatStellatedDodecahedron.shape(config)?),
+        Shape::new(&gl, KpPolyhedron::GreatIcosahedron.shape(config)?),
     ];
 
     let initial_rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
@@ -92,7 +93,7 @@ fn main() {
                                 2 | 5 => shape = 4,
                                 0 => {
                                     sides = (sides + 1).min(255);
-                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).shape(config));
+                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).shape(config)?);
                                 },
                                 _ => (),
                             },
@@ -103,7 +104,7 @@ fn main() {
                                     if sides > 3 {
                                         sides -= 1;
                                     }
-                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).shape(config));
+                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).shape(config)?);
                                 },
                                 _ => (),
                             },
@@ -126,7 +127,7 @@ fn main() {
                             Keycode::G => match shape {
                                 0 => {
                                     sides = 3;
-                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).shape(config));
+                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).shape(config)?);
                                     shape = 5;
                                 },
                                 1 ..= 5 => shape = 6,
@@ -221,6 +222,8 @@ fn main() {
             gl.delete_vertex_array(shape.vertices.0);
         }
     }
+
+    Ok(())
 }
 
 fn create_sdl2_context() -> (
