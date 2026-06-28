@@ -123,13 +123,12 @@ where
         let vertex_count = self.vertices().len();
         self.indices()
             .into_iter()
-            .map(|indexes| indexes.into_iter())
-            .flatten()
+            .flat_map(|indexes| indexes.iter())
             .map(|&i| cast::<I, usize>(i).unwrap())
             .collect::<Vec<_>>()
             .into_iter()
             .filter(|&i| i >= vertex_count)
-            .fold(Ok(self), |_, _| Err(ShapingError::InvalidIndex))
+            .try_fold(self, |_, _| Err(ShapingError::InvalidIndex))
     }
 }
 
