@@ -39,7 +39,7 @@ where
     ///
     /// May panic if an invalid index is provided.
     pub(in super::super) fn without_normals(vertices: Vec<[C; 3]>, indices: Vec<I>) -> Self {
-        Self::validate(vertices.len(), &indices);
+        Self::validate(vertices.len(), &indices).unwrap();
         Shape { vertices, normals: vec![], indices: Indices::Indexes(indices) }
     }
 
@@ -49,7 +49,7 @@ where
     ///
     /// May panic if an invalid index is provided.
     pub(in super::super) fn with_normals(vertices: Vec<[C; 3]>, normals: Vec<[C; 3]>, indices: Vec<I>) -> Self {
-        Self::validate(vertices.len(), &indices);
+        Self::validate(vertices.len(), &indices).unwrap();
         Shape { vertices, normals, indices: Indices::Indexes(indices) }
     }
 
@@ -60,7 +60,7 @@ where
     /// May panic if an invalid index is provided.
     pub(in super::super) fn as_strips(vertices: Vec<[C; 3]>, strips: Vec<Vec<I>>) -> Self {
         for strip in &strips {
-            Self::validate(vertices.len(), strip);
+            Self::validate(vertices.len(), strip).unwrap();
         }
         Shape { vertices, normals: vec![], indices: Indices::Strips(strips) }
     }
@@ -132,12 +132,11 @@ where
     }
 
     /// Ensures the indices refer to valid indexes.
-    fn validate(vertex_count: usize, indices: &[I]) {
-        for _ in indices.iter()
+    pub fn validate(vertex_count: usize, indices: &[I]) -> Result<(), ShapingError> {
+        indices.iter()
             .map(|&i| cast::<I, usize>(i).unwrap())
             .filter(|&i| i >= vertex_count)
-            .map(|_| panic!("Invalid index")) {
-        }
+            .fold(Ok(()), |_, _| Err(ShapingError::InvalidIndex))
     }
 }
 
@@ -167,6 +166,8 @@ pub enum ShapingError {
     NoData,
     /// Insufficient range of values in index type.
     IndexOverflow,
+    /// Supplied index is out of bounds.
+    InvalidIndex,
 }
 
 /// Construct a well-defined [`Shape`] on demand.
