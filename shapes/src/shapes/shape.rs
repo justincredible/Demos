@@ -162,12 +162,12 @@ pub struct NormalShape<C: Float, I: Unsigned> {
 /// Errors in making or working with [`Shape`]s.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ShapingError {
-    /// Requisite data is missing.
-    NoData,
     /// Insufficient range of values in index type.
     IndexOverflow,
     /// Supplied index is out of bounds.
     InvalidIndex,
+    /// Requisite data is missing.
+    NoData,
 }
 
 /// Construct a well-defined [`Shape`] on demand.
