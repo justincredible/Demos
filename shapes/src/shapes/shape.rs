@@ -35,22 +35,17 @@ where
 
     /// Constructs a triangle list `Shape` without normals.
     pub(in super::super) fn without_normals(vertices: Vec<[C; 3]>, indices: Vec<I>) -> Result<Self, ShapingError> {
-        Self::validate(vertices.len(), &indices)?;
-        Ok(Shape { vertices, normals: vec![], indices: Indices::Indexes(indices) })
+        Shape { vertices, normals: vec![], indices: Indices::Indexes(indices) }.validate()
     }
 
     /// Constructs a triangle list `Shape` with normals.
     pub(in super::super) fn with_normals(vertices: Vec<[C; 3]>, normals: Vec<[C; 3]>, indices: Vec<I>) -> Result<Self, ShapingError> {
-        Self::validate(vertices.len(), &indices)?;
-        Ok(Shape { vertices, normals, indices: Indices::Indexes(indices) })
+        Shape { vertices, normals, indices: Indices::Indexes(indices) }.validate()
     }
 
     /// Constructs a `Shape` as triangle strips.
     pub(in super::super) fn as_strips(vertices: Vec<[C; 3]>, strips: Vec<Vec<I>>) -> Result<Self, ShapingError> {
-        for strip in &strips {
-            Self::validate(vertices.len(), strip)?;
-        }
-        Ok(Shape { vertices, normals: vec![], indices: Indices::Strips(strips) })
+        Shape { vertices, normals: vec![], indices: Indices::Strips(strips) }.validate()
     }
 
     /// Returns `true` if the `Shape`'s `indices` are triangle strips.
@@ -124,11 +119,17 @@ where
     /// # Errors
     ///
     /// Returns an error if an index exceeds the vertex count.
-    pub fn validate(vertex_count: usize, indices: &[I]) -> Result<(), ShapingError> {
-        indices.iter()
+    pub fn validate(self) -> Result<Self, ShapingError> {
+        let vertex_count = self.vertices().len();
+        self.indices()
+            .into_iter()
+            .map(|indexes| indexes.into_iter())
+            .flatten()
             .map(|&i| cast::<I, usize>(i).unwrap())
+            .collect::<Vec<_>>()
+            .into_iter()
             .filter(|&i| i >= vertex_count)
-            .fold(Ok(()), |_, _| Err(ShapingError::InvalidIndex))
+            .fold(Ok(self), |_, _| Err(ShapingError::InvalidIndex))
     }
 }
 
