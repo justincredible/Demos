@@ -63,4 +63,3 @@ where
         Pentagonal { width, center, radius, middle }
     }
 }
-

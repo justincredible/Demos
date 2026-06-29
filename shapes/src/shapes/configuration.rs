@@ -64,4 +64,3 @@ pub struct Configuration {
     /// Provides index data as triangle strips, if possible.
     pub prefer_strips: bool,
 }
-

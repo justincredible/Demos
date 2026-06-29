@@ -166,4 +166,3 @@ pub enum ShapingError {
 pub trait Shaper<C: Float, I: Unsigned> {
     fn shape(&self, request: Configuration) -> Result<Shape<C, I>, ShapingError>;
 }
-
