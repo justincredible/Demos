@@ -17,6 +17,7 @@ fn main() -> Result<(), ShapingError> {
     // Create a context from a sdl2 window
     let (gl, window, mut event_loop, _context) = create_sdl2_context();
 
+    unsafe { gl.viewport(200, 0, 600, 400); }
     // Create a shader program from source
     let program = create_program(
         &gl,
