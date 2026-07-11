@@ -231,9 +231,7 @@ fn main() -> Result<(), ShapingError> {
                 .show(ui, |ui| {
                     ui.label("Menu");
                     ui.add_space(SPACER);
-                    if ui.button("Click me!").clicked() {
-                        eprintln!("Clicked!");
-                    }
+                    let _ = ui.button("Click me!");
                 });
             egui::Panel::top("top menu")
                 .min_size(TOP_PANEL.into())
@@ -247,6 +245,11 @@ fn main() -> Result<(), ShapingError> {
                     );
                 });
         });
+        for output_event in full_output.platform_output.events {
+            if let egui::output::OutputEvent::Clicked(egui::WidgetInfo { typ: egui::WidgetType::Button, label, .. }) = output_event && let Some(label) = label && &label == "Click me!" {
+                eprintln!("Clicked!");
+            }
+        }
         let paint_jobs = ctx.tessellate(full_output.shapes, full_output.pixels_per_point);
 
         unsafe {
