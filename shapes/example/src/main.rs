@@ -190,14 +190,14 @@ fn main() -> Result<(), ShapingError> {
             egui::Panel::top("top menu")
                 .min_size(TOP_PANEL.into())
                 .show(ui, |ui| {
-                ui.label(
-                    "Up and Down arrows modify vertices per face.\n\
-                    Left and Right arrows modify faces per vertex.\n\
-                    G switches between polyhedra and polygons.\n\
-                    R toggles rotation.\n\
-                    H returns object to initial orientation."
-                );
-            });
+                    ui.label(
+                        "Up and Down arrows modify vertices per face.\n\
+                        Left and Right arrows modify faces per vertex.\n\
+                        G switches between polyhedra and polygons.\n\
+                        R toggles rotation.\n\
+                        H returns object to initial orientation."
+                    );
+                });
         });
         let paint_jobs = ctx.tessellate(full_output.shapes, full_output.pixels_per_point);
 
