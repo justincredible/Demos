@@ -5,6 +5,7 @@ use glow::*;
 use sdl2::event::Event;
 use sdl2::image::LoadSurface;
 use sdl2::keyboard::Keycode;
+use sdl2::mouse::MouseButton;
 use sdl2::surface::Surface;
 
 use shapes::kepler_poinsot::KpPolyhedron;
@@ -86,11 +87,56 @@ fn main() -> Result<(), ShapingError> {
         H returns object to initial orientation."
     );
     'render: loop {
+        let mut raw_input = egui::RawInput::default();
         {
             for event in event_loop.poll_iter() {
                 match event {
                     Event::Quit { .. } => break 'render,
-                    Event::KeyDown { keycode: Some(keycode), .. } => {
+                    Event::MouseButtonDown { mouse_btn, clicks, x, y, .. } => {
+                        for _ in 0..clicks {
+                            raw_input.events.push(
+                                egui::Event::PointerButton {
+                                    pos: [(x as u16).into(), (y as u16).into()].into(),
+                                    button: sdl2_mouse_button_to_egui_pointer_button(mouse_btn),
+                                    pressed: true,
+                                    modifiers: egui::Modifiers::NONE,
+                                }
+                            );
+                        }
+                    },
+                    Event::MouseButtonUp { mouse_btn, clicks, x, y, .. } => {
+                        for _ in 0..clicks {
+                            raw_input.events.push(
+                                egui::Event::PointerButton {
+                                    pos: [(x as u16).into(), (y as u16).into()].into(),
+                                    button: sdl2_mouse_button_to_egui_pointer_button(mouse_btn),
+                                    pressed: false,
+                                    modifiers: egui::Modifiers::NONE,
+                                }
+                            );
+                        }
+                    },
+                    Event::KeyUp { keycode: Some(keycode), keymod, repeat, .. } => {
+                        raw_input.events.push(
+                            egui::Event::Key {
+                                key: sdl2_keycode_to_egui_key(keycode),
+                                physical_key: None,
+                                pressed: true,
+                                repeat,
+                                modifiers: sdl2_mod_to_egui_modifiers(keymod),
+                            }
+                        );
+                    },
+                    Event::KeyDown { keycode: Some(keycode), keymod, repeat, .. } => {
+                        raw_input.events.push(
+                            egui::Event::Key {
+                                key: sdl2_keycode_to_egui_key(keycode),
+                                physical_key: None,
+                                pressed: false,
+                                repeat,
+                                modifiers: sdl2_mod_to_egui_modifiers(keymod),
+                            }
+                        );
                         match keycode {
                             Keycode::Up => match shape {
                                 1 | 3 => shape = 2,
@@ -179,13 +225,15 @@ fn main() -> Result<(), ShapingError> {
         const LEFT_PANEL: u16 = 200;
         const TOP_PANEL: u16 = 100;
         const SPACER: f32 = 10.;
-        let raw_input = egui::RawInput::default();
         let full_output = ctx.run_ui(raw_input, |ui| {
             egui::Panel::left("left menu")
                 .min_size(LEFT_PANEL.into())
                 .show(ui, |ui| {
                     ui.label("Menu");
                     ui.add_space(SPACER);
+                    if ui.button("Click me!").clicked() {
+                        eprintln!("Clicked!");
+                    }
                 });
             egui::Panel::top("top menu")
                 .min_size(TOP_PANEL.into())
@@ -390,6 +438,30 @@ fn set_uniform_matrix(gl: &glow::Context, program: NativeProgram, name: &str, ma
             false,
             matrix,
         );
+    }
+}
+
+fn sdl2_keycode_to_egui_key(keycode: Keycode) -> egui::Key {
+    match keycode {
+        Keycode::KP_TAB | Keycode::TAB => egui::Key::Tab,
+        Keycode::KP_SPACE | Keycode::SPACE => egui::Key::Space,
+        Keycode::KP_ENTER | Keycode::RETURN | Keycode::RETURN2 => egui::Key::Enter,
+        _ => egui::Key::Escape,
+    }
+}
+
+fn sdl2_mouse_button_to_egui_pointer_button(mouse_button: MouseButton) -> egui::PointerButton {
+    match mouse_button {
+        MouseButton::Left => egui::PointerButton::Primary,
+        MouseButton::Middle => egui::PointerButton::Middle,
+        MouseButton::Right => egui::PointerButton::Secondary,
+        _ => egui::PointerButton::Extra2,
+    }
+}
+
+fn sdl2_mod_to_egui_modifiers(modifiers: sdl2::keyboard::Mod) -> egui::Modifiers {
+    match modifiers {
+        _ => Default::default(),
     }
 }
 
