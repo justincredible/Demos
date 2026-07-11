@@ -13,6 +13,9 @@ use shapes::platonic_solid::PlatonicSolid;
 use shapes::Shaper;
 use shapes::shapes::ShapingError;
 
+const WINDOW_WIDTH: u32 = 800;
+const WINDOW_HEIGHT: u32 = 600;
+
 fn main() -> Result<(), ShapingError> {
     // Create a context from a sdl2 window
     let (gl, window, mut event_loop, _context) = create_sdl2_context();
@@ -173,15 +176,19 @@ fn main() -> Result<(), ShapingError> {
             &matrix.to_cols_array(),
         );
 
+        const LEFT_PANEL: u16 = 200;
+        const TOP_PANEL: u16 = 100;
+        const SPACER: f32 = 10.;
         let raw_input = egui::RawInput::default();
         let full_output = ctx.run_ui(raw_input, |ui| {
             egui::Panel::left("left menu")
-                .min_size(200.)
+                .min_size(LEFT_PANEL.into())
                 .show(ui, |ui| {
                     ui.label("Menu");
+                    ui.add_space(SPACER);
                 });
             egui::Panel::top("top menu")
-                .min_size(100.)
+                .min_size(TOP_PANEL.into())
                 .show(ui, |ui| {
                 ui.label(
                     "Up and Down arrows modify vertices per face.\n\
@@ -198,13 +205,18 @@ fn main() -> Result<(), ShapingError> {
             gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
 
             painter.paint_and_update_textures(
-                [800, 600],
+                [WINDOW_WIDTH, WINDOW_HEIGHT],
                 full_output.pixels_per_point,
                 &paint_jobs,
                 &full_output.textures_delta,
             );
 
-            gl.viewport(200, 0, 600, 400);
+            gl.viewport(
+                LEFT_PANEL.into(),
+                0,
+                (WINDOW_WIDTH - LEFT_PANEL as u32).try_into().unwrap(),
+                (WINDOW_HEIGHT - TOP_PANEL as u32).try_into().unwrap(),
+            );
             gl.enable(glow::DEPTH_TEST);
             gl.enable(glow::CULL_FACE);
             gl.use_program(Some(program));
@@ -275,7 +287,7 @@ fn create_sdl2_context() -> (
     gl_attr.set_context_version(4, 6);
     gl_attr.set_context_flags().forward_compatible().set();
     let mut window = video
-        .window("Shapes", 800, 600)
+        .window("Shapes", WINDOW_WIDTH, WINDOW_HEIGHT)
         .position_centered()
         .opengl()
         .build()
