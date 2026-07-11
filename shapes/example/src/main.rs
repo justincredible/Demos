@@ -16,8 +16,10 @@ use shapes::shapes::ShapingError;
 fn main() -> Result<(), ShapingError> {
     // Create a context from a sdl2 window
     let (gl, window, mut event_loop, _context) = create_sdl2_context();
+    let ctx = egui::Context::default();
+    let gl = std::sync::Arc::new(gl);
+    let mut painter = egui_glow::Painter::new(gl.clone(), "", None, false).unwrap();
 
-    unsafe { gl.viewport(200, 0, 600, 400); }
     // Create a shader program from source
     let program = create_program(
         &gl,
@@ -29,8 +31,6 @@ fn main() -> Result<(), ShapingError> {
 
     unsafe {
         gl.clear_color(0., 0., 0., 1.);
-        gl.enable(glow::DEPTH_TEST);
-        gl.enable(glow::CULL_FACE);
         gl.cull_face(glow::BACK);
     }
     let mut sides = 3;
@@ -173,8 +173,41 @@ fn main() -> Result<(), ShapingError> {
             &matrix.to_cols_array(),
         );
 
+        let raw_input = egui::RawInput::default();
+        let full_output = ctx.run_ui(raw_input, |ui| {
+            egui::Panel::left("left menu")
+                .min_size(200.)
+                .show(ui, |ui| {
+                    ui.label("Menu");
+                });
+            egui::Panel::top("top menu")
+                .min_size(100.)
+                .show(ui, |ui| {
+                ui.label(
+                    "Up and Down arrows modify vertices per face.\n\
+                    Left and Right arrows modify faces per vertex.\n\
+                    G switches between polyhedra and polygons.\n\
+                    R toggles rotation.\n\
+                    H returns object to initial orientation."
+                );
+            });
+        });
+        let paint_jobs = ctx.tessellate(full_output.shapes, full_output.pixels_per_point);
+
         unsafe {
             gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
+
+            painter.paint_and_update_textures(
+                [800, 600],
+                full_output.pixels_per_point,
+                &paint_jobs,
+                &full_output.textures_delta,
+            );
+
+            gl.viewport(200, 0, 600, 400);
+            gl.enable(glow::DEPTH_TEST);
+            gl.enable(glow::CULL_FACE);
+            gl.use_program(Some(program));
             gl.bind_vertex_array(Some(shapes[shape].vertices.0));
             //gl.bind_buffer(glow::ARRAY_BUFFER, Some(shapes[shape].vertices.1));
             match &shapes[shape].indices.0 {
@@ -204,6 +237,8 @@ fn main() -> Result<(), ShapingError> {
 
         window.gl_swap_window();
     }
+
+    painter.destroy();
 
     // Clean up
     unsafe {
