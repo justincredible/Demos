@@ -2,10 +2,7 @@ use std::f32::consts;
 
 use glam::{Mat4, Quat, Vec3};
 use glow::*;
-use sdl2::event::Event;
 use sdl2::image::LoadSurface;
-use sdl2::keyboard::{Keycode, Mod};
-use sdl2::mouse::MouseButton;
 use sdl2::surface::Surface;
 
 use shapes::kepler_poinsot::KpPolyhedron;
@@ -14,12 +11,17 @@ use shapes::platonic_solid::PlatonicSolid;
 use shapes::Shaper;
 use shapes::shapes::ShapingError;
 
+mod egui_sdl2;
+use egui_sdl2::{process_event, run_ui};
+
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
+const LEFT_PANEL: u16 = 200;
+const TOP_PANEL: u16 = 100;
 
 fn main() -> Result<(), ShapingError> {
     // Create a context from a sdl2 window
-    let (gl, window, mut event_loop, event_sender, _context) = create_sdl2_context();
+    let (gl, window, mut event_loop, _context) = create_sdl2_context();
     let ctx = egui::Context::default();
     let gl = std::sync::Arc::new(gl);
     let mut painter = egui_glow::Painter::new(gl.clone(), "", None, false).unwrap();
@@ -37,10 +39,20 @@ fn main() -> Result<(), ShapingError> {
         gl.clear_color(0., 0., 0., 1.);
         gl.cull_face(glow::BACK);
     }
-    let mut sides = 3;
+
+    let mut state = ExampleState {
+        sides: 3,
+        reset_polygon: false,
+        shape: 5,
+        rotating: true,
+        initial_rotation: Quat::from_axis_angle(Vec3::ONE, 0.0),
+        rotation: Quat::from_axis_angle(Vec3::ONE, 0.0),
+        rotation_delta: Quat::from_axis_angle(Vec3::ONE, 0.01),
+        should_quit: false,
+    };
     let config = Default::default();
     let mut shapes = [
-        Shape::new(&gl, Polygon::new(sides).shape(config)?),
+        Shape::new(&gl, Polygon::new(state.sides).shape(config)?),
         Shape::new(&gl, PlatonicSolid::Tetrahedron.shape(config)?),
         Shape::new(&gl, PlatonicSolid::Hexahedron.shape(config)?),
         Shape::new(&gl, PlatonicSolid::Octahedron.shape(config)?),
@@ -51,13 +63,6 @@ fn main() -> Result<(), ShapingError> {
         Shape::new(&gl, KpPolyhedron::GreatStellatedDodecahedron.shape(config)?),
         Shape::new(&gl, KpPolyhedron::GreatIcosahedron.shape(config)?),
     ];
-
-    let initial_rotation = Quat::from_axis_angle(Vec3::ONE, 0.0);
-    let mut rotation = initial_rotation;
-    let mut rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01);
-    let mut rotating = true;
-
-    let mut shape = 5;
 
     let rh_cross = config.orientation.is_ccw() && config.orientation.is_right()
         || config.orientation.is_cw() && config.orientation.is_left();
@@ -83,136 +88,23 @@ fn main() -> Result<(), ShapingError> {
         let mut raw_input = egui::RawInput::default();
         {
             for event in event_loop.poll_iter() {
-                match event {
-                    Event::Quit { .. } => break 'render,
-                    Event::MouseMotion { x, y, xrel, yrel, .. } => {
-                        raw_input.events.push(egui::Event::PointerMoved([x as f32, y as f32].into()));
-                        raw_input.events.push(egui::Event::MouseMoved([xrel as f32, yrel as f32].into()));
-                    },
-                    Event::MouseButtonDown { mouse_btn, clicks, x, y, .. } => {
-                        for _ in 0..clicks {
-                            raw_input.events.push(
-                                egui::Event::PointerButton {
-                                    pos: [(x as u16).into(), (y as u16).into()].into(),
-                                    button: sdl2_mouse_button_to_egui_pointer_button(mouse_btn),
-                                    pressed: true,
-                                    modifiers: egui::Modifiers::NONE,
-                                }
-                            );
-                        }
-                    },
-                    Event::MouseButtonUp { mouse_btn, clicks, x, y, .. } => {
-                        for _ in 0..clicks {
-                            raw_input.events.push(
-                                egui::Event::PointerButton {
-                                    pos: [(x as u16).into(), (y as u16).into()].into(),
-                                    button: sdl2_mouse_button_to_egui_pointer_button(mouse_btn),
-                                    pressed: false,
-                                    modifiers: egui::Modifiers::NONE,
-                                }
-                            );
-                        }
-                    },
-                    Event::TextInput { text, .. } => raw_input.events.push(egui::Event::Text(text)),
-                    Event::KeyUp { keycode: Some(keycode), keymod, repeat, .. } => {
-                        raw_input.events.push(
-                            egui::Event::Key {
-                                key: sdl2_keycode_to_egui_key(keycode),
-                                physical_key: None,
-                                pressed: true,
-                                repeat,
-                                modifiers: sdl2_mod_to_egui_modifiers(keymod),
-                            }
-                        );
-                    },
-                    Event::KeyDown { keycode: Some(keycode), keymod, repeat, .. } => {
-                        raw_input.events.push(
-                            egui::Event::Key {
-                                key: sdl2_keycode_to_egui_key(keycode),
-                                physical_key: None,
-                                pressed: false,
-                                repeat,
-                                modifiers: sdl2_mod_to_egui_modifiers(keymod),
-                            }
-                        );
-                        match keycode {
-                            Keycode::Up => match shape {
-                                1 | 3 => shape = 2,
-                                2 | 5 => shape = 4,
-                                0 => {
-                                    sides = (sides + 1).min(255);
-                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).shape(config)?);
-                                },
-                                _ => (),
-                            },
-                            Keycode::Down => match shape {
-                                4 => shape = 2,
-                                2 => shape = 1,
-                                0 => {
-                                    if sides > 3 {
-                                        sides -= 1;
-                                    }
-                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).shape(config)?);
-                                },
-                                _ => (),
-                            },
-                            Keycode::Left => match shape {
-                                9 => shape = 8,
-                                8 => shape = 7,
-                                7 => shape = 6,
-                                5 => shape = 3,
-                                3 => shape = 1,
-                                _ => (),
-                            },
-                            Keycode::Right => match shape {
-                                1 | 2 => shape = 3,
-                                3 | 4 => shape = 5,
-                                6 => shape = 7,
-                                7 => shape = 8,
-                                8 => shape = 9,
-                                _ => (),
-                            },
-                            Keycode::G => match shape {
-                                0 => {
-                                    sides = 3;
-                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).shape(config)?);
-                                    shape = 5;
-                                },
-                                1 ..= 5 => shape = 6,
-                                _ => shape = 0,
-                            },
-                            Keycode::R => rotating = !rotating,
-                            Keycode::KP_0 => rotation_delta = Quat::from_axis_angle(Vec3::ZERO, 0.01),
-                            Keycode::KP_1 => rotation_delta = Quat::from_axis_angle(Vec3::new(0., 0., 1.), 0.01),
-                            Keycode::KP_2 => rotation_delta = Quat::from_axis_angle(Vec3::new(0., 1., 0.), 0.01),
-                            Keycode::KP_3 => rotation_delta = Quat::from_axis_angle(Vec3::new(0., 1., 1.), 0.01),
-                            Keycode::KP_4 => rotation_delta = Quat::from_axis_angle(Vec3::new(1., 0., 0.), 0.01),
-                            Keycode::KP_5 => rotation_delta = Quat::from_axis_angle(Vec3::new(1., 0., 1.), 0.01),
-                            Keycode::KP_6 => rotation_delta = Quat::from_axis_angle(Vec3::new(1., 1., 0.), 0.01),
-                            Keycode::KP_7 => rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01),
-                            Keycode::Minus => rotation_delta = rotation_delta.conjugate(),
-                            Keycode::H => rotation = initial_rotation,
-                            _ => (),
-                        }
-                    },
-                    _ => (), //eprintln!("{:?}", event),
-                }
+                process_event(event, &mut raw_input, &mut state)
             }
         }
 
-        if rotating {
-            rotation *= rotation_delta;
+        if state.rotating {
+            state.rotation *= state.rotation_delta;
         }
-        let scale = Vec3::ONE * if shape == 0 {
-            let angle = consts::TAU / sides as f32;
+        let scale = Vec3::ONE * if state.shape == 0 {
+            let angle = consts::TAU / state.sides as f32;
             f32::sin(angle) / f32::cos(0.5 * angle)
-        } else if shape == 4 || shape == 8 {
+        } else if state.shape == 4 || state.shape == 8 {
             // the dodecahedron is rather large
             0.7
         } else {
             1.0
         };
-        let matrix = Mat4::from_scale_rotation_translation(scale, rotation.normalize(), Vec3::ZERO);
+        let matrix = Mat4::from_scale_rotation_translation(scale, state.rotation.normalize(), Vec3::ZERO);
         set_uniform_matrix(
             &gl,
             program,
@@ -220,217 +112,16 @@ fn main() -> Result<(), ShapingError> {
             &matrix.to_cols_array(),
         );
 
-        const LEFT_PANEL: u16 = 200;
-        const TOP_PANEL: u16 = 100;
-        const SPACER: f32 = 10.;
-        let full_output = ctx.run_ui(raw_input, |ui| {
-            egui::Panel::left("left menu")
-                .min_size(LEFT_PANEL.into())
-                .max_size(LEFT_PANEL.into())
-                .show(ui, |ui| {
-                    ui.separator();
-                    ui.heading("Global Menu");
-                    ui.separator();
-                    ui.vertical_centered(|ui| {
-                        ui.add_space(SPACER);
-                        if ui.add(egui::Button::new("Quit").shortcut_text("Alt+F4")).clicked() {
-                            event_sender.push_event(Event::Quit { timestamp: 0 }).unwrap();
-                        }
-                        ui.add_space(SPACER);
-                        let mut home_layout = Default::default();
-                        egui::RichText::new("H").underline().append_to(
-                            &mut home_layout,
-                            &ctx.global_style(),
-                            Default::default(),
-                            Default::default(),
-                        );
-                        egui::RichText::new("ome Position").append_to(
-                            &mut home_layout,
-                            &ctx.global_style(),
-                            Default::default(),
-                            Default::default(),
-                        );
-                        if ui.button(home_layout).clicked() {
-                            rotation = initial_rotation;
-                        }
-                        ui.add_space(SPACER);
-                        let mut rotation_layout = Default::default();
-                        egui::RichText::new("Toggle ").append_to(
-                            &mut rotation_layout,
-                            &ctx.global_style(),
-                            Default::default(),
-                            Default::default(),
-                        );
-                        egui::RichText::new("R").underline().append_to(
-                            &mut rotation_layout,
-                            &ctx.global_style(),
-                            Default::default(),
-                            Default::default(),
-                        );
-                        egui::RichText::new("otation").append_to(
-                            &mut rotation_layout,
-                            &ctx.global_style(),
-                            Default::default(),
-                            Default::default(),
-                        );
-                        if ui.button(rotation_layout).clicked() {
-                            rotating = !rotating;
-                        }
-                        ui.add_space(SPACER);
-                        let mut reverse_layout = Default::default();
-                        egui::RichText::new("Reverse Rotation ( ").append_to(
-                            &mut reverse_layout,
-                            &ctx.global_style(),
-                            Default::default(),
-                            Default::default(),
-                        );
-                        egui::RichText::new("-").underline().append_to(
-                            &mut reverse_layout,
-                            &ctx.global_style(),
-                            Default::default(),
-                            Default::default(),
-                        );
-                        egui::RichText::new(" )").append_to(
-                            &mut reverse_layout,
-                            &ctx.global_style(),
-                            Default::default(),
-                            Default::default(),
-                        );
-                        if ui.button(reverse_layout).clicked() {
-                            rotation_delta = rotation_delta.conjugate();
-                        }
-                        ui.add_space(SPACER);
-                        ui.label("Rotation Axis");
-                        ui.horizontal(|ui| {
-                            ui.add_space(2.25 * SPACER);
-                            ui.group(|ui| {
-                                ui.vertical_centered(|ui| {
-                                    ui.horizontal(|ui| {
-                                        if ui.button(" _ ").clicked() {
-                                            rotation_delta = Quat::from_axis_angle(Vec3::ZERO, 0.01);
-                                        }
-                                        if ui.button(" Z ").clicked() {
-                                            rotation_delta = Quat::from_axis_angle(Vec3::new(0., 0., 1.), 0.01);
-                                        }
-                                        if ui.button(" Y ").clicked() {
-                                            rotation_delta = Quat::from_axis_angle(Vec3::new(0., 1., 0.), 0.01);
-                                        }
-                                        if ui.button("YZ").clicked() {
-                                            rotation_delta = Quat::from_axis_angle(Vec3::new(0., 1., 1.), 0.01);
-                                        }
-                                    });
-                                    ui.horizontal(|ui| {
-                                        if ui.button(" X ").clicked() {
-                                            rotation_delta = Quat::from_axis_angle(Vec3::new(1., 0., 0.), 0.01);
-                                        }
-                                        if ui.button("XZ").clicked() {
-                                            rotation_delta = Quat::from_axis_angle(Vec3::new(1., 0., 1.), 0.01);
-                                        }
-                                        if ui.button("XY").clicked() {
-                                            rotation_delta = Quat::from_axis_angle(Vec3::new(1., 1., 0.), 0.01);
-                                        }
-                                        if ui.button("XYZ").clicked() {
-                                            rotation_delta = Quat::from_axis_angle(Vec3::ONE, 0.01);
-                                        }
-                                    });
-                                });
-                            });
-                        });
-                        ui.add_space(SPACER);
-                    });
-                    ui.separator();
-                    ui.heading("Group Menu");
-                    ui.separator();
-                    ui.vertical_centered(|ui| {
-                        ui.add_space(SPACER);
-                        let mut group_layout = Default::default();
-                        egui::RichText::new("Cycle ").append_to(
-                            &mut group_layout,
-                            &ctx.global_style(),
-                            Default::default(),
-                            Default::default(),
-                        );
-                        egui::RichText::new("G").underline().append_to(
-                            &mut group_layout,
-                            &ctx.global_style(),
-                            Default::default(),
-                            Default::default(),
-                        );
-                        egui::RichText::new("roup").append_to(
-                            &mut group_layout,
-                            &ctx.global_style(),
-                            Default::default(),
-                            Default::default(),
-                        );
-                        if ui.button(group_layout).clicked() {
-                            match shape {
-                                0 => {
-                                    sides = 3;
-                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).shape(config).unwrap());
-                                    shape = 5;
-                                },
-                                1 ..= 5 => shape = 6,
-                                _ => shape = 0,
-                            }
-                        }
-                        ui.add_space(SPACER);
-                        match shape {
-                            0 => {
-                                ui.label("Polygon Sides");
-                                ui.horizontal(|ui| {
-                                    ui.add_space(2. * SPACER);
-                                    let _ = ui.add(egui::Slider::new(&mut sides, 3..=u8::MAX as u16));
-                                    shapes[shape] = Shape::new(&gl, Polygon::new(sides).shape(config).unwrap());
-                                });
-                            },
-                            1..=5 => {
-                                ui.label("Platonic Solid");
-                                ui.horizontal(|ui| {
-                                    ui.add_space(4. * SPACER);
-                                    egui::ComboBox::from_id_salt(0)
-                                        .show_ui(ui, |ui| {
-                                            ui.selectable_value(&mut shape, 1, "Tetrahedron");
-                                            ui.selectable_value(&mut shape, 2, "Hexahedron");
-                                            ui.selectable_value(&mut shape, 3, "Octahedron");
-                                            ui.selectable_value(&mut shape, 4, "Dodecahedron");
-                                            ui.selectable_value(&mut shape, 5, "Icosahedron");
-                                        });
-                                });
-                            },
-                            6..=9 => {
-                                ui.label("Kepler-Poinsot Polyhedron");
-                                ui.horizontal(|ui| {
-                                    ui.add_space(4. * SPACER);
-                                    egui::ComboBox::from_id_salt(0)
-                                        .show_ui(ui, |ui| {
-                                            ui.selectable_value(&mut shape, 6, "Stellated Dodecahedron");
-                                            ui.selectable_value(&mut shape, 7, "Great Dodecahedron");
-                                            ui.selectable_value(&mut shape, 8, "Great Stellated Dodecahedron");
-                                            ui.selectable_value(&mut shape, 9, "Great Icosahedron");
-                                        });
-                                });
-                            },
-                            _ => {
-                                ui.label("Unknown group!");
-                            },
-                        }
-                    });
-                });
-            egui::Panel::top("top menu")
-                .min_size(TOP_PANEL.into())
-                .max_size(TOP_PANEL.into())
-                .show(ui, |ui| {
-                    ui.add_space(SPACER);
-                    ui.label(
-                        "Up and Down arrows modify vertices per face.\n\
-                        Left and Right arrows modify faces per vertex.\n\
-                        G switches between polyhedra and polygons.\n\
-                        R toggles rotation.\n\
-                        H returns object to initial orientation."
-                    );
-                });
-        });
+        let full_output = run_ui(&ctx, raw_input, &mut state);
         let paint_jobs = ctx.tessellate(full_output.shapes, full_output.pixels_per_point);
+
+        if state.reset_polygon {
+            shapes[0] = Shape::new(&gl, Polygon::new(state.sides).shape(config)?);
+            state.reset_polygon = false;
+        }
+        if state.should_quit {
+            break 'render;
+        }
 
         unsafe {
             gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
@@ -451,14 +142,14 @@ fn main() -> Result<(), ShapingError> {
             gl.enable(glow::DEPTH_TEST);
             gl.enable(glow::CULL_FACE);
             gl.use_program(Some(program));
-            gl.bind_vertex_array(Some(shapes[shape].vertices.0));
+            gl.bind_vertex_array(Some(shapes[state.shape].vertices.0));
             //gl.bind_buffer(glow::ARRAY_BUFFER, Some(shapes[shape].vertices.1));
-            match &shapes[shape].indices.0 {
-                Indices::None => gl.draw_arrays(glow::TRIANGLE_STRIP, 0, shapes[shape].vertices.2 as i32),
+            match &shapes[state.shape].indices.0 {
+                Indices::None => gl.draw_arrays(glow::TRIANGLE_STRIP, 0, shapes[state.shape].vertices.2 as i32),
                 Indices::One(buffer) => {
                     gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(buffer.0));
                     gl.draw_elements(
-                        shapes[shape].indices.1,
+                        shapes[state.shape].indices.1,
                         buffer.1 as i32,
                         glow::UNSIGNED_BYTE,
                         0,
@@ -468,7 +159,7 @@ fn main() -> Result<(), ShapingError> {
                     for buffer in vertex {
                         gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(buffer.0));
                         gl.draw_elements(
-                            shapes[shape].indices.1,
+                            shapes[state.shape].indices.1,
                             buffer.1 as i32,
                             glow::UNSIGNED_BYTE,
                             0,
@@ -509,7 +200,6 @@ fn create_sdl2_context() -> (
     glow::Context,
     sdl2::video::Window,
     sdl2::EventPump,
-    sdl2::EventSubsystem,
     sdl2::video::GLContext,
 ) {
     let sdl = sdl2::init().unwrap();
@@ -529,7 +219,7 @@ fn create_sdl2_context() -> (
     let gl = unsafe { glow::Context::from_loader_function(|s| video.gl_get_proc_address(s) as *const _) };
     let event_loop = sdl.event_pump().unwrap();
 
-    (gl, window, event_loop, sdl.event().unwrap(), gl_context)
+    (gl, window, event_loop, gl_context)
 }
 
 fn create_program(
@@ -625,34 +315,6 @@ fn set_uniform_matrix(gl: &glow::Context, program: NativeProgram, name: &str, ma
     }
 }
 
-fn sdl2_keycode_to_egui_key(keycode: Keycode) -> egui::Key {
-    match keycode {
-        Keycode::ESCAPE => egui::Key::Escape,
-        Keycode::KP_TAB | Keycode::TAB => egui::Key::Tab,
-        Keycode::KP_SPACE | Keycode::SPACE => egui::Key::Space,
-        Keycode::KP_ENTER | Keycode::RETURN | Keycode::RETURN2 => egui::Key::Enter,
-        Keycode::BACKSPACE => egui::Key::Backspace,
-        _ => egui::Key::IntlBackslash,
-    }
-}
-
-fn sdl2_mouse_button_to_egui_pointer_button(mouse_button: MouseButton) -> egui::PointerButton {
-    match mouse_button {
-        MouseButton::Left => egui::PointerButton::Primary,
-        MouseButton::Middle => egui::PointerButton::Middle,
-        MouseButton::Right => egui::PointerButton::Secondary,
-        _ => egui::PointerButton::Extra2,
-    }
-}
-
-fn sdl2_mod_to_egui_modifiers(mods: Mod) -> egui::Modifiers {
-    let mut modifiers = egui::Modifiers::default();
-    if mods.contains(Mod::LSHIFTMOD) || mods.contains(Mod::RSHIFTMOD) {
-        modifiers.shift = true;
-    }
-    modifiers
-}
-
 enum Indices {
     None,
     One((NativeBuffer, usize)),
@@ -685,6 +347,17 @@ impl Shape {
             Self { vertices, indices }
         }
     }
+}
+
+struct ExampleState {
+    pub sides: u16,
+    pub reset_polygon: bool,
+    pub shape: usize,
+    pub rotating: bool,
+    pub initial_rotation: Quat,
+    pub rotation: Quat,
+    pub rotation_delta: Quat,
+    pub should_quit: bool,
 }
 
 const VERTEX_SHADER_SOURCE: &str = r#"#version 150
