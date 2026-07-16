@@ -92,9 +92,22 @@ fn main() -> Result<(), ShapingError> {
             }
         }
 
+        let full_output = run_ui(&ctx, raw_input, &mut state);
+        let paint_jobs = ctx.tessellate(full_output.shapes, full_output.pixels_per_point);
+
+        if state.should_quit {
+            break 'render;
+        }
+
+        if state.reset_polygon {
+            shapes[0] = Shape::new(&gl, Polygon::new(state.sides).shape(config)?);
+            state.reset_polygon = false;
+        }
+
         if state.rotating {
             state.rotation *= state.rotation_delta;
         }
+
         let scale = Vec3::ONE * if state.shape == 0 {
             let angle = consts::TAU / state.sides as f32;
             f32::sin(angle) / f32::cos(0.5 * angle)
@@ -104,6 +117,7 @@ fn main() -> Result<(), ShapingError> {
         } else {
             1.0
         };
+
         let matrix = Mat4::from_scale_rotation_translation(scale, state.rotation.normalize(), Vec3::ZERO);
         set_uniform_matrix(
             &gl,
@@ -111,37 +125,10 @@ fn main() -> Result<(), ShapingError> {
             "transform",
             &matrix.to_cols_array(),
         );
-
-        let full_output = run_ui(&ctx, raw_input, &mut state);
-        let paint_jobs = ctx.tessellate(full_output.shapes, full_output.pixels_per_point);
-
-        if state.reset_polygon {
-            shapes[0] = Shape::new(&gl, Polygon::new(state.sides).shape(config)?);
-            state.reset_polygon = false;
-        }
-        if state.should_quit {
-            break 'render;
-        }
+        reset_gl_state(&gl);
 
         unsafe {
             gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
-
-            painter.paint_and_update_textures(
-                [WINDOW_WIDTH, WINDOW_HEIGHT],
-                full_output.pixels_per_point,
-                &paint_jobs,
-                &full_output.textures_delta,
-            );
-
-            gl.viewport(
-                LEFT_PANEL.into(),
-                0,
-                (WINDOW_WIDTH - LEFT_PANEL as u32).try_into().unwrap(),
-                (WINDOW_HEIGHT - TOP_PANEL as u32).try_into().unwrap(),
-            );
-            gl.enable(glow::DEPTH_TEST);
-            gl.enable(glow::CULL_FACE);
-            gl.use_program(Some(program));
             gl.bind_vertex_array(Some(shapes[state.shape].vertices.0));
             //gl.bind_buffer(glow::ARRAY_BUFFER, Some(shapes[shape].vertices.1));
             match &shapes[state.shape].indices.0 {
@@ -168,6 +155,13 @@ fn main() -> Result<(), ShapingError> {
                 },
             }
         }
+
+        painter.paint_and_update_textures(
+            [WINDOW_WIDTH, WINDOW_HEIGHT],
+            full_output.pixels_per_point,
+            &paint_jobs,
+            &full_output.textures_delta,
+        );
 
         window.gl_swap_window();
     }
@@ -307,11 +301,27 @@ fn create_index_buffer(gl: &glow::Context, indices: &[u8]) -> (NativeBuffer, usi
 fn set_uniform_matrix(gl: &glow::Context, program: NativeProgram, name: &str, matrix: &[f32]) {
     let uniform_location = unsafe { gl.get_uniform_location(program, name) };
     unsafe {
+        gl.use_program(Some(program));
         gl.uniform_matrix_4_f32_slice(
             uniform_location.as_ref(),
             false,
             matrix,
         );
+    }
+}
+
+/// resets the OpenGL state corrupted by `egui_glow`
+/// except installing the program object which is handled more cleanly in `set_uniform_matrix()`
+fn reset_gl_state(gl: &Context) {
+    unsafe {
+        gl.viewport(
+            LEFT_PANEL.into(),
+            0,
+            (WINDOW_WIDTH - LEFT_PANEL as u32).try_into().unwrap(),
+            (WINDOW_HEIGHT - TOP_PANEL as u32).try_into().unwrap(),
+        );
+        gl.enable(glow::DEPTH_TEST);
+        gl.enable(glow::CULL_FACE);
     }
 }
 
