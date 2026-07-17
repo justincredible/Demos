@@ -21,10 +21,11 @@ const TOP_PANEL: u16 = 100;
 
 fn main() -> Result<(), ShapingError> {
     // Create a context from a sdl2 window
-    let (gl, window, mut event_loop, _context) = create_sdl2_context();
+    let (window, mut event_loop, gl, context, ui_gl, ui_context) = create_sdl2_context();
     let ctx = egui::Context::default();
-    let gl = std::sync::Arc::new(gl);
-    let mut painter = egui_glow::Painter::new(gl.clone(), "", None, false).unwrap();
+    let ui_gl = std::sync::Arc::new(ui_gl);
+    let mut painter = egui_glow::Painter::new(ui_gl, "", None, false).unwrap();
+    window.gl_make_current(&context).unwrap();
 
     // Create a shader program from source
     let program = create_program(
@@ -36,7 +37,15 @@ fn main() -> Result<(), ShapingError> {
     unsafe { gl.use_program(Some(program)); }
 
     unsafe {
+        gl.viewport(
+            LEFT_PANEL.into(),
+            0,
+            (WINDOW_WIDTH - LEFT_PANEL as u32).try_into().unwrap(),
+            (WINDOW_HEIGHT - TOP_PANEL as u32).try_into().unwrap(),
+        );
         gl.clear_color(0., 0., 0., 1.);
+        gl.enable(glow::DEPTH_TEST);
+        gl.enable(glow::CULL_FACE);
         gl.cull_face(glow::BACK);
     }
 
@@ -125,7 +134,6 @@ fn main() -> Result<(), ShapingError> {
             "transform",
             &matrix.to_cols_array(),
         );
-        reset_gl_state(&gl);
 
         unsafe {
             gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
@@ -156,6 +164,7 @@ fn main() -> Result<(), ShapingError> {
             }
         }
 
+        window.gl_make_current(&ui_context).unwrap();
         painter.paint_and_update_textures(
             [WINDOW_WIDTH, WINDOW_HEIGHT],
             full_output.pixels_per_point,
@@ -164,6 +173,7 @@ fn main() -> Result<(), ShapingError> {
         );
 
         window.gl_swap_window();
+        window.gl_make_current(&context).unwrap();
     }
 
     painter.destroy();
@@ -191,9 +201,11 @@ fn main() -> Result<(), ShapingError> {
 }
 
 fn create_sdl2_context() -> (
-    glow::Context,
     sdl2::video::Window,
     sdl2::EventPump,
+    glow::Context,
+    sdl2::video::GLContext,
+    glow::Context,
     sdl2::video::GLContext,
 ) {
     let sdl = sdl2::init().unwrap();
@@ -209,11 +221,13 @@ fn create_sdl2_context() -> (
         .build()
         .unwrap();
     window.set_icon(Surface::from_file("res/icon.tga").unwrap());
-    let gl_context = window.gl_create_context().unwrap();
-    let gl = unsafe { glow::Context::from_loader_function(|s| video.gl_get_proc_address(s) as *const _) };
+    let gl_context1 = window.gl_create_context().unwrap();
+    let gl1 = unsafe { glow::Context::from_loader_function(|s| video.gl_get_proc_address(s) as *const _) };
+    let gl_context2 = window.gl_create_context().unwrap();
+    let gl2 = unsafe { glow::Context::from_loader_function(|s| video.gl_get_proc_address(s) as *const _) };
     let event_loop = sdl.event_pump().unwrap();
 
-    (gl, window, event_loop, gl_context)
+    (window, event_loop, gl1, gl_context1, gl2, gl_context2)
 }
 
 fn create_program(
@@ -301,27 +315,11 @@ fn create_index_buffer(gl: &glow::Context, indices: &[u8]) -> (NativeBuffer, usi
 fn set_uniform_matrix(gl: &glow::Context, program: NativeProgram, name: &str, matrix: &[f32]) {
     let uniform_location = unsafe { gl.get_uniform_location(program, name) };
     unsafe {
-        gl.use_program(Some(program));
         gl.uniform_matrix_4_f32_slice(
             uniform_location.as_ref(),
             false,
             matrix,
         );
-    }
-}
-
-/// resets the OpenGL state corrupted by `egui_glow`
-/// except installing the program object which is handled more cleanly in `set_uniform_matrix()`
-fn reset_gl_state(gl: &Context) {
-    unsafe {
-        gl.viewport(
-            LEFT_PANEL.into(),
-            0,
-            (WINDOW_WIDTH - LEFT_PANEL as u32).try_into().unwrap(),
-            (WINDOW_HEIGHT - TOP_PANEL as u32).try_into().unwrap(),
-        );
-        gl.enable(glow::DEPTH_TEST);
-        gl.enable(glow::CULL_FACE);
     }
 }
 
