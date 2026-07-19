@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        path: ["glium_app", "shapes", "simple_targa", "text"]
+        path: ["glium_app", "simple_targa", "text"]
     steps:
     - uses: actions/checkout@v4
     - name: Build
